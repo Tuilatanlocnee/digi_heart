@@ -114,6 +114,55 @@ export const authAPI = {
 // 2. BIỂU MẪU ĐĂNG KÝ THÀNH VIÊN (CANDIDATES API)
 // ==========================================
 export const candidateAPI = {
+  // Lấy thông tin hồ sơ cá nhân của chính mình
+  getProfile: async () => {
+    try {
+      const response = await api.get('/candidates/profile');
+      return response.data;
+    } catch (error) {
+      if (isNetworkError(error)) {
+        console.warn('⚠️ Backend offline. Đang tạo dữ liệu profile giả lập từ localStorage.');
+        const userStr = localStorage.getItem('digiheart_admin_user');
+        if (userStr) {
+          const user = JSON.parse(userStr);
+          return {
+            fullName: user.fullName || 'Thành viên Demo',
+            phone: user.username,
+            email: `${user.username}@mobifone.vn`,
+            department: 'Phòng ban CLB',
+            targetBan: user.role === 'admin' ? 'Ban Quản trị' : 'Ban chuyên môn',
+            skills: 'Công nghệ thông tin, Thiết kế Canva',
+            reason: 'Tài khoản offline fallback.',
+            status: 'Đã duyệt'
+          };
+        }
+      }
+      throw error;
+    }
+  },
+
+  // Cập nhật thông tin hồ sơ cá nhân (ví dụ cập nhật avatar)
+  updateProfile: async (profileData) => {
+    try {
+      const response = await api.put('/candidates/profile', profileData);
+      return response.data;
+    } catch (error) {
+      if (isNetworkError(error)) {
+        console.warn('⚠️ Backend offline. Đang giả lập cập nhật profile qua localStorage.');
+        const userStr = localStorage.getItem('digiheart_admin_user');
+        if (userStr) {
+          const user = JSON.parse(userStr);
+          if (profileData.avatar !== undefined) {
+            user.avatar = profileData.avatar;
+            localStorage.setItem('digiheart_admin_user', JSON.stringify(user));
+          }
+        }
+        return { message: 'Cập nhật thành công (Mô phỏng offline)!', avatar: profileData.avatar };
+      }
+      throw new Error(error.response?.data?.message || 'Lỗi cập nhật hồ sơ cá nhân!');
+    }
+  },
+
   // Lấy danh sách ứng viên
   getAll: async () => {
     try {

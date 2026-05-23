@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { FiUserCheck, FiCpu, FiMessageSquare, FiCompass, FiAward } from 'react-icons/fi';
 import { candidateAPI } from '../utils/api';
 
@@ -9,6 +10,7 @@ import { candidateAPI } from '../utils/api';
 export default function JoinUs() {
   // Trạng thái lưu trữ danh sách các thành viên đăng ký ứng tuyển
   const [candidates, setCandidates] = useState([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   
   // Trạng thái cho biểu mẫu nhập liệu
   const [formData, setFormData] = useState({
@@ -35,6 +37,10 @@ export default function JoinUs() {
   };
 
   useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
+    const token = localStorage.getItem('digiheart_admin_token');
+    setIsLoggedIn(!!token);
+    /* eslint-enable react-hooks/set-state-in-effect */
     fetchCandidates();
   }, []);
 
@@ -108,9 +114,34 @@ export default function JoinUs() {
   return (
     <div className="bg-gray-50 text-gray-800 min-h-screen py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Tiêu đề */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
+        {isLoggedIn ? (
+          <div className="max-w-2xl mx-auto bg-white border border-gray-250 p-8 rounded-3xl shadow-xl text-center space-y-6 animate-fadeIn">
+            <div className="w-16 h-16 bg-blue-50 text-[#0054A6] rounded-full border border-blue-100 flex items-center justify-center mx-auto text-3xl font-black shadow-sm">
+              ✓
+            </div>
+            <h1 className="text-2xl font-black text-gray-800">Bạn Đã Gia Nhập CLB</h1>
+            <p className="text-gray-500 text-sm leading-relaxed font-medium">
+              Tài khoản của bạn đã được xác thực tư cách thành viên câu lạc bộ Digi Heart. Không cần thực hiện lại biểu mẫu đăng ký gia nhập.
+            </p>
+            <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-center">
+              <Link
+                to="/profile"
+                className="px-6 py-3 bg-[#0054A6] hover:bg-[#003d80] text-white font-bold rounded-xl shadow-md transition-colors"
+              >
+                Xem trang cá nhân
+              </Link>
+              <Link
+                to="/fanpage"
+                className="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition-colors"
+              >
+                Ghé thăm Fanpage
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Tiêu đề */}
+            <div className="text-center max-w-3xl mx-auto mb-16 font-semibold">
           <h1 className="text-2xl sm:text-3xl md:text-5xl font-black mb-4 text-gray-800">
             Đăng Ký <span className="text-[#0054A6]">Gia Nhập CLB</span>
           </h1>
@@ -312,7 +343,8 @@ export default function JoinUs() {
             </table>
           </div>
         </div>
-
+          </>
+        )}
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ import { authAPI } from '../utils/api';
 /**
  * Component Navbar - Thanh điều hướng chính của trang web (Light Mode).
  * Hỗ trợ nhận diện phiên đăng nhập của Admin & Thành viên để hiển thị menu tương ứng và đổi mật khẩu.
+ * Đặc biệt: Di chuột (hover) vào tên thành viên sẽ hiện Profile Hover Card dạng Facebook đầy đủ thông tin & bài viết đã đăng.
  */
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -26,6 +27,7 @@ export default function Navbar() {
 
   // Kiểm tra trạng thái đăng nhập khi URL thay đổi
   useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
     const token = localStorage.getItem('digiheart_admin_token');
     const userStr = localStorage.getItem('digiheart_admin_user');
     if (token && userStr) {
@@ -34,7 +36,7 @@ export default function Navbar() {
         const parsedUser = JSON.parse(userStr);
         setUser(parsedUser);
         setIsAdmin(parsedUser.role === 'admin' || parsedUser.role === 'superadmin');
-      } catch (e) {
+      } catch {
         setIsLoggedIn(false);
         setUser(null);
         setIsAdmin(false);
@@ -44,6 +46,7 @@ export default function Navbar() {
       setUser(null);
       setIsAdmin(false);
     }
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [location]);
 
   // Xử lý khi nhấn Đăng xuất
@@ -99,6 +102,11 @@ export default function Navbar() {
     { name: 'Liên hệ', path: '/contact' },
   ];
 
+  // Ẩn tab "Góc thành viên" nếu đã đăng nhập thành công
+  const filteredNavLinks = isLoggedIn 
+    ? navLinks.filter(link => link.path !== '/join-us')
+    : navLinks;
+
   return (
     <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-200/80 text-gray-800 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -122,7 +130,7 @@ export default function Navbar() {
 
           {/* Menu điều hướng dành cho Desktop (Light Mode) */}
           <div className="hidden md:flex items-center space-x-1">
-            {navLinks.map((link) => (
+            {filteredNavLinks.map((link) => (
               <NavLink
                 key={link.path}
                 to={link.path}
@@ -157,11 +165,16 @@ export default function Navbar() {
                   </NavLink>
                 )}
 
-                {/* Tên hiển thị người dùng */}
-                <div className="flex items-center space-x-1 px-2.5 py-1.5 bg-gray-50 rounded-lg text-xs font-bold text-gray-700 max-w-[150px] truncate" title={user?.fullName}>
-                  <FiUser className="w-3 h-3 text-[#0054A6]" />
+                {/* Tên hiển thị người dùng dẫn đến trang Profile */}
+                <Link
+                  to="/profile"
+                  className="flex items-center space-x-1 px-2.5 py-1.5 bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-100 rounded-lg text-xs font-bold text-gray-700 max-w-[150px] truncate transition-all"
+                  title="Xem hồ sơ cá nhân"
+                >
+                  <FiUser className="w-3.5 h-3.5 text-[#0054A6]" />
                   <span>{user?.fullName || user?.username}</span>
-                </div>
+                </Link>
+
 
                 {/* Nút Đổi mật khẩu */}
                 <button
@@ -217,7 +230,7 @@ export default function Navbar() {
       {isOpen && (
         <div className="md:hidden bg-white border-t border-gray-100 shadow-lg border-b border-gray-200/80 animate-fadeIn">
           <div className="px-3 pt-2 pb-4 space-y-1">
-            {navLinks.map((link) => (
+            {filteredNavLinks.map((link) => (
               <NavLink
                 key={link.path}
                 to={link.path}
@@ -238,13 +251,17 @@ export default function Navbar() {
             <div className="pt-2 border-t border-gray-100 mt-2">
               {isLoggedIn ? (
                 <div className="space-y-1.5">
-                  <div className="px-3 py-2 rounded-xl text-sm font-bold text-gray-700 bg-gray-50 flex items-center space-x-2">
+                  <Link
+                    to="/profile"
+                    onClick={() => setIsOpen(false)}
+                    className="px-3 py-2.5 rounded-xl text-sm font-bold text-[#0054A6] hover:text-[#003d80] bg-gray-50 hover:bg-blue-50/50 flex items-center space-x-2 transition-all border border-gray-150"
+                  >
                     <FiUser className="text-[#0054A6] w-4 h-4" />
-                    <span>{user?.fullName || user?.username}</span>
+                    <span className="font-extrabold">{user?.fullName || user?.username}</span>
                     <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-100 text-[#0054A6]">
                       {user?.role === 'admin' || user?.role === 'superadmin' ? 'Q.Trị' : 'T.Viên'}
                     </span>
-                  </div>
+                  </Link>
 
                   {isAdmin && (
                     <NavLink

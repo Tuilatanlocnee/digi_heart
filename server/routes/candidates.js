@@ -16,6 +16,61 @@ router.get('/', authMiddleware, async (req, res) => {
   }
 });
 
+// 1.5 API Lấy thông tin hồ sơ cá nhân của người dùng đang đăng nhập
+router.get('/profile', authMiddleware, async (req, res) => {
+  try {
+    const candidate = await Candidate.findOne({ phone: req.user.username });
+    
+    if (!candidate) {
+      // Nếu là admin, trả về thông tin mặc định để tránh lỗi 404
+      if (req.user.role === 'admin' || req.user.role === 'superadmin') {
+        const adminUser = await User.findById(req.user.id);
+        return res.json({
+          fullName: req.user.fullName || 'Ban Quản Trị CLB',
+          email: 'admin.cantho@mobifone.vn',
+          phone: req.user.username,
+          department: 'Văn phòng Đoàn',
+          targetBan: 'Ban Quản trị',
+          skills: 'Lãnh đạo, quản lý hệ thống, số hóa quy trình',
+          reason: 'Tài khoản điều hành tối cao của CLB Chuyển đổi số.',
+          status: 'Đã duyệt',
+          avatar: adminUser?.avatar || ''
+        });
+      }
+      return res.status(404).json({ message: 'Không tìm thấy hồ sơ cá nhân.' });
+    }
+    
+    res.json(candidate);
+  } catch (error) {
+    res.status(500).json({ message: 'Lỗi lấy thông tin hồ sơ cá nhân!', error: error.message });
+  }
+});
+
+// 1.6 API Cập nhật avatar của người dùng đang đăng nhập
+router.put('/profile', authMiddleware, async (req, res) => {
+  const { avatar } = req.body;
+
+  try {
+    const candidate = await Candidate.findOne({ phone: req.user.username });
+    
+    if (candidate) {
+      candidate.avatar = avatar;
+      await candidate.save();
+    }
+    
+    // Đồng thời cập nhật trong model User
+    const user = await User.findById(req.user.id);
+    if (user) {
+      user.avatar = avatar;
+      await user.save();
+    }
+
+    res.json({ message: 'Cập nhật ảnh đại diện thành công!', avatar });
+  } catch (error) {
+    res.status(500).json({ message: 'Lỗi cập nhật ảnh đại diện!', error: error.message });
+  }
+});
+
 // 2. API Đăng ký gia nhập CLB mới (Công khai cho tất cả người dùng)
 router.post('/', async (req, res) => {
   const { fullName, email, phone, department, targetBan, skills, reason } = req.body;

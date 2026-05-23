@@ -7,6 +7,7 @@ import Projects from './views/Projects';
 import Fanpage from './views/Fanpage';
 import JoinUs from './views/JoinUs';
 import Contact from './views/Contact';
+import Profile from './views/Profile';
 import AdminLogin from './views/AdminLogin';
 import AdminDashboard from './views/AdminDashboard';
 
@@ -31,6 +32,7 @@ function App() {
             <Route path="/fanpage" element={<Fanpage />} />
             <Route path="/join-us" element={<JoinUs />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/profile" element={<Profile />} />
             
             {/* Phân hệ quản trị Admin */}
             <Route path="/admin/login" element={<AdminLogin />} />

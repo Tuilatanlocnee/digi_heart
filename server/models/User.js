@@ -20,6 +20,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: 'member',
     enum: ['admin', 'superadmin', 'member']
+  },
+  avatar: {
+    type: String,
+    default: ''
   }
 }, {
   timestamps: true // Tự động thêm createdAt và updatedAt

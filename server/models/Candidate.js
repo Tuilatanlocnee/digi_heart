@@ -40,6 +40,10 @@ const candidateSchema = new mongoose.Schema({
     default: 'Chờ duyệt',
     enum: ['Chờ duyệt', 'Đã duyệt', 'Từ chối']
   },
+  avatar: {
+    type: String,
+    default: ''
+  },
   date: {
     type: String,
     default: () => new Date().toISOString().split('T')[0]
