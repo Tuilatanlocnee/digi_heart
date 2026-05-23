@@ -428,6 +428,46 @@ export const postAPI = {
     }
   },
 
+  // Lấy danh sách chi tiết người thích bài viết
+  getLikes: async (id) => {
+    try {
+      const response = await api.get(`/posts/${id}/likes`);
+      return response.data;
+    } catch (error) {
+      if (isNetworkError(error)) {
+        const local = localStorage.getItem('digiheart_posts');
+        if (local) {
+          const list = JSON.parse(local);
+          const post = list.find(p => p.id === id || p._id === id);
+          if (post && post.likedBy) {
+            return post.likedBy.map(item => {
+              if (item.startsWith('user_')) {
+                const username = item.replace('user_', '');
+                return {
+                  username,
+                  fullName: username === 'admin' ? 'Ban Quản Trị CLB' : `Thành viên (${username})`,
+                  avatar: '',
+                  role: 'member',
+                  type: 'user'
+                };
+              } else {
+                return {
+                  username: item,
+                  fullName: 'Khách ẩn danh',
+                  avatar: '',
+                  role: 'guest',
+                  type: 'guest'
+                };
+              }
+            });
+          }
+        }
+        return [];
+      }
+      throw error;
+    }
+  },
+
   // Bình luận bài viết
   comment: async (id, commentData) => {
     try {
@@ -452,6 +492,34 @@ export const postAPI = {
           });
           localStorage.setItem('digiheart_posts', JSON.stringify(updated));
           return { message: 'Bình luận cục bộ thành công!' };
+        }
+      }
+      throw error;
+    }
+  },
+
+  // Chỉnh sửa bài viết
+  update: async (id, postData) => {
+    try {
+      const response = await api.put(`/posts/${id}`, postData);
+      return response.data;
+    } catch (error) {
+      if (isNetworkError(error)) {
+        const local = localStorage.getItem('digiheart_posts');
+        if (local) {
+          const list = JSON.parse(local);
+          const updated = list.map(post => {
+            if (post.id === id || post._id === id) {
+              return { 
+                ...post, 
+                content: postData.content, 
+                image: postData.image !== undefined ? postData.image : post.image 
+              };
+            }
+            return post;
+          });
+          localStorage.setItem('digiheart_posts', JSON.stringify(updated));
+          return { message: 'Chỉnh sửa bài viết cục bộ thành công!' };
         }
       }
       throw error;

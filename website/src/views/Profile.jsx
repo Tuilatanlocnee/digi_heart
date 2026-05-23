@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { FiUser, FiMapPin, FiMail, FiPhone, FiTag, FiThumbsUp, FiMessageSquare, FiClock, FiArrowLeft, FiLogOut, FiEdit, FiX } from 'react-icons/fi';
+import { FiUser, FiMapPin, FiMail, FiPhone, FiTag, FiThumbsUp, FiMessageSquare, FiClock, FiArrowLeft, FiLogOut, FiEdit, FiX, FiPlusCircle, FiMoreHorizontal } from 'react-icons/fi';
 import { candidateAPI, postAPI } from '../utils/api';
 
 /**
@@ -17,6 +17,26 @@ export default function Profile() {
   const [profile, setProfile] = useState(null);
   const [myPosts, setMyPosts] = useState([]);
   const [stats, setStats] = useState({ totalPosts: 0, totalLikes: 0 });
+  
+  // Trạng thái cho danh sách người thích bài viết
+  const [showLikesModal, setShowLikesModal] = useState(false);
+  const [likersList, setLikersList] = useState([]);
+  const [loadingLikers, setLoadingLikers] = useState(false);
+
+  // Trạng thái cho việc chỉnh sửa thông tin cá nhân
+  const [showEditProfileModal, setShowEditProfileModal] = useState(false);
+  const [editProfileData, setEditProfileData] = useState({ fullName: '', email: '', department: '', targetBan: '', skills: '', reason: '' });
+  const [savingProfile, setSavingProfile] = useState(false);
+
+  // Trạng thái cho việc chỉnh sửa bài viết
+  const [showEditPostModal, setShowEditPostModal] = useState(false);
+  const [editingPostId, setEditingPostId] = useState(null);
+  const [editPostText, setEditPostText] = useState('');
+  const [editPostImage, setEditPostImage] = useState('');
+  const [savingPost, setSavingPost] = useState(false);
+
+  // Trạng thái dropdown menu của bài viết
+  const [activeDropdownPostId, setActiveDropdownPostId] = useState(null);
 
   // Hàm tải dữ liệu hồ sơ từ API và danh sách bài viết cá nhân
   const loadProfileAndPosts = async (currentUser) => {
@@ -73,12 +93,138 @@ export default function Profile() {
     /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
 
+  // Tự động đóng dropdown menu khi click ra ngoài
+  useEffect(() => {
+    const handleOutsideClick = () => {
+      setActiveDropdownPostId(null);
+    };
+    window.addEventListener('click', handleOutsideClick);
+    return () => {
+      window.removeEventListener('click', handleOutsideClick);
+    };
+  }, []);
+
   // Hàm xử lý Đăng xuất
   const handleLogout = () => {
     localStorage.removeItem('digiheart_admin_token');
     localStorage.removeItem('digiheart_admin_user');
     navigate('/');
     window.location.reload(); // Reload để đồng bộ lại trạng thái Navbar
+  };
+
+  // Xử lý mở Modal xem danh sách người thích bài viết
+  const handleOpenLikesModal = async (postId) => {
+    setShowLikesModal(true);
+    setLoadingLikers(true);
+    setLikersList([]);
+    try {
+      const data = await postAPI.getLikes(postId);
+      setLikersList(data || []);
+    } catch (error) {
+      console.error('Không tải được danh sách người thích:', error);
+    } finally {
+      setLoadingLikers(false);
+    }
+  };
+
+  // Mở Modal Chỉnh sửa thông tin cá nhân
+  const handleOpenEditProfile = () => {
+    setEditProfileData({
+      fullName: profile?.fullName || user?.fullName || '',
+      email: profile?.email || '',
+      department: profile?.department || '',
+      targetBan: profile?.targetBan || 'Ban Kỹ thuật Số',
+      skills: profile?.skills || '',
+      reason: profile?.reason || ''
+    });
+    setShowEditProfileModal(true);
+  };
+
+  // Gửi cập nhật thông tin cá nhân
+  const handleUpdateProfile = async (e) => {
+    e.preventDefault();
+    setSavingProfile(true);
+    try {
+      await candidateAPI.updateProfile(editProfileData);
+      setProfile({
+        ...profile,
+        ...editProfileData
+      });
+      if (user) {
+        const updatedUser = {
+          ...user,
+          fullName: editProfileData.fullName
+        };
+        setUser(updatedUser);
+        localStorage.setItem('digiheart_admin_user', JSON.stringify(updatedUser));
+      }
+      alert('Cập nhật thông tin hồ sơ cá nhân thành công!');
+      setShowEditProfileModal(false);
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+      alert(err.message || 'Lỗi khi cập nhật hồ sơ cá nhân.');
+    } finally {
+      setSavingProfile(false);
+    }
+  };
+
+  // Mở Modal chỉnh sửa bài viết
+  const handleOpenEditPost = (post) => {
+    setEditingPostId(post._id || post.id);
+    setEditPostText(post.content);
+    setEditPostImage(post.image || '');
+    setShowEditPostModal(true);
+  };
+
+  // Chọn ảnh cho bài viết chỉnh sửa
+  const handleEditPostImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Kích thước ảnh quá lớn! Vui lòng chọn ảnh nhỏ hơn 5MB.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setEditPostImage(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Gửi cập nhật bài viết
+  const handleUpdatePost = async (e) => {
+    e.preventDefault();
+    if (!editPostText.trim()) return;
+    setSavingPost(true);
+    try {
+      await postAPI.update(editingPostId, {
+        content: editPostText,
+        image: editPostImage || null
+      });
+      alert('Đã cập nhật bài viết thành công!');
+      setShowEditPostModal(false);
+      loadProfileAndPosts(user);
+    } catch (err) {
+      console.error(err);
+      alert(err.message || 'Lỗi khi cập nhật bài viết.');
+    } finally {
+      setSavingPost(false);
+    }
+  };
+
+  // Xóa bài viết
+  const handleDeletePost = async (postId) => {
+    if (!confirm('Bạn có chắc chắn muốn xóa bài viết này không?')) return;
+    try {
+      await postAPI.delete(postId);
+      alert('Đã xóa bài viết thành công!');
+      loadProfileAndPosts(user);
+    } catch (err) {
+      console.error(err);
+      alert(err.message || 'Lỗi khi xóa bài viết.');
+    }
   };
 
   // Xử lý tải và cập nhật ảnh đại diện (avatar) của thành viên
@@ -287,10 +433,19 @@ export default function Profile() {
           {/* 📌 Cột Trái: Thông tin cá nhân chi tiết */}
           <div className="space-y-6">
             <div className="bg-white border border-gray-200/80 rounded-3xl p-6 shadow-sm">
-              <h3 className="text-base font-extrabold text-gray-800 pb-3 border-b border-gray-150 mb-4 flex items-center space-x-2">
-                <FiUser className="text-[#0054A6] w-4 h-4" />
-                <span>Thông tin cá nhân</span>
-              </h3>
+              <div className="flex items-center justify-between pb-3 border-b border-gray-150 mb-4">
+                <h3 className="text-base font-extrabold text-gray-800 flex items-center space-x-2">
+                  <FiUser className="text-[#0054A6] w-4 h-4" />
+                  <span>Thông tin cá nhân</span>
+                </h3>
+                <button
+                  onClick={handleOpenEditProfile}
+                  className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-500 hover:text-[#0054A6] transition-colors"
+                  title="Chỉnh sửa hồ sơ"
+                >
+                  <FiEdit className="w-4 h-4" />
+                </button>
+              </div>
               
               <div className="space-y-4 text-sm text-gray-600">
                 {profile?.department && (
@@ -388,26 +543,29 @@ export default function Profile() {
 
               <div className="space-y-6">
                 {myPosts.length === 0 ? (
-                  <div className="text-center py-12 text-gray-400 italic space-y-2">
-                    <p className="text-sm">Bạn chưa đăng tải bài viết nào trên trang Fanpage.</p>
-                    <Link to="/fanpage" className="text-xs text-[#0054A6] hover:underline font-bold inline-block mt-2">
-                      Chia sẻ bài viết đầu tiên ngay &rarr;
-                    </Link>
+                  <div className="text-center py-8 text-gray-400 text-xs font-semibold">
+                    Chưa có bài đăng nào trên dòng thời gian.
                   </div>
                 ) : (
                   myPosts.map((post) => {
                     const postId = post._id || post.id;
+                    const avatarLetter = (post.author || 'U').charAt(0).toUpperCase();
                     return (
-                      <div 
-                        key={postId} 
-                        className="p-5 bg-gray-50 border border-gray-200 rounded-2xl space-y-4 hover:border-blue-100 transition-all"
-                      >
-                        {/* Header bài viết */}
+                      <div key={postId} className="border border-gray-150 rounded-2xl p-4 space-y-4 hover:shadow-md transition-shadow bg-white">
+                        {/* Header bài đăng */}
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-3">
-                            <div className="w-9 h-9 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center font-bold text-sm text-[#0054A6]">
-                              {avatarLetter}
-                            </div>
+                            {profile?.avatar || user?.avatar ? (
+                              <img
+                                src={profile?.avatar || user?.avatar}
+                                alt={post.author}
+                                className="w-9 h-9 rounded-full object-cover border border-blue-200"
+                              />
+                            ) : (
+                              <div className="w-9 h-9 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center font-bold text-sm text-[#0054A6]">
+                                {avatarLetter}
+                              </div>
+                            )}
                             <div>
                               <h4 className="font-bold text-sm text-gray-800">{post.author}</h4>
                               <div className="text-[10px] text-gray-400 flex items-center space-x-1 mt-0.5">
@@ -416,18 +574,75 @@ export default function Profile() {
                               </div>
                             </div>
                           </div>
+                          
+                          {/* Dropdown tác vụ 3 chấm */}
+                          <div className="relative">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setActiveDropdownPostId(activeDropdownPostId === postId ? null : postId);
+                              }}
+                              className="p-1.5 hover:bg-gray-100 rounded-full text-gray-500 hover:text-gray-800 transition-all"
+                              title="Tác vụ bài viết"
+                            >
+                              <FiMoreHorizontal className="w-5 h-5" />
+                            </button>
+
+                            {activeDropdownPostId === postId && (
+                              <div className="absolute right-0 mt-1 w-32 bg-white border border-gray-200 rounded-xl shadow-lg py-1 z-20">
+                                <button
+                                  onClick={() => {
+                                    setActiveDropdownPostId(null);
+                                    handleOpenEditPost(post);
+                                  }}
+                                  className="w-full px-3.5 py-2 text-left text-xs text-gray-700 hover:bg-gray-50 hover:text-[#0054A6] font-semibold flex items-center space-x-1.5 transition-colors"
+                                >
+                                  <FiEdit className="w-3.5 h-3.5" />
+                                  <span>Chỉnh sửa</span>
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setActiveDropdownPostId(null);
+                                    handleDeletePost(postId);
+                                  }}
+                                  className="w-full px-3.5 py-2 text-left text-xs text-red-600 hover:bg-red-50 font-semibold flex items-center space-x-1.5 transition-colors"
+                                >
+                                  <FiX className="w-3.5 h-3.5" />
+                                  <span>Xóa bài</span>
+                                </button>
+                              </div>
+                            )}
+                          </div>
                         </div>
 
                         {/* Nội dung bài viết */}
                         <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">{post.content}</p>
 
+                        {/* Hình ảnh đính kèm */}
+                        {post.image && (
+                          <div className="overflow-hidden rounded-xl border border-gray-100 max-h-[500px] flex justify-center bg-gray-50/50">
+                            <img
+                              src={post.image}
+                              alt="Đính kèm bài đăng"
+                              className="max-h-[500px] w-auto object-contain"
+                            />
+                          </div>
+                        )}
+
                         {/* Tương tác */}
                         <div className="flex items-center justify-between pt-3 border-t border-gray-200/60 text-xs text-gray-500 font-medium">
-                          <div className="flex items-center space-x-1.5 hover:text-[#0054A6] transition-colors cursor-pointer">
+                          <button
+                            onClick={() => {
+                              if (post.likes > 0) handleOpenLikesModal(postId);
+                            }}
+                            className={`flex items-center space-x-1.5 transition-colors ${
+                              post.likes > 0 ? 'hover:underline hover:text-[#0054A6] cursor-pointer' : 'cursor-default'
+                            }`}
+                          >
                             <FiThumbsUp className="w-4 h-4 text-[#0054A6]" />
                             <span>{post.likes || 0} Lượt thích</span>
-                          </div>
-                          <div className="flex items-center space-x-1.5 hover:text-[#0054A6] transition-colors cursor-pointer">
+                          </button>
+                          <div className="flex items-center space-x-1.5 text-gray-500">
                             <FiMessageSquare className="w-4 h-4" />
                             <span>{post.comments?.length || 0} Bình luận</span>
                           </div>
@@ -443,6 +658,248 @@ export default function Profile() {
 
         </div>
       </div>
+
+      {/* Modal Chỉnh sửa thông tin cá nhân */}
+      {showEditProfileModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-lg rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+            <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+              <h3 className="font-bold text-gray-800 text-sm">Chỉnh sửa hồ sơ cá nhân</h3>
+              <button
+                onClick={() => setShowEditProfileModal(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors w-7 h-7 rounded-full bg-gray-50 flex items-center justify-center font-bold text-xs"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdateProfile} className="p-5 space-y-4 max-h-[450px] overflow-y-auto">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Họ và tên *</label>
+                  <input
+                    type="text"
+                    required
+                    value={editProfileData.fullName}
+                    onChange={(e) => setEditProfileData({ ...editProfileData, fullName: e.target.value })}
+                    className="w-full bg-white border border-gray-250 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#0054A6] text-gray-800"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Địa chỉ Email *</label>
+                  <input
+                    type="email"
+                    required
+                    value={editProfileData.email}
+                    onChange={(e) => setEditProfileData({ ...editProfileData, email: e.target.value })}
+                    className="w-full bg-white border border-gray-250 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#0054A6] text-gray-800"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Đơn vị công tác</label>
+                  <input
+                    type="text"
+                    value={editProfileData.department}
+                    onChange={(e) => setEditProfileData({ ...editProfileData, department: e.target.value })}
+                    className="w-full bg-white border border-gray-250 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#0054A6] text-gray-800"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Ban hoạt động</label>
+                  <select
+                    value={editProfileData.targetBan}
+                    onChange={(e) => setEditProfileData({ ...editProfileData, targetBan: e.target.value })}
+                    className="w-full bg-white border border-gray-250 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#0054A6] text-gray-800"
+                  >
+                    <option value="Ban Kỹ thuật Số">Ban Kỹ thuật Số</option>
+                    <option value="Ban Truyền thông Số">Ban Truyền thông Số</option>
+                    <option value="Ban Sự kiện & Phong trào">Ban Sự kiện & Phong trào</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Kỹ năng (phân tách bằng dấu phẩy)</label>
+                <input
+                  type="text"
+                  placeholder="Ví dụ: Excel nâng cao, Thiết kế Canva, MC"
+                  value={editProfileData.skills}
+                  onChange={(e) => setEditProfileData({ ...editProfileData, skills: e.target.value })}
+                  className="w-full bg-white border border-gray-250 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#0054A6] text-gray-800"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Mục tiêu tham gia</label>
+                <textarea
+                  rows="3"
+                  value={editProfileData.reason}
+                  onChange={(e) => setEditProfileData({ ...editProfileData, reason: e.target.value })}
+                  className="w-full bg-white border border-gray-250 rounded-xl p-3 text-xs focus:outline-none focus:border-[#0054A6] text-gray-800 resize-none"
+                />
+              </div>
+
+              <div className="pt-2 flex justify-end space-x-3">
+                <button
+                  type="button"
+                  onClick={() => setShowEditProfileModal(false)}
+                  className="px-4 py-2 border border-gray-250 text-gray-650 hover:bg-gray-50 rounded-xl text-xs font-bold transition-colors"
+                >
+                  Hủy bỏ
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingProfile}
+                  className="px-4 py-2 bg-[#0054A6] hover:bg-[#003d80] text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center space-x-1"
+                >
+                  {savingProfile ? 'Đang lưu...' : 'Lưu thay đổi'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Chỉnh sửa bài viết */}
+      {showEditPostModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+            <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+              <h3 className="font-bold text-gray-800 text-sm">Chỉnh sửa bài viết</h3>
+              <button
+                onClick={() => setShowEditPostModal(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors w-7 h-7 rounded-full bg-gray-50 flex items-center justify-center font-bold text-xs"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdatePost} className="p-5 space-y-4">
+              <div>
+                <textarea
+                  required
+                  rows="3"
+                  value={editPostText}
+                  onChange={(e) => setEditPostText(e.target.value)}
+                  className="w-full bg-white border border-gray-250 rounded-xl p-3 text-xs focus:outline-none focus:border-[#0054A6] text-gray-800 placeholder-gray-400 resize-none shadow-inner"
+                />
+              </div>
+
+              {/* Preview hình ảnh */}
+              {editPostImage && (
+                <div className="relative inline-block border border-gray-200 rounded-xl p-1 bg-gray-50 shadow-sm max-w-[150px]">
+                  <img
+                    src={editPostImage}
+                    alt="Preview chỉnh sửa"
+                    className="max-h-20 w-auto rounded-lg object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setEditPostImage('')}
+                    className="absolute -top-1.5 -right-1.5 bg-red-500 hover:bg-red-600 text-white rounded-full w-4.5 h-4.5 flex items-center justify-center text-[10px] font-bold shadow-md transition-colors"
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
+
+              <div className="flex items-center gap-3">
+                <input
+                  type="file"
+                  id="edit-post-image-upload"
+                  accept="image/*"
+                  onChange={handleEditPostImageChange}
+                  className="hidden"
+                />
+                <label
+                  htmlFor="edit-post-image-upload"
+                  className="flex-grow flex items-center justify-center space-x-1.5 px-3 py-2 border border-dashed border-gray-300 hover:border-[#0054A6] hover:bg-blue-50/20 rounded-xl text-xs text-gray-550 font-semibold cursor-pointer transition-all duration-200 bg-gray-50/50"
+                >
+                  <FiPlusCircle className="w-3.5 h-3.5 text-gray-400" />
+                  <span>{editPostImage ? 'Chọn ảnh khác' : 'Chọn ảnh đính kèm'}</span>
+                </label>
+              </div>
+
+              <div className="pt-2 flex justify-end space-x-3">
+                <button
+                  type="button"
+                  onClick={() => setShowEditPostModal(false)}
+                  className="px-4 py-2 border border-gray-250 text-gray-650 hover:bg-gray-50 rounded-xl text-xs font-bold transition-colors"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingPost}
+                  className="px-4 py-2 bg-[#0054A6] hover:bg-[#003d80] text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center space-x-1"
+                >
+                  {savingPost ? 'Đang lưu...' : 'Lưu lại'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal hiển thị danh sách người thích bài viết */}
+      {showLikesModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-sm rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+            <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+              <h3 className="font-bold text-gray-800 text-sm">Người đã thích bài viết</h3>
+              <button
+                onClick={() => setShowLikesModal(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors w-7 h-7 rounded-full bg-gray-50 flex items-center justify-center font-bold text-xs"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="px-5 py-3 max-h-[300px] overflow-y-auto space-y-2">
+              {loadingLikers ? (
+                <div className="flex items-center justify-center py-6">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#0054A6]"></div>
+                </div>
+              ) : likersList.length === 0 ? (
+                <p className="text-center text-gray-400 py-6 text-xs">Chưa có lượt thích nào.</p>
+              ) : (
+                likersList.map((liker, idx) => (
+                  <div key={idx} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-xl transition-colors">
+                    <div className="flex items-center space-x-2.5">
+                      {liker.avatar ? (
+                        <img
+                          src={liker.avatar}
+                          alt={liker.fullName}
+                          className="w-8 h-8 rounded-full object-cover border border-gray-200"
+                        />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold text-xs shadow-sm">
+                          {liker.fullName.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      <div>
+                        <h5 className="font-bold text-xs text-gray-800">{liker.fullName}</h5>
+                        {liker.type === 'user' ? (
+                          <span className="text-[9px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded-full font-semibold">
+                            {liker.role === 'admin' || liker.role === 'superadmin' ? 'Ban Quản Trị' : 'Thành viên'}
+                          </span>
+                        ) : (
+                          <span className="text-[9px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded-full font-semibold">
+                            Khách
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

@@ -2,6 +2,7 @@ import express from 'express';
 import bcrypt from 'bcryptjs';
 import Candidate from '../models/Candidate.js';
 import User from '../models/User.js';
+import Post from '../models/Post.js';
 import authMiddleware from '../middleware/auth.js';
 
 const router = express.Router();
@@ -22,22 +23,19 @@ router.get('/profile', authMiddleware, async (req, res) => {
     const candidate = await Candidate.findOne({ phone: req.user.username });
     
     if (!candidate) {
-      // Nếu là admin, trả về thông tin mặc định để tránh lỗi 404
-      if (req.user.role === 'admin' || req.user.role === 'superadmin') {
-        const adminUser = await User.findById(req.user.id);
-        return res.json({
-          fullName: req.user.fullName || 'Ban Quản Trị CLB',
-          email: 'admin.cantho@mobifone.vn',
-          phone: req.user.username,
-          department: 'Văn phòng Đoàn',
-          targetBan: 'Ban Quản trị',
-          skills: 'Lãnh đạo, quản lý hệ thống, số hóa quy trình',
-          reason: 'Tài khoản điều hành tối cao của CLB Chuyển đổi số.',
-          status: 'Đã duyệt',
-          avatar: adminUser?.avatar || ''
-        });
-      }
-      return res.status(404).json({ message: 'Không tìm thấy hồ sơ cá nhân.' });
+      // Lấy thông tin cơ bản từ tài khoản User
+      const user = await User.findById(req.user.id);
+      return res.json({
+        fullName: user?.fullName || req.user.fullName || 'Thành viên CLB',
+        email: `${req.user.username}@mobifone.vn`,
+        phone: req.user.username,
+        department: 'Phòng Kỹ thuật nghiệp vụ',
+        targetBan: 'Ban Kỹ thuật Số',
+        skills: 'Chưa cập nhật',
+        reason: 'Thành viên chính thức của CLB.',
+        status: 'Đã duyệt',
+        avatar: user?.avatar || ''
+      });
     }
     
     res.json(candidate);
@@ -46,26 +44,56 @@ router.get('/profile', authMiddleware, async (req, res) => {
   }
 });
 
-// 1.6 API Cập nhật avatar của người dùng đang đăng nhập
+// 1.6 API Cập nhật thông tin hồ sơ cá nhân của người dùng đang đăng nhập
 router.put('/profile', authMiddleware, async (req, res) => {
-  const { avatar } = req.body;
+  const { avatar, fullName, email, department, targetBan, skills, reason } = req.body;
 
   try {
+    let authorName = '';
     const candidate = await Candidate.findOne({ phone: req.user.username });
     
     if (candidate) {
-      candidate.avatar = avatar;
+      authorName = candidate.fullName;
+      if (avatar !== undefined) candidate.avatar = avatar;
+      if (fullName !== undefined) candidate.fullName = fullName;
+      if (email !== undefined) candidate.email = email;
+      if (department !== undefined) candidate.department = department;
+      if (targetBan !== undefined) candidate.targetBan = targetBan;
+      if (skills !== undefined) candidate.skills = skills;
+      if (reason !== undefined) candidate.reason = reason;
       await candidate.save();
     }
     
     // Đồng thời cập nhật trong model User
     const user = await User.findById(req.user.id);
     if (user) {
-      user.avatar = avatar;
+      authorName = authorName || user.fullName;
+      if (avatar !== undefined) user.avatar = avatar;
+      if (fullName !== undefined) user.fullName = fullName;
       await user.save();
     }
 
-    res.json({ message: 'Cập nhật ảnh đại diện thành công!', avatar });
+    // Đồng thời cập nhật ảnh đại diện và tên tác giả của toàn bộ bài viết của người này trong bảng Post
+    if (authorName) {
+      const updateData = {};
+      if (avatar !== undefined) updateData.avatar = avatar;
+      if (fullName !== undefined) updateData.author = fullName;
+      
+      if (Object.keys(updateData).length > 0) {
+        await Post.updateMany({ author: authorName }, updateData);
+      }
+    }
+
+    res.json({ 
+      message: 'Cập nhật thông tin hồ sơ thành công!', 
+      avatar,
+      fullName,
+      email,
+      department,
+      targetBan,
+      skills,
+      reason
+    });
   } catch (error) {
     res.status(500).json({ message: 'Lỗi cập nhật ảnh đại diện!', error: error.message });
   }

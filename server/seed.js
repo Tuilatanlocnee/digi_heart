@@ -107,33 +107,9 @@ const seedDatabase = async () => {
     await Idea.insertMany(mockIdeas);
     console.log(`✅ Đã nạp thành công ${mockIdeas.length} ý tưởng sáng kiến mẫu.`);
 
-    // 5. Nạp danh sách bài viết Fanpage mẫu (Posts)
+    // 5. Nạp danh sách bài viết Fanpage mẫu (Posts) - Đã dọn dẹp theo yêu cầu người dùng
     console.log('Đang nạp dữ liệu bài đăng mẫu...');
-    const mockPosts = [
-      {
-        author: 'Ban Truyền Thông CLB',
-        avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=120&q=80',
-        time: '2 giờ trước',
-        content: 'Hôm nay CLB Digi Heart đã hoàn thành lắp đặt hệ thống mã QR thanh toán không dùng tiền mặt tại hơn 50 quầy hàng ở chợ Cần Thơ. Chúc mừng đội ngũ kỹ thuật và truyền thông đã làm việc hết mình! 🎉💪',
-        image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=800&q=80',
-        likes: 24,
-        comments: [
-          { author: 'Nguyễn Minh Anh', text: 'Tuyệt vời quá các bạn ơi! Sáng kiến rất thiết thực.', date: '2026-05-22' },
-          { author: 'Trần Văn Linh', text: 'Tuổi trẻ MobiFone Cần Thơ năng động quá!', date: '2026-05-22' }
-        ]
-      },
-      {
-        author: 'Ban Kỹ Thuật Số',
-        avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80',
-        time: '1 ngày trước',
-        content: 'Tin vui! Bản beta của app Quản lý Đoàn viên nội bộ đã chạy thử nghiệm thành công mà không phát sinh lỗi lớn. Cảm ơn các thành viên core team đã thức đêm fix bug nhé. 🚀🔥',
-        image: 'https://images.unsplash.com/photo-1600132806370-bf17e65e942f?auto=format&fit=crop&w=800&q=80',
-        likes: 18,
-        comments: [
-          { author: 'Lê Thu Thảo', text: 'Hóng bản chính thức để áp dụng cho chi đoàn mình.', date: '2026-05-21' }
-        ]
-      }
-    ];
+    const mockPosts = [];
     await Post.insertMany(mockPosts);
     console.log(`✅ Đã nạp thành công ${mockPosts.length} bài đăng Fanpage mẫu.`);
 
