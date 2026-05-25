@@ -38,72 +38,13 @@ const seedDatabase = async () => {
 
     // 3. Nạp danh sách ứng viên mẫu (Candidates)
     console.log('Đang nạp dữ liệu ứng viên mẫu...');
-    const mockCandidates = [
-      {
-        fullName: 'Phạm Minh Trí',
-        email: 'tripm.cantho@mobifone.vn',
-        phone: '0901234567',
-        department: 'Phòng Kỹ thuật nghiệp vụ',
-        targetBan: 'Ban Kỹ thuật Số',
-        skills: 'Excel nâng cao, lập trình Python cơ bản',
-        reason: 'Tôi muốn học hỏi thêm về tự động hóa báo cáo và ứng dụng AI vào công việc đối soát số liệu hàng ngày.',
-        status: 'Đã duyệt',
-        date: '2026-05-21'
-      },
-      {
-        fullName: 'Nguyễn Kiều Trang',
-        email: 'trangnk.cantho@mobifone.vn',
-        phone: '0907654321',
-        department: 'Phòng Khách hàng doanh nghiệp',
-        targetBan: 'Ban Truyền thông Số',
-        skills: 'Thiết kế Canva, biên tập nội dung, dựng video CapCut',
-        reason: 'Đóng góp năng lực thiết kế để quảng bá hình ảnh các sản phẩm số của MobiFone Cần Thơ tới các đoàn viên trẻ.',
-        status: 'Chờ duyệt',
-        date: '2026-05-20'
-      },
-      {
-        fullName: 'Vương Chí Cường',
-        email: 'cuongvc.cantho@mobifone.vn',
-        phone: '0939888999',
-        department: 'Phòng Bán hàng & Chăm sóc khách hàng',
-        targetBan: 'Ban Sự kiện & Phong trào',
-        skills: 'MC, tổ chức team building, hoạt náo viên',
-        reason: 'Tôi muốn tham gia các hoạt động cộng đồng, tổ chức các buổi ra quân cài đặt ứng dụng số MobiFone Money cho bà con.',
-        status: 'Chờ duyệt',
-        date: '2026-05-22'
-      }
-    ];
+    const mockCandidates = [];
     await Candidate.insertMany(mockCandidates);
     console.log(`✅ Đã nạp thành công ${mockCandidates.length} ứng viên mẫu.`);
 
     // 4. Nạp danh sách ý tưởng sáng kiến mẫu (Ideas)
     console.log('Đang nạp dữ liệu ý tưởng mẫu...');
-    const mockIdeas = [
-      {
-        fullName: 'Lê Hoàng Long',
-        email: 'longlh.cantho@mobifone.vn',
-        title: 'Tự động hóa đối soát thẻ nạp bằng Python',
-        description: 'Xây dựng một script Python chạy tự động hàng ngày để so sánh file đối soát giao dịch thẻ nạp từ đối tác với hệ thống đối soát nội bộ của MobiFone, giảm thiểu 90% thời gian đối soát thủ công bằng Excel.',
-        status: 'Đang thử nghiệm',
-        date: '2026-05-22'
-      },
-      {
-        fullName: 'Trần Thị Thuỷ',
-        email: 'thuytt.cantho@mobifone.vn',
-        title: 'Phát hành QR Code tài liệu sinh hoạt chi đoàn',
-        description: 'Thay vì in ấn các tài liệu giấy cho các buổi họp Đoàn hàng tháng, sẽ tạo một trang lưu trữ tài liệu trên Drive và tạo mã QR dán tại phòng họp. Đoàn viên chỉ cần quét mã bằng điện thoại để xem tài liệu, tiết kiệm chi phí in ấn.',
-        status: 'Đã áp dụng',
-        date: '2026-05-19'
-      },
-      {
-        fullName: 'Đỗ Hữu Nghĩa',
-        email: 'nghiadh.cantho@mobifone.vn',
-        title: 'Xây dựng chatbot Zalo hỗ trợ tra cứu cẩm nang nội bộ',
-        description: 'Tích hợp một chatbot Zalo OA kết nối với cơ sở dữ liệu cẩm nang chuyển đổi số để nhân viên bán hàng có thể tra cứu nhanh các chính sách gói cước mới của MobiFone ngay trong lúc tư vấn cho khách hàng.',
-        status: 'Chờ duyệt',
-        date: '2026-05-22'
-      }
-    ];
+    const mockIdeas = [];
     await Idea.insertMany(mockIdeas);
     console.log(`✅ Đã nạp thành công ${mockIdeas.length} ý tưởng sáng kiến mẫu.`);
 

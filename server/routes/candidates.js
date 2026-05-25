@@ -17,6 +17,16 @@ router.get('/', authMiddleware, async (req, res) => {
   }
 });
 
+// 1.2 API Lấy danh sách ứng viên đã duyệt (Công khai)
+router.get('/approved', async (req, res) => {
+  try {
+    const candidates = await Candidate.find({ status: 'Đã duyệt' }).sort({ createdAt: -1 });
+    res.json(candidates);
+  } catch (error) {
+    res.status(500).json({ message: 'Lỗi lấy danh sách thành viên!', error: error.message });
+  }
+});
+
 // 1.5 API Lấy thông tin hồ sơ cá nhân của người dùng đang đăng nhập
 router.get('/profile', authMiddleware, async (req, res) => {
   try {

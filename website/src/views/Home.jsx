@@ -38,7 +38,7 @@ export default function Home() {
     <div className="bg-white text-gray-800 min-h-screen">
       
       {/* 🚀 Hero Section (Banner lớn phong cách mobifone.vn) */}
-      <section className="relative overflow-hidden pt-16 pb-20 sm:pt-20 sm:pb-24 md:pt-28 md:pb-32 bg-gradient-to-r from-[#002f6c] via-[#0054A6] to-[#002f6c] text-white">
+      <section className="relative overflow-hidden py-8 sm:py-12 md:py-16 bg-gradient-to-r from-[#002f6c] via-[#0054A6] to-[#002f6c] text-white">
         
         {/* Điểm nhấn vệt sáng công nghệ nhẹ nhàng */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] md:w-[600px] md:h-[600px] bg-blue-400/20 rounded-full blur-3xl -z-10 pointer-events-none"></div>
@@ -46,18 +46,18 @@ export default function Home() {
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           {/* Nhãn nhỏ mang Slogan MobiFone */}
-          <span className="inline-block px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-white/10 border border-white/20 text-[10px] sm:text-xs font-semibold text-blue-200 mb-5 md:mb-6 uppercase tracking-wider max-w-full truncate sm:overflow-visible">
+          <span className="inline-block px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-white/10 border border-white/20 text-[10px] sm:text-xs font-semibold text-blue-200 mb-3 md:mb-4 uppercase tracking-wider max-w-full truncate sm:overflow-visible">
             MobiFone Cần Thơ • Kết nối giá trị - Khơi dậy tiềm năng
           </span>
           
-          <h1 className="text-2xl sm:text-4xl md:text-6xl font-extrabold leading-tight tracking-tight mb-5 md:mb-6">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold leading-tight tracking-tight mb-3 md:mb-4">
             Đoàn Thanh Niên <br className="hidden sm:inline" />
-            <span className="bg-gradient-to-r from-white via-blue-100 to-red-200 bg-clip-text text-transparent inline-block py-1">
-              DIGI HEART - TRÁI TIM SỐ
+            <span className="bg-gradient-to-r from-white via-blue-100 to-red-200 bg-clip-text text-transparent inline-block py-2 px-1 leading-normal">
+              {"DIGI HEART - TRÁI TIM S\u1ED0"}
             </span>
           </h1>
           
-          <p className="text-sm sm:text-base md:text-xl text-blue-100 max-w-3xl mx-auto mb-8 md:mb-10 leading-relaxed font-light px-2 sm:px-0">
+          <p className="text-sm sm:text-base md:text-lg text-blue-100 max-w-3xl mx-auto mb-6 md:mb-8 leading-relaxed font-light px-2 sm:px-0">
             Nơi hội tụ thế hệ trẻ MobiFone Cần Thơ mang trong mình tinh thần tiên phong, sẵn sàng đưa công nghệ và chuyển đổi số đi sâu vào đời sống, sản xuất kinh doanh và các phong trào Đoàn.
           </p>
           
@@ -65,7 +65,7 @@ export default function Home() {
             {!isLoggedIn && (
               <Link
                 to="/join-us"
-                className="w-full sm:w-auto px-6 sm:px-8 py-3.5 bg-[#E30613] hover:bg-[#c2050f] rounded-xl font-bold shadow-lg shadow-red-900/20 hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2 text-white"
+                className="w-full sm:w-auto px-6 sm:px-8 py-2.5 bg-[#E30613] hover:bg-[#c2050f] rounded-xl font-bold shadow-lg shadow-red-900/20 hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2 text-white"
               >
                 <span>Tham gia ngay</span>
                 <FiArrowRight className="w-5 h-5" />
@@ -73,7 +73,7 @@ export default function Home() {
             )}
             <Link
               to="/projects"
-              className="w-full sm:w-auto px-6 sm:px-8 py-3.5 bg-white/10 border border-white/25 rounded-xl font-bold hover:bg-white/25 hover:border-white/40 transition-all duration-300 flex items-center justify-center space-x-2 text-white"
+              className="w-full sm:w-auto px-6 sm:px-8 py-2.5 bg-white/10 border border-white/25 rounded-xl font-bold hover:bg-white/25 hover:border-white/40 transition-all duration-300 flex items-center justify-center space-x-2 text-white"
             >
               <FiBookOpen className="w-5 h-5 text-blue-300" />
               <span>Xem dự án số</span>

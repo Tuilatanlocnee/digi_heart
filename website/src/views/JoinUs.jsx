@@ -26,13 +26,13 @@ export default function JoinUs() {
   // Trạng thái hiển thị thông báo gửi thành công
   const [showSuccess, setShowSuccess] = useState(false);
 
-  // 1. Tải danh sách ứng viên khi khởi chạy trang
+  // 1. Tải danh sách ứng viên đã được phê duyệt khi khởi chạy trang
   const fetchCandidates = async () => {
     try {
-      const data = await candidateAPI.getAll();
+      const data = await candidateAPI.getApproved();
       setCandidates(data);
     } catch (error) {
-      console.error('Không lấy được danh sách ứng viên:', error);
+      console.error('Không lấy được danh sách ứng viên đã duyệt:', error);
     }
   };
 

@@ -178,6 +178,25 @@ export const candidateAPI = {
     }
   },
 
+  // Lấy danh sách ứng viên đã được duyệt (Công khai)
+  getApproved: async () => {
+    try {
+      const response = await api.get('/candidates/approved');
+      return response.data;
+    } catch (error) {
+      if (isNetworkError(error)) {
+        console.warn('⚠️ Backend offline. Đang lọc các ứng viên đã duyệt từ LocalStorage.');
+        const local = localStorage.getItem('digiheart_candidates');
+        if (local) {
+          const list = JSON.parse(local);
+          return list.filter(cand => cand.status === 'Đã duyệt');
+        }
+        return [];
+      }
+      throw error;
+    }
+  },
+
   // Gửi đăng ký mới
   create: async (candidateData) => {
     try {

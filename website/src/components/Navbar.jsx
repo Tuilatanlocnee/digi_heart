@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { FiMenu, FiX, FiLock, FiLogOut, FiKey, FiUser } from 'react-icons/fi';
 import { authAPI } from '../utils/api';
@@ -312,7 +313,7 @@ export default function Navbar() {
       )}
 
       {/* 🔐 Modal Đổi mật khẩu */}
-      {showChangePassword && (
+      {showChangePassword && createPortal(
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/55 backdrop-blur-sm p-4 animate-fadeIn">
           <div className="bg-white border border-gray-200/80 w-full max-w-md rounded-3xl p-6 shadow-2xl relative">
             <h3 className="text-lg font-black text-gray-800 mb-5 flex items-center space-x-2">
@@ -396,7 +397,8 @@ export default function Navbar() {
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </nav>
   );
