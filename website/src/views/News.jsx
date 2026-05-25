@@ -1,8 +1,12 @@
-import { useState } from 'react';
-import { FiCalendar, FiUser, FiSearch, FiArrowLeft, FiTag } from 'react-icons/fi';
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { FiCalendar, FiUser, FiSearch, FiArrowLeft, FiTag, FiInbox, FiPlusCircle, FiEdit, FiTrash2 } from 'react-icons/fi';
+import { newsAPI } from '../utils/api';
 
 /**
  * View News - Trang hiển thị Tin tức & Sự kiện của CLB Digi Heart.
+ * Dữ liệu được kết nối động tới database MongoDB thông qua Backend API.
+ * Đặc biệt: Admin đăng nhập có thể đăng bài viết tin tức trực tiếp tại trang này.
  */
 export default function News() {
   // Bộ lọc danh mục đang được chọn
@@ -12,57 +16,138 @@ export default function News() {
   // Bài viết đang được mở xem chi tiết (nếu null là đang ở màn hình danh sách)
   const [activePost, setActivePost] = useState(null);
 
-  // Danh sách dữ liệu mẫu tin tức (Mock Data) mang đậm dấu ấn Đoàn MobiFone Cần Thơ
-  const newsList = [
-    {
-      id: 1,
-      title: 'Đoàn Thanh Niên MobiFone Cần Thơ ra quân hỗ trợ phổ cập MobiFone Money',
-      summary: 'Hoạt động hỗ trợ người dân cài đặt và thanh toán không dùng tiền mặt tại các chợ truyền thống trên địa bàn thành phố Cần Thơ.',
-      content: `Trong hai ngày cuối tuần qua, câu lạc bộ Chuyển đổi số Digi Heart phối hợp cùng Đoàn cơ sở MobiFone Cần Thơ đã triển khai chương trình ra quân “Kỳ nghỉ hồng số hóa”. Hơn 30 đoàn viên thanh niên đã trực tiếp đến các chợ truyền thống lớn tại quận Ninh Kiều và Cái Răng để hướng dẫn các tiểu thương cũng như người dân mở ví điện tử MobiFone Money, cách nạp tiền, chuyển khoản và thanh toán hóa đơn điện nước qua điện thoại.
+  // Trạng thái danh sách tin tức động từ API
+  const [newsList, setNewsList] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-Đây là hoạt động thiết thực nhằm thực hiện chương trình Chuyển đổi số quốc gia, đẩy mạnh thanh toán không dùng tiền mặt, đem lại sự thuận tiện và an toàn tối đa cho bà con trong hoạt động mua bán hàng ngày. Sau chiến dịch, đã có hơn 250 tài khoản ví điện tử được mở mới và kích hoạt thành công, nhận được sự hưởng ứng vô cùng nồng nhiệt từ người dân địa phương.`,
-      category: 'Hoạt động Đoàn',
-      date: '2026-05-20',
-      author: 'Nguyễn Văn Nam',
-      image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=800&q=80',
-    },
-    {
-      id: 2,
-      title: 'Workshop số 02: Ứng dụng AI và ChatGPT hỗ trợ nâng cao hiệu suất làm việc văn phòng',
-      summary: 'Khóa đào tạo nội bộ về cách ứng dụng các mô hình ngôn ngữ lớn (LLM) để soạn thảo văn bản, báo cáo và dịch thuật nhanh chóng.',
-      content: `Nhằm nâng cao năng lực công nghệ cho đội ngũ cán bộ nhân viên trẻ, CLB Digi Heart đã tổ chức thành công buổi Workshop chuyên đề "Khai phá sức mạnh AI tại văn phòng". Buổi học đã thu hút sự tham gia của gần 40 cán bộ đoàn và đoàn viên ưu tú.
+  // Trạng thái quản trị của Admin
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingNewsId, setEditingNewsId] = useState(null);
+  const [newsForm, setNewsForm] = useState({
+    title: '',
+    summary: '',
+    content: '',
+    category: 'Hoạt động Đoàn',
+    author: 'Ban Truyền Thông',
+    image: ''
+  });
+  const [notify, setNotify] = useState({ text: '', type: '' });
 
-Tại buổi thảo luận, các diễn giả từ Ban Kỹ thuật của CLB đã hướng dẫn chi tiết cách viết prompt (câu lệnh) hiệu quả cho ChatGPT, Gemini để xử lý số liệu excel, lên ý tưởng chiến dịch truyền thông, và tóm tắt văn bản hành chính. Hoạt động này được Ban lãnh đạo MobiFone Cần Thơ đánh giá rất cao vì giúp tối ưu hóa thời gian xử lý công việc hành chính thường nhật lên đến 30%.`,
-      category: 'Đào tạo',
-      date: '2026-05-15',
-      author: 'Lê Thị Mai',
-      image: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80',
-    },
-    {
-      id: 3,
-      title: 'Ra mắt Cẩm nang Chuyển đổi số dành cho Đoàn viên năm 2026',
-      summary: 'Ấn phẩm số hóa đầu tay tổng hợp tất cả công cụ thiết yếu và hướng dẫn bảo mật thông tin trên môi trường mạng internet.',
-      content: `Với mục tiêu giúp mỗi đoàn viên trở thành một tuyên truyền viên tích cực về công nghệ, CLB Digi Heart đã biên soạn và phát hành phiên bản số của "Cẩm nang Chuyển đổi số 2026". Ấn phẩm này được lưu hành dưới dạng mã QR code tiện lợi để mọi người dễ dàng quét và đọc trên smartphone.
+  // Tải danh sách tin tức từ backend khi trang khởi chạy
+  const fetchNews = async () => {
+    try {
+      const data = await newsAPI.getAll();
+      setNewsList(data);
+    } catch (error) {
+      console.error('Không lấy được danh sách tin tức:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-Nội dung cẩm nang được thiết kế dưới dạng infographic trực quan sinh động, bao gồm các chủ đề nóng: Cách thiết lập mật khẩu 2 lớp bảo mật, nhận diện email/tin nhắn giả mạo lừa đảo, giới thiệu các app dịch vụ công trực tuyến và các công cụ thiết kế ấn phẩm truyền thông cơ bản bằng Canva.`,
-      category: 'Cẩm nang số',
-      date: '2026-05-10',
-      author: 'Trần Minh Hoàng',
-      image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80',
-    },
-    {
-      id: 4,
-      title: 'Đại hội CLB Digi Heart nhiệm kỳ mới: Xác định các mục tiêu cốt lõi',
-      summary: 'Kế hoạch hành động cụ thể để ứng dụng tự động hóa quy trình (RPA) vào các nghiệp vụ tại MobiFone Cần Thơ.',
-      content: `Vừa qua, câu lạc bộ Digi Heart đã tiến hành Đại hội tổng kết hoạt động năm qua và vạch ra chiến lược cho nhiệm kỳ mới. Với tinh thần học hỏi sáng tạo không ngừng, đại hội thống nhất sẽ đẩy mạnh triển khai nghiên cứu ứng dụng công nghệ RPA (Robotic Process Automation) vào việc cập nhật và đối soát báo cáo kinh doanh nội bộ.
+  useEffect(() => {
+    fetchNews();
 
-Mục tiêu cụ thể được đặt ra là giảm thiểu 50% thao tác thủ công lặp đi lặp lại của nhân viên nghiệp vụ, hỗ trợ đắc lực cho MobiFone Cần Thơ trong quá trình vận hành bộ máy linh hoạt, hiệu quả hơn.`,
-      category: 'Hoạt động Đoàn',
-      date: '2026-05-05',
-      author: 'Ban Truyền Thông',
-      image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80',
-    },
-  ];
+    // Kiểm tra tư cách Admin
+    const token = localStorage.getItem('digiheart_admin_token');
+    const userStr = localStorage.getItem('digiheart_admin_user');
+    if (token && userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        setIsAdmin(user.role === 'admin' || user.role === 'superadmin');
+      } catch {
+        setIsAdmin(false);
+      }
+    }
+  }, []);
+
+  // Xử lý đăng tin tức mới
+  const handleCreateNews = async (e) => {
+    e.preventDefault();
+    if (!newsForm.title || !newsForm.summary || !newsForm.content || !newsForm.author) {
+      alert('Vui lòng điền đầy đủ các thông tin bắt buộc (*)');
+      return;
+    }
+    try {
+      const response = await newsAPI.create(newsForm);
+      setNewsList([response.news, ...newsList]);
+      setShowAddModal(false);
+      setNewsForm({
+        title: '',
+        summary: '',
+        content: '',
+        category: 'Hoạt động Đoàn',
+        author: 'Ban Truyền Thông',
+        image: ''
+      });
+      setNotify({ text: 'Đăng bài viết tin tức thành công!', type: 'success' });
+      setTimeout(() => setNotify({ text: '', type: '' }), 4500);
+    } catch (error) {
+      alert(error.message || 'Lỗi khi đăng tin tức!');
+    }
+  };
+  
+  // Xóa bài viết tin tức trực tiếp
+  const handleDeleteNews = async (id) => {
+    if (!window.confirm('Bạn có chắc chắn muốn xóa bài viết tin tức này không?')) return;
+    try {
+      await newsAPI.delete(id);
+      setNewsList(newsList.filter(item => item._id !== id && item.id !== id));
+      setNotify({ text: 'Đã xóa bài viết tin tức thành công!', type: 'success' });
+      setTimeout(() => setNotify({ text: '', type: '' }), 4500);
+    } catch (error) {
+      alert(error.message || 'Lỗi khi xóa bài viết tin tức!');
+    }
+  };
+
+  // Bắt đầu chỉnh sửa bài viết tin tức trực tiếp
+  const startEditNews = (post, e) => {
+    e.stopPropagation();
+    setEditingNewsId(post._id || post.id);
+    setNewsForm({
+      title: post.title,
+      summary: post.summary,
+      content: post.content,
+      category: post.category,
+      author: post.author,
+      image: post.image || ''
+    });
+    setShowEditModal(true);
+  };
+
+  // Gửi cập nhật tin tức lên API
+  const handleUpdateNews = async (e) => {
+    e.preventDefault();
+    if (!newsForm.title || !newsForm.summary || !newsForm.content || !newsForm.author) {
+      alert('Vui lòng điền đầy đủ các thông tin bắt buộc (*)');
+      return;
+    }
+    try {
+      const response = await newsAPI.update(editingNewsId, newsForm);
+      const updatedNews = response.news || { ...newsForm, _id: editingNewsId };
+      
+      setNewsList(newsList.map(item => 
+        (item._id === editingNewsId || item.id === editingNewsId) ? { ...item, ...updatedNews } : item
+      ));
+      
+      setShowEditModal(false);
+      setEditingNewsId(null);
+      setNewsForm({
+        title: '',
+        summary: '',
+        content: '',
+        category: 'Hoạt động Đoàn',
+        author: 'Ban Truyền Thông',
+        image: ''
+      });
+      setNotify({ text: 'Chỉnh sửa bài viết tin tức thành công!', type: 'success' });
+      setTimeout(() => setNotify({ text: '', type: '' }), 4500);
+    } catch (error) {
+      alert(error.message || 'Lỗi khi chỉnh sửa bài viết tin tức!');
+    }
+  };
 
   // Danh mục tin tức để người dùng lựa chọn lọc bài viết
   const categories = ['Tất cả', 'Hoạt động Đoàn', 'Đào tạo', 'Cẩm nang số'];
@@ -89,7 +174,7 @@ Mục tiêu cụ thể được đặt ra là giảm thiểu 50% thao tác thủ
             <span>Quay lại danh sách tin tức</span>
           </button>
 
-          <article className="bg-white border border-gray-200/80 rounded-3xl p-6 md:p-10 shadow-lg">
+          <article className="bg-white border border-gray-200/80 rounded-3xl p-6 md:p-10 shadow-lg animate-fadeIn">
             <img
               src={activePost.image}
               alt={activePost.title}
@@ -131,14 +216,33 @@ Mục tiêu cụ thể được đặt ra là giảm thiểu 50% thao tác thủ
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Tiêu đề trang */}
-        <div className="text-center max-w-3xl mx-auto mb-12">
+        <div className="text-center max-w-3xl mx-auto mb-12 relative">
           <h1 className="text-2xl sm:text-3xl md:text-5xl font-black mb-4 text-gray-800">
             Tin Tức & <span className="text-[#0054A6]">Sự Kiện</span>
           </h1>
           <p className="text-gray-500 font-medium">
             Cập nhật những tin tức mới nhất về các hoạt động hỗ trợ xã hội, các lớp đào tạo và cẩm nang công nghệ của Digi Heart tại Cần Thơ.
           </p>
+
+          {isAdmin && (
+            <div className="mt-6 flex justify-center animate-fadeIn">
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="px-6 py-2.5 bg-[#0054A6] hover:bg-[#003d80] text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center space-x-2 hover:scale-105"
+              >
+                <FiPlusCircle className="w-4 h-4 text-emerald-300" />
+                <span>Đăng Tin Tức Mới</span>
+              </button>
+            </div>
+          )}
         </div>
+
+        {/* Thông báo sự kiện */}
+        {notify.text && (
+          <div className="max-w-xl mx-auto mb-8 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold text-center animate-fadeIn">
+            🎉 {notify.text}
+          </div>
+        )}
 
         {/* Thanh tìm kiếm và bộ lọc */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-12 bg-white border border-gray-200/80 p-4 rounded-2xl shadow-sm">
@@ -174,55 +278,320 @@ Mục tiêu cụ thể được đặt ra là giảm thiểu 50% thao tác thủ
 
         </div>
 
-        {/* Danh sách bài viết dạng Grid */}
-        {filteredNews.length > 0 ? (
+        {/* Trạng thái Loading */}
+        {loading ? (
+          <div className="bg-white border border-gray-200 rounded-3xl p-16 text-center shadow-sm max-w-md mx-auto">
+            <span className="inline-block w-8 h-8 border-4 border-[#0054A6] border-t-transparent rounded-full animate-spin"></span>
+            <p className="text-gray-400 text-xs font-bold mt-4 uppercase">Đang tải danh sách bài viết...</p>
+          </div>
+        ) : filteredNews.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {filteredNews.map((post) => (
-              <div
-                key={post.id}
-                onClick={() => setActivePost(post)}
-                className="bg-white border border-gray-200/80 rounded-2xl overflow-hidden hover:border-[#0054A6]/30 hover:shadow-xl transition-all duration-300 cursor-pointer group flex flex-col h-full shadow-sm"
-              >
-                <div className="relative h-48 md:h-56 overflow-hidden">
-                  <img
-                    src={post.image}
-                    alt={post.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <span className="absolute top-4 left-4 px-2.5 py-1 rounded-md text-xs font-bold bg-[#0054A6] text-white shadow-sm">
-                    {post.category}
-                  </span>
-                </div>
-                
-                <div className="p-6 flex flex-col flex-grow">
-                  <div className="flex items-center space-x-1 text-xs text-gray-400 mb-3">
-                    <FiCalendar className="w-3.5 h-3.5" />
-                    <span>{post.date}</span>
+            {filteredNews.map((post) => {
+              const postId = post._id || post.id;
+              return (
+                <div
+                  key={postId}
+                  onClick={() => setActivePost(post)}
+                  className="bg-white border border-gray-200/80 rounded-2xl overflow-hidden hover:border-[#0054A6]/30 hover:shadow-xl transition-all duration-300 cursor-pointer group flex flex-col h-full shadow-sm animate-fadeIn"
+                >
+                  <div className="relative h-48 md:h-56 overflow-hidden">
+                    <img
+                      src={post.image}
+                      alt={post.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <span className="absolute top-4 left-4 px-2.5 py-1 rounded-md text-xs font-bold bg-[#0054A6] text-white shadow-sm">
+                      {post.category}
+                    </span>
+                    {isAdmin && (
+                      <div className="absolute top-4 right-4 flex space-x-1.5 z-10">
+                        <button
+                          onClick={(e) => startEditNews(post, e)}
+                          className="p-1.5 bg-white/95 hover:bg-white text-[#0054A6] rounded-lg shadow-md transition-all hover:scale-110"
+                          title="Sửa bài viết"
+                        >
+                          <FiEdit className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteNews(postId);
+                          }}
+                          className="p-1.5 bg-white/95 hover:bg-red-50 text-red-500 rounded-lg shadow-md transition-all hover:scale-110"
+                          title="Xóa bài viết"
+                        >
+                          <FiTrash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    )}
                   </div>
                   
-                  <h3 className="text-lg md:text-xl font-bold mb-3 text-gray-800 group-hover:text-[#0054A6] transition-colors line-clamp-2">
-                    {post.title}
-                  </h3>
-                  
-                  <p className="text-gray-500 text-sm leading-relaxed mb-4 line-clamp-3">
-                    {post.summary}
-                  </p>
-                  
-                  <span className="text-xs font-bold text-[#0054A6] mt-auto flex items-center space-x-1 group-hover:underline">
-                    <span>Xem chi tiết bài viết</span>
-                    <span>&rarr;</span>
-                  </span>
+                  <div className="p-6 flex flex-col flex-grow">
+                    <div className="flex items-center space-x-1 text-xs text-gray-400 mb-3">
+                      <FiCalendar className="w-3.5 h-3.5" />
+                      <span>{post.date}</span>
+                    </div>
+                    
+                    <h3 className="text-lg md:text-xl font-bold mb-3 text-gray-800 group-hover:text-[#0054A6] transition-colors line-clamp-2 leading-tight">
+                      {post.title}
+                    </h3>
+                    
+                    <p className="text-gray-500 text-sm leading-relaxed mb-4 line-clamp-3">
+                      {post.summary}
+                    </p>
+                    
+                    <span className="text-xs font-bold text-[#0054A6] mt-auto flex items-center space-x-1 group-hover:underline">
+                      <span>Xem chi tiết bài viết</span>
+                      <span>&rarr;</span>
+                    </span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
-          <div className="text-center py-16 bg-white border border-dashed border-gray-200 rounded-2xl shadow-sm">
-            <p className="text-gray-400">Không tìm thấy bài viết nào phù hợp với bộ lọc hoặc từ khóa.</p>
+          <div className="text-center py-16 bg-white border border-gray-200 rounded-3xl shadow-sm p-8 max-w-xl mx-auto space-y-4 animate-fadeIn">
+            <div className="w-12 h-12 bg-gray-50 text-gray-400 rounded-full flex items-center justify-center mx-auto text-xl shadow-inner">
+              <FiInbox />
+            </div>
+            <p className="text-gray-400 text-sm">Không tìm thấy bài viết nào phù hợp với bộ lọc hoặc từ khóa.</p>
           </div>
         )}
 
       </div>
+
+      {/* 🔐 Modal Đăng Tin Tức Mới dành cho Admin */}
+      {showAddModal && createPortal(
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/55 backdrop-blur-sm p-4 animate-fadeIn">
+          <div className="bg-white border border-gray-200/80 w-full max-w-2xl rounded-3xl p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <h3 className="text-lg font-black text-gray-800 mb-5 flex items-center space-x-2 border-b border-gray-100 pb-3">
+              <FiTag className="text-[#0054A6] w-5 h-5" />
+              <span>Đăng Tin Tức & Sự Kiện Mới</span>
+            </h3>
+
+            <form onSubmit={handleCreateNews} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Tiêu đề tin tức *</label>
+                  <input
+                    type="text"
+                    value={newsForm.title}
+                    onChange={(e) => setNewsForm({ ...newsForm, title: e.target.value })}
+                    className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#0054A6] text-gray-800 shadow-inner"
+                    placeholder="Nhập tiêu đề nổi bật..."
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Tác giả (Người viết) *</label>
+                  <input
+                    type="text"
+                    value={newsForm.author}
+                    onChange={(e) => setNewsForm({ ...newsForm, author: e.target.value })}
+                    className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#0054A6] text-gray-800 shadow-inner"
+                    placeholder="Ban Truyền Thông, Nguyễn Văn A..."
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Danh mục tin tức *</label>
+                  <select
+                    value={newsForm.category}
+                    onChange={(e) => setNewsForm({ ...newsForm, category: e.target.value })}
+                    className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#0054A6] text-gray-800"
+                    required
+                  >
+                    <option value="Hoạt động Đoàn">Hoạt động Đoàn</option>
+                    <option value="Đào tạo">Đào tạo</option>
+                    <option value="Cẩm nang số">Cẩm nang số</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Link ảnh đại diện (URL)</label>
+                  <input
+                    type="url"
+                    value={newsForm.image}
+                    onChange={(e) => setNewsForm({ ...newsForm, image: e.target.value })}
+                    className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#0054A6] text-gray-800 shadow-inner"
+                    placeholder="https://images.unsplash.com/..."
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Tóm tắt ngắn bài viết *</label>
+                <input
+                  type="text"
+                  value={newsForm.summary}
+                  onChange={(e) => setNewsForm({ ...newsForm, summary: e.target.value })}
+                  className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#0054A6] text-gray-800 shadow-inner"
+                  placeholder="Tóm tắt ngắn gọn nội dung tin tức..."
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Nội dung chi tiết tin tức *</label>
+                <textarea
+                  rows="6"
+                  value={newsForm.content}
+                  onChange={(e) => setNewsForm({ ...newsForm, content: e.target.value })}
+                  className="w-full bg-white border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:border-[#0054A6] text-gray-800 resize-none shadow-inner"
+                  placeholder="Viết nội dung bài viết tin tức tại đây..."
+                  required
+                />
+              </div>
+
+              <div className="flex items-center justify-end space-x-3 pt-3 border-t border-gray-100">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowAddModal(false);
+                    setNewsForm({
+                      title: '',
+                      summary: '',
+                      content: '',
+                      category: 'Hoạt động Đoàn',
+                      author: 'Ban Truyền Thông',
+                      image: ''
+                    });
+                  }}
+                  className="px-4 py-2 text-xs font-bold text-gray-500 hover:bg-gray-100 rounded-xl transition-colors"
+                >
+                  Hủy bỏ
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 bg-[#0054A6] hover:bg-[#003d80] text-white text-xs font-bold rounded-xl shadow-md transition-colors"
+                >
+                  Đăng tin tức
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* 🔐 Modal Chỉnh Sửa Tin Tức dành cho Admin */}
+      {showEditModal && createPortal(
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/55 backdrop-blur-sm p-4 animate-fadeIn">
+          <div className="bg-white border border-gray-200/80 w-full max-w-2xl rounded-3xl p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <h3 className="text-lg font-black text-gray-800 mb-5 flex items-center space-x-2 border-b border-gray-100 pb-3">
+              <FiEdit className="text-[#0054A6] w-5 h-5" />
+              <span>Chỉnh Sửa Tin Tức & Sự Kiện</span>
+            </h3>
+
+            <form onSubmit={handleUpdateNews} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Tiêu đề tin tức *</label>
+                  <input
+                    type="text"
+                    value={newsForm.title}
+                    onChange={(e) => setNewsForm({ ...newsForm, title: e.target.value })}
+                    className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#0054A6] text-gray-800 shadow-inner"
+                    placeholder="Nhập tiêu đề nổi bật..."
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Tác giả (Người viết) *</label>
+                  <input
+                    type="text"
+                    value={newsForm.author}
+                    onChange={(e) => setNewsForm({ ...newsForm, author: e.target.value })}
+                    className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#0054A6] text-gray-800 shadow-inner"
+                    placeholder="Ban Truyền Thông, Nguyễn Văn A..."
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Danh mục tin tức *</label>
+                  <select
+                    value={newsForm.category}
+                    onChange={(e) => setNewsForm({ ...newsForm, category: e.target.value })}
+                    className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#0054A6] text-gray-800"
+                    required
+                  >
+                    <option value="Hoạt động Đoàn">Hoạt động Đoàn</option>
+                    <option value="Đào tạo">Đào tạo</option>
+                    <option value="Cẩm nang số">Cẩm nang số</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Link ảnh đại diện (URL)</label>
+                  <input
+                    type="url"
+                    value={newsForm.image}
+                    onChange={(e) => setNewsForm({ ...newsForm, image: e.target.value })}
+                    className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#0054A6] text-gray-800 shadow-inner"
+                    placeholder="https://images.unsplash.com/..."
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Tóm tắt ngắn bài viết *</label>
+                <input
+                  type="text"
+                  value={newsForm.summary}
+                  onChange={(e) => setNewsForm({ ...newsForm, summary: e.target.value })}
+                  className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#0054A6] text-gray-800 shadow-inner"
+                  placeholder="Tóm tắt ngắn gọn nội dung tin tức..."
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Nội dung chi tiết tin tức *</label>
+                <textarea
+                  rows="6"
+                  value={newsForm.content}
+                  onChange={(e) => setNewsForm({ ...newsForm, content: e.target.value })}
+                  className="w-full bg-white border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:border-[#0054A6] text-gray-800 resize-none shadow-inner"
+                  placeholder="Viết nội dung bài viết tin tức tại đây..."
+                  required
+                />
+              </div>
+
+              <div className="flex items-center justify-end space-x-3 pt-3 border-t border-gray-100">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowEditModal(false);
+                    setEditingNewsId(null);
+                    setNewsForm({
+                      title: '',
+                      summary: '',
+                      content: '',
+                      category: 'Hoạt động Đoàn',
+                      author: 'Ban Truyền Thông',
+                      image: ''
+                    });
+                  }}
+                  className="px-4 py-2 text-xs font-bold text-gray-500 hover:bg-gray-100 rounded-xl transition-colors"
+                >
+                  Hủy bỏ
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 bg-[#0054A6] hover:bg-[#003d80] text-white text-xs font-bold rounded-xl shadow-md transition-colors"
+                >
+                  Cập nhật tin tức
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 }

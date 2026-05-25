@@ -285,6 +285,25 @@ export const ideaAPI = {
     }
   },
 
+  // Lấy danh sách ý tưởng đã được duyệt/tiếp nhận (Công khai)
+  getApproved: async () => {
+    try {
+      const response = await api.get('/ideas/approved');
+      return response.data;
+    } catch (error) {
+      if (isNetworkError(error)) {
+        console.warn('⚠️ Backend offline. Đang lọc các ý tưởng đã duyệt từ LocalStorage.');
+        const local = localStorage.getItem('digiheart_ideas');
+        if (local) {
+          const list = JSON.parse(local);
+          return list.filter(idea => idea.status !== 'Chờ duyệt');
+        }
+        return [];
+      }
+      throw error;
+    }
+  },
+
   // Gửi ý tưởng đóng góp mới
   create: async (ideaData) => {
     try {
@@ -561,6 +580,92 @@ export const postAPI = {
         }
       }
       throw error;
+    }
+  }
+};
+
+// ==========================================
+// 5. CÁC API TIN TỨC & SỰ KIỆN (NEWS API)
+// ==========================================
+export const newsAPI = {
+  // Lấy toàn bộ danh sách tin tức
+  getAll: async () => {
+    try {
+      const response = await api.get('/news');
+      return response.data;
+    } catch (error) {
+      if (isNetworkError(error)) {
+        console.warn('⚠️ Backend offline. Đang sử dụng LocalStorage cho News.');
+        const local = localStorage.getItem('digiheart_news');
+        return local ? JSON.parse(local) : [];
+      }
+      throw error;
+    }
+  },
+
+  // Tạo tin tức mới (Yêu cầu quyền Admin)
+  create: async (newsData) => {
+    try {
+      const response = await api.post('/news', newsData);
+      return response.data;
+    } catch (error) {
+      if (isNetworkError(error)) {
+        console.warn('⚠️ Backend offline. Đang giả lập lưu tin tức vào LocalStorage.');
+        const local = localStorage.getItem('digiheart_news');
+        const list = local ? JSON.parse(local) : [];
+        const newNews = {
+          id: Date.now(),
+          ...newsData,
+          date: new Date().toISOString().split('T')[0]
+        };
+        const updatedList = [newNews, ...list];
+        localStorage.setItem('digiheart_news', JSON.stringify(updatedList));
+        return { message: 'Đăng bài viết thành công (Offline)!', news: newNews };
+      }
+      throw new Error(error.response?.data?.message || 'Lỗi đăng bài viết tin tức!');
+    }
+  },
+
+  // Xóa tin tức (Yêu cầu quyền Admin)
+  delete: async (id) => {
+    try {
+      const response = await api.delete(`/news/${id}`);
+      return response.data;
+    } catch (error) {
+      if (isNetworkError(error)) {
+        const local = localStorage.getItem('digiheart_news');
+        if (local) {
+          const list = JSON.parse(local);
+          const filtered = list.filter(item => item.id !== id && item._id !== id);
+          localStorage.setItem('digiheart_news', JSON.stringify(filtered));
+          return { message: 'Xóa bài viết cục bộ thành công!' };
+        }
+      }
+      throw error;
+    }
+  },
+
+  // Cập nhật tin tức (Yêu cầu quyền Admin)
+  update: async (id, newsData) => {
+    try {
+      const response = await api.put(`/news/${id}`, newsData);
+      return response.data;
+    } catch (error) {
+      if (isNetworkError(error)) {
+        const local = localStorage.getItem('digiheart_news');
+        if (local) {
+          const list = JSON.parse(local);
+          const updated = list.map(item => {
+            if (item.id === id || item._id === id) {
+              return { ...item, ...newsData };
+            }
+            return item;
+          });
+          localStorage.setItem('digiheart_news', JSON.stringify(updated));
+          return { message: 'Chỉnh sửa bài viết cục bộ thành công!', news: { id, ...newsData } };
+        }
+      }
+      throw new Error(error.response?.data?.message || 'Lỗi cập nhật bài viết tin tức!');
     }
   }
 };

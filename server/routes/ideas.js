@@ -4,6 +4,16 @@ import authMiddleware from '../middleware/auth.js';
 
 const router = express.Router();
 
+// 1.2 API Lấy danh sách ý tưởng đã được duyệt/tiếp nhận (Công khai)
+router.get('/approved', async (req, res) => {
+  try {
+    const ideas = await Idea.find({ status: { $ne: 'Chờ duyệt' } }).sort({ createdAt: -1 });
+    res.json(ideas);
+  } catch (error) {
+    res.status(500).json({ message: 'Lỗi lấy danh sách sáng kiến số!', error: error.message });
+  }
+});
+
 // 1. API Lấy danh sách toàn bộ ý tưởng (Dành riêng cho Admin)
 router.get('/', authMiddleware, async (req, res) => {
   try {

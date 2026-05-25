@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   FiUsers, FiZap, FiGrid, FiCheck, FiX, FiTrash2, 
-  FiRefreshCw, FiArrowRight, FiShield, FiFileText 
+  FiRefreshCw, FiArrowRight, FiShield, FiFileText, FiEdit
 } from 'react-icons/fi';
-import { candidateAPI, ideaAPI, postAPI } from '../utils/api';
+import { candidateAPI, ideaAPI, postAPI, newsAPI } from '../utils/api';
 
 /**
  * View AdminDashboard - Trang quản trị trung tâm dành cho Ban chủ nhiệm CLB Digi Heart.
@@ -20,6 +20,20 @@ export default function AdminDashboard() {
   const [candidates, setCandidates] = useState([]);
   const [ideas, setIdeas] = useState([]);
   const [posts, setPosts] = useState([]);
+  const [news, setNews] = useState([]);
+  
+  // Trạng thái đăng tin tức mới
+  const [showAddNews, setShowAddNews] = useState(false);
+  const [showEditNews, setShowEditNews] = useState(false);
+  const [editingNewsId, setEditingNewsId] = useState(null);
+  const [newsForm, setNewsForm] = useState({
+    title: '',
+    summary: '',
+    content: '',
+    category: 'Hoạt động Đoàn',
+    author: 'Ban Truyền Thông',
+    image: ''
+  });
   
   // Trạng thái loading
   const [loading, setLoading] = useState(false);
@@ -41,14 +55,16 @@ export default function AdminDashboard() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [candidatesData, ideasData, postsData] = await Promise.all([
+      const [candidatesData, ideasData, postsData, newsData] = await Promise.all([
         candidateAPI.getAll(),
         ideaAPI.getAll(),
-        postAPI.getAll()
+        postAPI.getAll(),
+        newsAPI.getAll()
       ]);
       setCandidates(candidatesData);
       setIdeas(ideasData);
       setPosts(postsData);
+      setNews(newsData);
     } catch (error) {
       showNotify('Không thể kết nối đến máy chủ. Hệ thống đang chạy ở chế độ offline LocalStorage Fallback!', 'warning');
     } finally {
@@ -129,13 +145,95 @@ export default function AdminDashboard() {
     }
   };
 
+  // ==========================================
+  // XỬ LÝ NEWS (TIN TỨC & SỰ KIỆN)
+  // ==========================================
+  const handleCreateNews = async (e) => {
+    e.preventDefault();
+    if (!newsForm.title || !newsForm.summary || !newsForm.content || !newsForm.author) {
+      showNotify('Vui lòng điền đầy đủ các thông tin bắt buộc (*)', 'warning');
+      return;
+    }
+    try {
+      const response = await newsAPI.create(newsForm);
+      showNotify('Đã đăng bài viết tin tức thành công!');
+      setNews([response.news, ...news]);
+      setShowAddNews(false);
+      setNewsForm({
+        title: '',
+        summary: '',
+        content: '',
+        category: 'Hoạt động Đoàn',
+        author: 'Ban Truyền Thông',
+        image: ''
+      });
+    } catch (error) {
+      showNotify(error.message || 'Lỗi khi đăng tin tức!', 'danger');
+    }
+  };
+
+  const handleDeleteNews = async (id) => {
+    if (!window.confirm('Bạn có chắc chắn muốn xóa bài viết tin tức này không?')) return;
+    try {
+      await newsAPI.delete(id);
+      showNotify('Đã xóa bài viết tin tức thành công!');
+      setNews(news.filter(item => item._id !== id && item.id !== id));
+    } catch (error) {
+      showNotify('Gặp lỗi khi xóa bài viết tin tức!', 'danger');
+    }
+  };
+  
+  const startEditNews = (item) => {
+    setEditingNewsId(item._id || item.id);
+    setNewsForm({
+      title: item.title,
+      summary: item.summary,
+      content: item.content,
+      category: item.category,
+      author: item.author,
+      image: item.image || ''
+    });
+    setShowEditNews(true);
+  };
+  
+  const handleUpdateNews = async (e) => {
+    e.preventDefault();
+    if (!newsForm.title || !newsForm.summary || !newsForm.content || !newsForm.author) {
+      showNotify('Vui lòng điền đầy đủ các thông tin bắt buộc (*)', 'warning');
+      return;
+    }
+    try {
+      const response = await newsAPI.update(editingNewsId, newsForm);
+      showNotify('Đã cập nhật bài viết tin tức thành công!');
+      
+      const updatedNews = response.news || { ...newsForm, _id: editingNewsId };
+      setNews(news.map(item => 
+        (item._id === editingNewsId || item.id === editingNewsId) ? { ...item, ...updatedNews } : item
+      ));
+      
+      setShowEditNews(false);
+      setEditingNewsId(null);
+      setNewsForm({
+        title: '',
+        summary: '',
+        content: '',
+        category: 'Hoạt động Đoàn',
+        author: 'Ban Truyền Thông',
+        image: ''
+      });
+    } catch (error) {
+      showNotify(error.message || 'Lỗi khi cập nhật tin tức!', 'danger');
+    }
+  };
+
   // Tính toán nhanh số liệu thống kê
   const stats = {
     totalCandidates: candidates.length,
     pendingCandidates: candidates.filter(c => c.status === 'Chờ duyệt').length,
     approvedCandidates: candidates.filter(c => c.status === 'Đã duyệt').length,
     totalIdeas: ideas.length,
-    totalPosts: posts.length
+    totalPosts: posts.length,
+    totalNews: news.length
   };
 
   return (
@@ -261,6 +359,17 @@ export default function AdminDashboard() {
           >
             <FiGrid className="w-4 h-4" />
             <span>Bài viết Fanpage ({stats.totalPosts})</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('news')}
+            className={`flex-grow md:flex-grow-0 px-5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-1.5 ${
+              activeTab === 'news' 
+                ? 'bg-blue-50 text-[#0054A6] shadow-sm border border-blue-100/50' 
+                : 'text-gray-550 hover:bg-gray-50'
+            }`}
+          >
+            <FiFileText className="w-4 h-4" />
+            <span>Quản lý Tin Tức ({stats.totalNews})</span>
           </button>
         </div>
 
@@ -521,10 +630,333 @@ export default function AdminDashboard() {
               </div>
             )}
 
+            {/* TAB 4: QUẢN LÝ TIN TỨC */}
+            {activeTab === 'news' && (
+              <div>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-gray-100 pb-4 animate-fadeIn">
+                  <h3 className="text-lg font-bold text-gray-800 flex items-center space-x-2">
+                    <FiFileText className="text-[#0054A6]" />
+                    <span>Danh sách bài viết tin tức & sự kiện</span>
+                  </h3>
+                  <button
+                    onClick={() => setShowAddNews(true)}
+                    className="px-4 py-2 bg-[#0054A6] hover:bg-[#003d80] text-white text-xs font-bold rounded-xl shadow-md transition-colors flex items-center space-x-1.5 self-start"
+                  >
+                    <span>+ Đăng tin tức mới</span>
+                  </button>
+                </div>
+
+                {news.length === 0 ? (
+                  <div className="py-12 text-center text-gray-400 text-xs animate-fadeIn">Hiện tại chưa có tin tức nào được đăng.</div>
+                ) : (
+                  <div className="overflow-x-auto animate-fadeIn">
+                    <table className="w-full text-left text-xs text-gray-600 min-w-[800px]">
+                      <thead className="text-[10px] uppercase bg-gray-50 text-gray-500 border-b border-gray-200">
+                        <tr>
+                          <th className="px-4 py-3.5">Tiêu đề tin tức</th>
+                          <th className="px-4 py-3.5">Danh mục</th>
+                          <th className="px-4 py-3.5">Người viết / Ngày đăng</th>
+                          <th className="px-4 py-3.5">Tóm tắt ngắn</th>
+                          <th className="px-4 py-3.5 text-center">Thao tác</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-155">
+                        {news.map((item) => {
+                          const itemId = item._id || item.id;
+                          return (
+                            <tr key={itemId} className="hover:bg-gray-50/50">
+                              <td className="px-4 py-4">
+                                <div className="flex items-center space-x-3 max-w-[280px]">
+                                  {item.image && (
+                                    <img
+                                      src={item.image}
+                                      alt="Cover"
+                                      className="w-10 h-10 object-cover rounded-lg shrink-0 border border-gray-100"
+                                    />
+                                  )}
+                                  <p className="font-bold text-gray-800 line-clamp-2" title={item.title}>
+                                    {item.title}
+                                  </p>
+                                </div>
+                              </td>
+                              <td className="px-4 py-4 font-semibold">
+                                <span className="px-2.5 py-1 bg-blue-50/80 text-[#0054A6] rounded-md font-bold text-[10px]">
+                                  {item.category}
+                                </span>
+                              </td>
+                              <td className="px-4 py-4">
+                                <p className="font-bold text-gray-700">{item.author}</p>
+                                <p className="text-gray-400 text-[10px] mt-0.5">{item.date}</p>
+                              </td>
+                              <td className="px-4 py-4 max-w-[280px]">
+                                <p className="text-gray-500 line-clamp-2" title={item.summary}>
+                                  {item.summary}
+                                </p>
+                              </td>
+                              <td className="px-4 py-4 text-center">
+                                <div className="flex items-center justify-center space-x-1.5">
+                                  <button
+                                    onClick={() => startEditNews(item)}
+                                    className="p-1.5 bg-blue-50 hover:bg-blue-100 text-[#0054A6] rounded-lg transition-colors"
+                                    title="Chỉnh sửa bài viết"
+                                  >
+                                    <FiEdit className="w-4 h-4" />
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteNews(itemId)}
+                                    className="p-1.5 bg-red-50 hover:bg-red-100 text-red-500 rounded-lg transition-colors"
+                                    title="Xóa bài viết tin tức"
+                                  >
+                                    <FiTrash2 className="w-4 h-4" />
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            )}
+
+          </div>
+        )}
+
+        {/* 🔐 Modal Đăng Tin Tức Mới */}
+        {showAddNews && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/55 backdrop-blur-sm p-4 animate-fadeIn">
+            <div className="bg-white border border-gray-200/80 w-full max-w-2xl rounded-3xl p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+              <h3 className="text-lg font-black text-gray-800 mb-5 flex items-center space-x-2 border-b border-gray-100 pb-3">
+                <FiFileText className="text-[#0054A6] w-5 h-5" />
+                <span>Đăng Tin Tức & Sự Kiện Mới</span>
+              </h3>
+
+              <form onSubmit={handleCreateNews} className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Tiêu đề tin tức *</label>
+                    <input
+                      type="text"
+                      value={newsForm.title}
+                      onChange={(e) => setNewsForm({ ...newsForm, title: e.target.value })}
+                      className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#0054A6] text-gray-800 shadow-inner"
+                      placeholder="Nhập tiêu đề nổi bật..."
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Tác giả (Người viết) *</label>
+                    <input
+                      type="text"
+                      value={newsForm.author}
+                      onChange={(e) => setNewsForm({ ...newsForm, author: e.target.value })}
+                      className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#0054A6] text-gray-800 shadow-inner"
+                      placeholder="Ban Truyền Thông, Nguyễn Văn A..."
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Danh mục tin tức *</label>
+                    <select
+                      value={newsForm.category}
+                      onChange={(e) => setNewsForm({ ...newsForm, category: e.target.value })}
+                      className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#0054A6] text-gray-800"
+                      required
+                    >
+                      <option value="Hoạt động Đoàn">Hoạt động Đoàn</option>
+                      <option value="Đào tạo">Đào tạo</option>
+                      <option value="Cẩm nang số">Cẩm nang số</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Link ảnh đại diện (URL)</label>
+                    <input
+                      type="url"
+                      value={newsForm.image}
+                      onChange={(e) => setNewsForm({ ...newsForm, image: e.target.value })}
+                      className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#0054A6] text-gray-800 shadow-inner"
+                      placeholder="https://images.unsplash.com/..."
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Tóm tắt ngắn bài viết *</label>
+                  <input
+                    type="text"
+                    value={newsForm.summary}
+                    onChange={(e) => setNewsForm({ ...newsForm, summary: e.target.value })}
+                    className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#0054A6] text-gray-800 shadow-inner"
+                    placeholder="Tóm tắt ngắn gọn nội dung tin tức..."
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Nội dung chi tiết tin tức *</label>
+                  <textarea
+                    rows="6"
+                    value={newsForm.content}
+                    onChange={(e) => setNewsForm({ ...newsForm, content: e.target.value })}
+                    className="w-full bg-white border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:border-[#0054A6] text-gray-800 resize-none shadow-inner"
+                    placeholder="Viết nội dung bài viết tin tức tại đây..."
+                    required
+                  />
+                </div>
+
+                <div className="flex items-center justify-end space-x-3 pt-3 border-t border-gray-100">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowAddNews(false);
+                      setNewsForm({
+                        title: '',
+                        summary: '',
+                        content: '',
+                        category: 'Hoạt động Đoàn',
+                        author: 'Ban Truyền Thông',
+                        image: ''
+                      });
+                    }}
+                    className="px-4 py-2 text-xs font-bold text-gray-500 hover:bg-gray-100 rounded-xl transition-colors"
+                  >
+                    Hủy bỏ
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-5 py-2 bg-[#0054A6] hover:bg-[#003d80] text-white text-xs font-bold rounded-xl shadow-md transition-colors"
+                  >
+                    Đăng tin tức
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+        
+        {/* 🔐 Modal Chỉnh Sửa Tin Tức */}
+        {showEditNews && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/55 backdrop-blur-sm p-4 animate-fadeIn">
+            <div className="bg-white border border-gray-200/80 w-full max-w-2xl rounded-3xl p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+              <h3 className="text-lg font-black text-gray-800 mb-5 flex items-center space-x-2 border-b border-gray-100 pb-3">
+                <FiEdit className="text-[#0054A6] w-5 h-5" />
+                <span>Chỉnh Sửa Tin Tức & Sự Kiện</span>
+              </h3>
+
+              <form onSubmit={handleUpdateNews} className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Tiêu đề tin tức *</label>
+                    <input
+                      type="text"
+                      value={newsForm.title}
+                      onChange={(e) => setNewsForm({ ...newsForm, title: e.target.value })}
+                      className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#0054A6] text-gray-800 shadow-inner"
+                      placeholder="Nhập tiêu đề nổi bật..."
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Tác giả (Người viết) *</label>
+                    <input
+                      type="text"
+                      value={newsForm.author}
+                      onChange={(e) => setNewsForm({ ...newsForm, author: e.target.value })}
+                      className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#0054A6] text-gray-800 shadow-inner"
+                      placeholder="Ban Truyền Thông, Nguyễn Văn A..."
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Danh mục tin tức *</label>
+                    <select
+                      value={newsForm.category}
+                      onChange={(e) => setNewsForm({ ...newsForm, category: e.target.value })}
+                      className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#0054A6] text-gray-800"
+                      required
+                    >
+                      <option value="Hoạt động Đoàn">Hoạt động Đoàn</option>
+                      <option value="Đào tạo">Đào tạo</option>
+                      <option value="Cẩm nang số">Cẩm nang số</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Link ảnh đại diện (URL)</label>
+                    <input
+                      type="url"
+                      value={newsForm.image}
+                      onChange={(e) => setNewsForm({ ...newsForm, image: e.target.value })}
+                      className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#0054A6] text-gray-800 shadow-inner"
+                      placeholder="https://images.unsplash.com/..."
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Tóm tắt ngắn bài viết *</label>
+                  <input
+                    type="text"
+                    value={newsForm.summary}
+                    onChange={(e) => setNewsForm({ ...newsForm, summary: e.target.value })}
+                    className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#0054A6] text-gray-800 shadow-inner"
+                    placeholder="Tóm tắt ngắn gọn nội dung tin tức..."
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Nội dung chi tiết tin tức *</label>
+                  <textarea
+                    rows="6"
+                    value={newsForm.content}
+                    onChange={(e) => setNewsForm({ ...newsForm, content: e.target.value })}
+                    className="w-full bg-white border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:border-[#0054A6] text-gray-800 resize-none shadow-inner"
+                    placeholder="Viết nội dung bài viết tin tức tại đây..."
+                    required
+                  />
+                </div>
+
+                <div className="flex items-center justify-end space-x-3 pt-3 border-t border-gray-100">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowEditNews(false);
+                      setEditingNewsId(null);
+                      setNewsForm({
+                        title: '',
+                        summary: '',
+                        content: '',
+                        category: 'Hoạt động Đoàn',
+                        author: 'Ban Truyền Thông',
+                        image: ''
+                      });
+                    }}
+                    className="px-4 py-2 text-xs font-bold text-gray-500 hover:bg-gray-100 rounded-xl transition-colors"
+                  >
+                    Hủy bỏ
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-5 py-2 bg-[#0054A6] hover:bg-[#003d80] text-white text-xs font-bold rounded-xl shadow-md transition-colors"
+                  >
+                    Cập nhật tin tức
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         )}
 
       </div>
     </div>
+
   );
 }
