@@ -124,17 +124,19 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8">
             {keyObjectives.map((obj, index) => (
               <div
                 key={index}
-                className="p-6 sm:p-8 bg-gray-50 border border-gray-200/60 rounded-2xl sm:rounded-3xl hover:bg-white hover:border-[#0054A6]/30 hover:shadow-xl transition-all duration-300 flex flex-col items-center text-center group"
+                className="p-5 md:p-8 bg-gray-50 border border-gray-200/80 rounded-2xl md:rounded-3xl hover:bg-white hover:border-[#0054A6]/30 hover:shadow-xl transition-all duration-300 flex flex-row md:flex-col items-start md:items-center text-left md:text-center gap-4 md:gap-0 group"
               >
-                <div className="p-4 bg-white border border-gray-200/60 rounded-2xl mb-5 sm:mb-6 shadow-sm group-hover:scale-110 transition-transform duration-300">
+                <div className="p-3 bg-white border border-gray-200/80 rounded-xl md:rounded-2xl mb-0 md:mb-6 shadow-sm shrink-0 group-hover:scale-110 transition-transform duration-300">
                   {obj.icon}
                 </div>
-                <h3 className="text-lg sm:text-xl font-bold mb-3 text-gray-800">{obj.title}</h3>
-                <p className="text-gray-500 leading-relaxed text-sm">{obj.description}</p>
+                <div className="flex-grow">
+                  <h3 className="text-sm md:text-xl font-bold mb-1 md:mb-3 text-gray-800">{obj.title}</h3>
+                  <p className="text-xs md:text-sm text-gray-500 leading-relaxed">{obj.description}</p>
+                </div>
               </div>
             ))}
           </div>

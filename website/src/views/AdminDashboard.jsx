@@ -243,8 +243,8 @@ export default function AdminDashboard() {
         {/* Header Dashboard */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 pb-5 border-b border-gray-200">
           <div>
-            <h1 className="text-3xl font-black text-gray-800 flex items-center space-x-2">
-              <FiShield className="text-[#0054A6] w-8 h-8" />
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-gray-800 flex items-center space-x-2">
+              <FiShield className="text-[#0054A6] w-6 h-6 md:w-8 md:h-8 shrink-0" />
               <span>Bảng Điều Khiển Quản Trị</span>
             </h1>
             <p className="text-gray-400 text-xs mt-1.5 font-semibold uppercase tracking-wider">
@@ -326,10 +326,10 @@ export default function AdminDashboard() {
         </div>
 
         {/* 🗂️ Menu Tab Quản Lý */}
-        <div className="flex border-b border-gray-200 mb-6 bg-white p-2 rounded-2xl border border-gray-150 shadow-sm space-x-1">
+        <div className="flex overflow-x-auto whitespace-nowrap border-b border-gray-200 mb-6 bg-white p-2 rounded-2xl border border-gray-150 shadow-sm space-x-1 scrollbar-none">
           <button
             onClick={() => setActiveTab('candidates')}
-            className={`flex-grow md:flex-grow-0 px-5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-1.5 ${
+            className={`shrink-0 px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-1.5 ${
               activeTab === 'candidates' 
                 ? 'bg-blue-50 text-[#0054A6] shadow-sm border border-blue-100/50' 
                 : 'text-gray-550 hover:bg-gray-50'
@@ -340,7 +340,7 @@ export default function AdminDashboard() {
           </button>
           <button
             onClick={() => setActiveTab('ideas')}
-            className={`flex-grow md:flex-grow-0 px-5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-1.5 ${
+            className={`shrink-0 px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-1.5 ${
               activeTab === 'ideas' 
                 ? 'bg-[#E30613]/5 text-[#E30613] shadow-sm border border-[#E30613]/10' 
                 : 'text-gray-550 hover:bg-gray-50'
@@ -351,7 +351,7 @@ export default function AdminDashboard() {
           </button>
           <button
             onClick={() => setActiveTab('posts')}
-            className={`flex-grow md:flex-grow-0 px-5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-1.5 ${
+            className={`shrink-0 px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-1.5 ${
               activeTab === 'posts' 
                 ? 'bg-emerald-50 text-[#0054A6] shadow-sm border border-emerald-100' 
                 : 'text-gray-550 hover:bg-gray-50'
@@ -362,7 +362,7 @@ export default function AdminDashboard() {
           </button>
           <button
             onClick={() => setActiveTab('news')}
-            className={`flex-grow md:flex-grow-0 px-5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-1.5 ${
+            className={`shrink-0 px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-1.5 ${
               activeTab === 'news' 
                 ? 'bg-blue-50 text-[#0054A6] shadow-sm border border-blue-100/50' 
                 : 'text-gray-550 hover:bg-gray-50'

@@ -342,92 +342,92 @@ export default function Profile() {
     <div className="min-h-screen bg-gray-50/50 pb-16">
       
       {/* 🚀 Cover Banner Layer */}
-      <div className="relative bg-gradient-to-r from-blue-700 via-[#0054A6] to-indigo-800 h-36 md:h-48 shadow-inner">
+      <div className="relative bg-gradient-to-r from-blue-700 via-[#0054A6] to-indigo-800 h-28 md:h-44 shadow-inner">
         <div className="absolute inset-0 bg-black/15"></div>
-        <div className="max-w-6xl mx-auto px-4 h-full flex items-end relative z-10">
-          <div className="flex flex-col md:flex-row items-center md:items-end space-y-4 md:space-y-0 md:space-x-6 w-full text-center md:text-left pb-4 md:pb-6">
+      </div>
+
+      {/* 👤 Khối thông tin cá nhân chính (Avatar, Tên, Nút) */}
+      <div className="max-w-6xl mx-auto px-4 relative z-10 -mt-14 md:-mt-20 flex flex-col md:flex-row items-center md:items-end md:space-x-6 text-center md:text-left mb-8">
+        
+        {/* Avatar tròn lớn */}
+        <div className="w-28 h-28 md:w-36 md:h-36 rounded-full border-4 border-white bg-blue-50 shadow-lg overflow-hidden flex items-center justify-center font-black text-[#0054A6] shrink-0 select-none relative group mb-4 md:mb-0">
+          {profile?.avatar || user?.avatar ? (
+            <img 
+              src={profile?.avatar || user?.avatar} 
+              alt="Avatar" 
+              className="w-full h-full object-cover" 
+            />
+          ) : (
+            <span className="text-4xl md:text-5xl">{avatarLetter}</span>
+          )}
+          
+          {/* Overlay tùy chọn ảnh đại diện khi hover */}
+          <div className="absolute inset-0 bg-black/55 flex flex-col items-center justify-center text-white text-[10px] md:text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity overflow-hidden">
             
-            {/* Avatar tròn lớn */}
-            <div className="w-28 h-28 md:w-36 md:h-36 rounded-full border-4 border-white bg-blue-50 shadow-lg overflow-hidden flex items-center justify-center font-black text-[#0054A6] flex-shrink-0 select-none translate-y-10 md:translate-y-14 relative group">
-              {profile?.avatar || user?.avatar ? (
-                <img 
-                  src={profile?.avatar || user?.avatar} 
-                  alt="Avatar" 
-                  className="w-full h-full object-cover" 
-                />
-              ) : (
-                <span className="text-4xl md:text-5xl">{avatarLetter}</span>
-              )}
-              
-              {/* Overlay tùy chọn ảnh đại diện khi hover */}
-              <div className="absolute inset-0 bg-black/55 flex flex-col items-center justify-center text-white text-[10px] md:text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity overflow-hidden">
-                
-                {/* Lựa chọn tải ảnh mới */}
-                <label className="flex flex-col items-center justify-center cursor-pointer hover:bg-white/10 transition-colors w-full h-1/2 border-b border-white/10 pt-2 pb-1">
-                  <FiEdit className="w-3.5 h-3.5 mb-1" />
-                  <span>Đổi ảnh</span>
-                  <input 
-                    type="file" 
-                    accept="image/*" 
-                    onChange={handleAvatarChange} 
-                    className="hidden" 
-                  />
-                </label>
+            {/* Lựa chọn tải ảnh mới */}
+            <label className="flex flex-col items-center justify-center cursor-pointer hover:bg-white/10 transition-colors w-full h-1/2 border-b border-white/10 pt-2 pb-1">
+              <FiEdit className="w-3.5 h-3.5 mb-1" />
+              <span>Đổi ảnh</span>
+              <input 
+                type="file" 
+                accept="image/*" 
+                onChange={handleAvatarChange} 
+                className="hidden" 
+              />
+            </label>
 
-                {/* Lựa chọn xóa ảnh nếu đã có */}
-                {profile?.avatar || user?.avatar ? (
-                  <button 
-                    type="button" 
-                    onClick={handleDeleteAvatar} 
-                    className="flex flex-col items-center justify-center w-full h-1/2 hover:bg-red-500/20 text-red-200 hover:text-red-100 transition-colors pt-1 pb-2"
-                  >
-                    <FiX className="w-3.5 h-3.5 mb-1" />
-                    <span>Xóa ảnh</span>
-                  </button>
-                ) : (
-                  <div className="flex flex-col items-center justify-center w-full h-1/2 opacity-30 select-none pt-1 pb-2">
-                    <FiX className="w-3.5 h-3.5 mb-1 text-gray-400" />
-                    <span className="text-gray-400">Xóa ảnh</span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Tên và Vai trò */}
-            <div className="pb-1 md:pb-2 flex-grow text-gray-800 md:text-white">
-              <h2 className="text-2xl md:text-3xl font-black flex items-center justify-center md:justify-start space-x-3 drop-shadow-none md:drop-shadow-sm">
-                <span>{profile?.fullName || user?.fullName}</span>
-                <span className="text-[10px] md:text-xs px-2.5 py-0.5 font-bold rounded-full bg-blue-100 text-[#0054A6] md:bg-white/20 md:text-white md:border md:border-white/10 md:backdrop-blur-sm shadow-sm">
-                  {user?.role === 'admin' || user?.role === 'superadmin' ? 'Ban Quản Trị' : 'Thành Viên CLB'}
-                </span>
-              </h2>
-              <p className="text-gray-500 md:text-blue-100/90 text-sm mt-1 font-semibold">@{user?.username}</p>
-            </div>
-
-            {/* Các nút tác vụ nhanh */}
-            <div className="flex items-center space-x-3 pb-2 md:pb-4 self-center md:self-end md:translate-y-12">
-              <Link
-                to="/fanpage"
-                className="px-4 py-2 bg-white text-[#0054A6] hover:bg-blue-50 text-xs font-bold rounded-xl shadow-md border border-gray-200 transition-all flex items-center space-x-1.5"
+            {/* Lựa chọn xóa ảnh nếu đã có */}
+            {profile?.avatar || user?.avatar ? (
+              <button 
+                type="button" 
+                onClick={handleDeleteAvatar} 
+                className="flex flex-col items-center justify-center w-full h-1/2 hover:bg-red-500/20 text-red-200 hover:text-red-100 transition-colors pt-1 pb-2"
               >
-                <FiEdit className="w-3.5 h-3.5" />
-                <span>Đăng bài viết mới</span>
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="px-4 py-2 bg-[#E30613] hover:bg-[#c2050f] text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center space-x-1.5"
-              >
-                <FiLogOut className="w-3.5 h-3.5" />
-                <span>Đăng xuất</span>
+                <FiX className="w-3.5 h-3.5 mb-1" />
+                <span>Xóa ảnh</span>
               </button>
-            </div>
-
+            ) : (
+              <div className="flex flex-col items-center justify-center w-full h-1/2 opacity-30 select-none pt-1 pb-2">
+                <FiX className="w-3.5 h-3.5 mb-1 text-gray-400" />
+                <span className="text-gray-400">Xóa ảnh</span>
+              </div>
+            )}
           </div>
         </div>
+
+        {/* Tên và Vai trò */}
+        <div className="pb-1 flex-grow text-gray-800">
+          <h2 className="text-xl md:text-3xl font-black flex flex-col sm:flex-row items-center justify-center md:justify-start gap-2">
+            <span>{profile?.fullName || user?.fullName}</span>
+            <span className="text-[10px] md:text-xs px-2.5 py-0.5 font-bold rounded-full bg-blue-50 text-[#0054A6] border border-blue-150 shadow-sm w-fit">
+              {user?.role === 'admin' || user?.role === 'superadmin' ? 'Ban Quản Trị' : 'Thành Viên CLB'}
+            </span>
+          </h2>
+          <p className="text-gray-400 text-xs mt-1 font-semibold">@{user?.username}</p>
+        </div>
+
+        {/* Các nút tác vụ nhanh */}
+        <div className="flex items-center justify-center space-x-3 mt-4 md:mt-0 shrink-0 pb-1">
+          <Link
+            to="/fanpage"
+            className="px-4 py-2 bg-white text-[#0054A6] hover:bg-blue-50 text-xs font-bold rounded-xl shadow-md border border-gray-200 transition-all flex items-center space-x-1.5"
+          >
+            <FiEdit className="w-3.5 h-3.5" />
+            <span>Đăng bài viết mới</span>
+          </Link>
+          <button
+            onClick={handleLogout}
+            className="px-4 py-2 bg-[#E30613] hover:bg-[#c2050f] text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center space-x-1.5"
+          >
+            <FiLogOut className="w-3.5 h-3.5" />
+            <span>Đăng xuất</span>
+          </button>
+        </div>
+
       </div>
 
       {/* 📊 Main Content Layout */}
-      <div className="max-w-6xl mx-auto px-4 mt-12 md:mt-16">
+      <div className="max-w-6xl mx-auto px-4 mt-4 md:mt-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
           {/* 📌 Cột Trái: Thông tin cá nhân chi tiết */}
