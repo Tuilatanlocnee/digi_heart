@@ -30,13 +30,10 @@ export default function Footer() {
                 <Link to="/" className="hover:text-[#0054A6] transition-colors duration-200">Trang chủ</Link>
               </li>
               <li>
-                <Link to="/news" className="hover:text-[#0054A6] transition-colors duration-200">Tin tức & Sự kiện</Link>
+                <Link to="/news" className="hover:text-[#0054A6] transition-colors duration-200">Tin tức</Link>
               </li>
               <li>
                 <Link to="/projects" className="hover:text-[#0054A6] transition-colors duration-200">Dự án số</Link>
-              </li>
-              <li>
-                <Link to="/fanpage" className="hover:text-[#0054A6] transition-colors duration-200">Fanpage</Link>
               </li>
               <li>
                 <Link to="/join-us" className="hover:text-[#0054A6] transition-colors duration-200">Gia nhập CLB</Link>

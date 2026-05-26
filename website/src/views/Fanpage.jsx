@@ -237,17 +237,17 @@ export default function Fanpage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Banner tiêu đề chính */}
-        <div className="text-center max-w-3xl mx-auto mb-16 relative">
+        <div className="text-center max-w-4xl mx-auto mb-16 relative">
           <h1 className="text-2xl sm:text-3xl md:text-5xl font-black mb-4 text-gray-800">
             Tin Tức CLB <span className="text-[#0054A6]">Digi Heart</span>
           </h1>
-          <p className="text-gray-500 font-medium">
+          <p className="text-gray-500 font-medium md:whitespace-nowrap">
             Nơi kết nối và cập nhật tức thì các hoạt động, hình ảnh sôi nổi của Câu lạc bộ Chuyển đổi số Digi Heart.
           </p>
 
           {/* Nút đăng bài cho thành viên đã đăng nhập */}
-          <div className="mt-6 flex justify-center animate-fadeIn">
-            {isLoggedIn ? (
+          {isLoggedIn && (
+            <div className="mt-6 flex justify-center animate-fadeIn">
               <button
                 onClick={() => setShowAddModal(true)}
                 className="px-6 py-2.5 bg-[#0054A6] hover:bg-[#003d80] text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center space-x-2 hover:scale-105"
@@ -255,12 +255,8 @@ export default function Fanpage() {
                 <FiPlusCircle className="w-4 h-4 text-emerald-300" />
                 <span>Đăng Bài Viết Mới</span>
               </button>
-            ) : (
-              <div className="text-xs text-gray-400 font-semibold bg-white px-4 py-2 rounded-xl border border-gray-200 shadow-sm">
-                💡 Đăng nhập để chia sẻ hoạt động chuyển đổi số của bạn cùng câu lạc bộ!
-              </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
         {/* Bố cục trang gồm Sidebar lọc và Timeline chính */}

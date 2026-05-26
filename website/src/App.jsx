@@ -2,7 +2,6 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './views/Home';
-import News from './views/News';
 import Projects from './views/Projects';
 import Fanpage from './views/Fanpage';
 import Contact from './views/Contact';
@@ -25,9 +24,8 @@ function App() {
         <main className="flex-grow">
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/news" element={<News />} />
+            <Route path="/news" element={<Fanpage />} />
             <Route path="/projects" element={<Projects />} />
-            <Route path="/fanpage" element={<Fanpage />} />
             <Route path="/contact" element={<Contact />} />
             
             {/* Phân hệ quản trị Admin */}
