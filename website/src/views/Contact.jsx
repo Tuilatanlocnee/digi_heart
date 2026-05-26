@@ -7,9 +7,6 @@ import { ideaAPI } from '../utils/api';
  * Kết nối dữ liệu MongoDB thông qua Backend API (hỗ trợ offline LocalStorage Fallback).
  */
 export default function Contact() {
-  // Trạng thái lưu trữ danh sách ý tưởng sáng tạo số đã gửi
-  const [ideas, setIdeas] = useState([]);
-  
   // Trạng thái nhập liệu cho form
   const [formData, setFormData] = useState({
     fullName: '',
@@ -20,20 +17,6 @@ export default function Contact() {
 
   // Trạng thái hiện popup báo gửi thành công
   const [showSuccess, setShowSuccess] = useState(false);
-
-  // 1. Tải danh sách ý tưởng khi khởi chạy trang
-  const fetchIdeas = async () => {
-    try {
-      const data = await ideaAPI.getAll();
-      setIdeas(data);
-    } catch (error) {
-      console.error('Không lấy được danh sách ý tưởng:', error);
-    }
-  };
-
-  useEffect(() => {
-    fetchIdeas();
-  }, []);
 
   // 2. Xử lý khi Submit gửi ý tưởng
   const handleSubmit = async (e) => {
@@ -48,8 +31,7 @@ export default function Contact() {
         description: formData.description
       });
 
-      // Tải lại danh sách sáng kiến
-      fetchIdeas();
+
 
       // Reset form
       setFormData({
@@ -211,47 +193,7 @@ export default function Contact() {
 
         </div>
 
-        {/* 💡 Danh sách các ý tưởng số hóa đã ghi nhận */}
-        <div className="mt-16 bg-white border border-gray-200/80 rounded-3xl p-6 shadow-sm">
-          <h3 className="text-xl font-bold mb-4 flex items-center space-x-2 text-gray-800">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#0054A6] animate-pulse"></span>
-            <span>Các ý tưởng đã được tiếp nhận</span>
-          </h3>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-gray-600">
-              <thead className="text-xs uppercase bg-gray-50 text-gray-700 border-b border-gray-200">
-                <tr>
-                  <th className="px-4 py-3">Người đóng góp</th>
-                  <th className="px-4 py-3">Tên sáng kiến</th>
-                  <th className="px-4 py-3 text-center">Tiến trình</th>
-                  <th className="px-4 py-3">Ngày gửi</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {ideas.map((idea) => {
-                  const ideaId = idea._id || idea.id;
-                  return (
-                    <tr key={ideaId} className="hover:bg-gray-50/50">
-                      <td className="px-4 py-3 font-bold text-gray-850">{idea.fullName}</td>
-                      <td className="px-4 py-3 text-[#0054A6] font-semibold">{idea.title}</td>
-                      <td className="px-4 py-3 text-center">
-                        <span className={`px-2.5 py-0.5 rounded-full font-bold text-[10px] ${
-                          idea.status === 'Đã áp dụng' ? 'bg-emerald-50 text-emerald-600' :
-                          idea.status === 'Đang thử nghiệm' ? 'bg-blue-50 text-blue-500' :
-                          idea.status === 'Đã tiếp nhận' ? 'bg-purple-50 text-purple-600' :
-                          'bg-amber-50 text-amber-600'
-                        }`}>
-                          {idea.status}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-gray-400">{idea.date}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
+
 
       </div>
     </div>

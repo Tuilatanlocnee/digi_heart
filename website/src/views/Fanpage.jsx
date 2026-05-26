@@ -1,687 +1,511 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { FiThumbsUp, FiMessageSquare, FiSend, FiPlusCircle, FiUser, FiClock, FiEdit, FiX, FiMoreHorizontal } from 'react-icons/fi';
+import { createPortal } from 'react-dom';
+import { 
+  FiImage, 
+  FiCalendar, 
+  FiUser, 
+  FiPlusCircle, 
+  FiFilter, 
+  FiInbox, 
+  FiTrash2, 
+  FiZap,
+  FiUpload,
+  FiX,
+  FiArrowLeft
+} from 'react-icons/fi';
 import { postAPI } from '../utils/api';
 
 /**
- * View Fanpage - Trang dòng thời gian (Feed) tương tác của câu lạc bộ.
- * Kết nối dữ liệu MongoDB thông qua Backend API (hỗ trợ offline LocalStorage Fallback).
+ * View Fanpage - Trang tin tức CLB Digi Heart.
+ * Hiển thị danh sách các bài viết chia sẻ theo Tháng/Năm, sắp xếp theo ngày.
+ * Người dùng có thể click vào bài viết để đọc chi tiết như một trang thông tin.
+ * Xóa bỏ hoàn toàn avatar và tên tác giả.
  */
-const getOrCreateGuestId = () => {
-  let gId = localStorage.getItem('digiheart_guest_id');
-  if (!gId) {
-    gId = 'guest_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-    localStorage.setItem('digiheart_guest_id', gId);
-  }
-  return gId;
-};
-
 export default function Fanpage() {
-  // Trạng thái lưu trữ danh sách các bài đăng
   const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedMonth, setSelectedMonth] = useState('Tất cả');
   
-  // Trạng thái đăng nhập của Admin
-  const [isLoggedIn] = useState(() => !!localStorage.getItem('digiheart_admin_token'));
-  
-  // Trạng thái guestId của khách truy cập
-  const [guestId] = useState(() => getOrCreateGuestId());
-  
-  // Trạng thái cho biểu mẫu tạo bài viết mới
-  const [newPostText, setNewPostText] = useState('');
-  const [newPostImage, setNewPostImage] = useState('');
-  
-  // Trạng thái đăng nhập và thông tin tài khoản hiện tại
-  const [currentUser] = useState(() => {
-    const userStr = localStorage.getItem('digiheart_admin_user');
-    return userStr ? JSON.parse(userStr) : null;
+  // Bài viết đang được đọc chi tiết (null: đang xem danh sách)
+  const [activePost, setActivePost] = useState(null);
+
+  // Trạng thái đăng nhập
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  // Form đăng bài viết mới
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [postForm, setPostForm] = useState({
+    title: '',
+    content: '',
+    image: ''
   });
 
-  // Trạng thái cho danh sách người thích bài viết
-  const [showLikesModal, setShowLikesModal] = useState(false);
-  const [likersList, setLikersList] = useState([]);
-  const [loadingLikers, setLoadingLikers] = useState(false);
-
-  // Trạng thái cho việc chỉnh sửa bài viết
-  const [showEditPostModal, setShowEditPostModal] = useState(false);
-  const [editingPostId, setEditingPostId] = useState(null);
-  const [editPostText, setEditPostText] = useState('');
-  const [editPostImage, setEditPostImage] = useState('');
-  const [savingPost, setSavingPost] = useState(false);
-  
-  // Trạng thái dropdown menu của bài viết
-  const [activeDropdownPostId, setActiveDropdownPostId] = useState(null);
-  
-  // Trạng thái nhập bình luận cho từng bài viết (key là ID bài viết, value là nội dung bình luận)
-  const [commentInputs, setCommentInputs] = useState({});
-
-  // Kiểm tra xem bài viết đã được thích bởi người dùng hiện tại (hoặc khách) chưa
-  const checkIfLiked = (post) => {
-    if (!post.likedBy) return false;
-    
-    const token = localStorage.getItem('digiheart_admin_token');
-    if (token) {
-      const userStr = localStorage.getItem('digiheart_admin_user');
-      if (userStr) {
-        try {
-          const user = JSON.parse(userStr);
-          return post.likedBy.includes(`user_${user.username}`);
-        } catch {
-          // Bỏ qua lỗi
-        }
-      }
-    }
-    
-    return post.likedBy.includes(`guest_${guestId}`);
-  };
-
-  // 1. Tải danh sách bài đăng khi khởi chạy trang
+  // Nạp danh sách bài viết từ Backend
   const fetchPosts = async () => {
     try {
       const data = await postAPI.getAll();
-      setPosts(data);
+      // Sắp xếp bài mới nhất lên đầu
+      const sorted = data.sort((a, b) => new Date(b.createdAt || b.time) - new Date(a.createdAt || a.time));
+      setPosts(sorted);
     } catch (error) {
-      console.error('Không tải được bài viết Fanpage:', error);
+      console.error('Không tải được danh sách bài đăng Fanpage:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    Promise.resolve().then(() => {
-      fetchPosts();
-    });
+    fetchPosts();
+
+    // Kiểm tra đăng nhập
+    const token = localStorage.getItem('digiheart_admin_token');
+    const userStr = localStorage.getItem('digiheart_admin_user');
+    if (token && userStr) {
+      try {
+        const parsed = JSON.parse(userStr);
+        setUser(parsed);
+        setIsLoggedIn(true);
+        setIsAdmin(parsed.role === 'admin' || parsed.role === 'superadmin');
+      } catch {
+        setIsLoggedIn(false);
+        setUser(null);
+        setIsAdmin(false);
+      }
+    }
   }, []);
 
-  // Tự động đóng dropdown menu khi click ra ngoài
-  useEffect(() => {
-    const handleOutsideClick = () => {
-      setActiveDropdownPostId(null);
-    };
-    window.addEventListener('click', handleOutsideClick);
-    return () => {
-      window.removeEventListener('click', handleOutsideClick);
-    };
-  }, []);
+  // Hàm chuyển đổi ngày thành định dạng Tháng/Năm
+  const getMonthYear = (post) => {
+    if (post.createdAt) {
+      const date = new Date(post.createdAt);
+      if (!isNaN(date.getTime())) {
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${month}/${year}`;
+      }
+    }
+    if (post.time && /^\d{4}-\d{2}-\d{2}$/.test(post.time)) {
+      const parts = post.time.split('-');
+      return `${parts[1]}/${parts[0]}`;
+    }
+    return 'Khác';
+  };
 
-  // 2. Xử lý Đăng bài viết mới
+  // Trích xuất danh sách các tháng duy nhất có bài đăng
+  const availableMonths = [
+    'Tất cả',
+    ...new Set(
+      posts
+        .map(post => getMonthYear(post))
+        .filter(m => m !== 'Khác')
+        .sort((a, b) => {
+          const [mA, yA] = a.split('/').map(Number);
+          const [mB, yB] = b.split('/').map(Number);
+          return yB - yA || mB - mA; // Sắp xếp tháng gần nhất lên đầu
+        })
+    )
+  ];
+
+  // Lọc danh sách bài đăng
+  const filteredPosts = posts.filter(post => {
+    if (selectedMonth === 'Tất cả') return true;
+    return getMonthYear(post) === selectedMonth;
+  });
+
+  // Xử lý khi người dùng chọn file ảnh từ máy tính
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Giới hạn kích thước file (ví dụ 4MB) để tránh lưu Base64 quá dài
+    if (file.size > 4 * 1024 * 1024) {
+      alert('Kích thước ảnh quá lớn! Vui lòng chọn file ảnh dưới 4MB.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPostForm({
+        ...postForm,
+        image: reader.result
+      });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Xử lý tạo bài viết mới
   const handleCreatePost = async (e) => {
     e.preventDefault();
-    if (!newPostText.trim()) return;
-
-    // Lấy tên đầy đủ của tài khoản đăng nhập để gán làm tác giả
-    const userStr = localStorage.getItem('digiheart_admin_user');
-    let authorName = 'Đoàn Viên MobiFone';
-    let authorAvatar = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80';
-    if (userStr) {
-      try {
-        const user = JSON.parse(userStr);
-        authorName = user.role === 'admin' || user.role === 'superadmin' ? 'Ban Quản Trị CLB' : (user.fullName || user.username);
-        if (user.avatar) {
-          authorAvatar = user.avatar;
-        }
-      } catch {
-        // Bỏ qua lỗi
-      }
+    if (!postForm.title.trim() || !postForm.content.trim()) {
+      alert('Vui lòng điền đầy đủ tiêu đề và nội dung bài viết!');
+      return;
     }
 
     try {
       await postAPI.create({
-        content: newPostText,
-        image: newPostImage || null,
-        author: authorName,
-        avatar: authorAvatar
+        title: postForm.title,
+        content: postForm.content,
+        image: postForm.image.trim() || null,
+        author: user?.fullName || 'Thành viên CLB',
+        avatar: user?.avatar || ''
       });
 
-      // Tải lại danh sách
-      fetchPosts();
-      
-      // Reset form
-      setNewPostText('');
-      setNewPostImage('');
+      setShowAddModal(false);
+      setPostForm({ title: '', content: '', image: '' });
+      await fetchPosts(); // Load lại danh sách bài viết
     } catch (error) {
-      console.error('Lỗi đăng bài viết:', error);
+      alert(error.message || 'Lỗi khi đăng bài viết!');
     }
   };
 
-  // Xử lý khi chọn ảnh từ máy tính
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      // Giới hạn ảnh < 5MB để tránh payload quá lớn cho Base64
-      if (file.size > 5 * 1024 * 1024) {
-        alert('Kích thước ảnh quá lớn! Vui lòng chọn ảnh nhỏ hơn 5MB.');
-        return;
-      }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setNewPostImage(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  // Xử lý mở Modal xem danh sách người thích bài viết
-  const handleOpenLikesModal = async (postId) => {
-    setShowLikesModal(true);
-    setLoadingLikers(true);
-    setLikersList([]);
-    try {
-      const data = await postAPI.getLikes(postId);
-      setLikersList(data || []);
-    } catch (error) {
-      console.error('Không tải được danh sách người thích:', error);
-    } finally {
-      setLoadingLikers(false);
-    }
-  };
-
-  // Mở Modal chỉnh sửa bài viết
-  const handleOpenEditPost = (post) => {
-    setEditingPostId(post._id || post.id);
-    setEditPostText(post.content);
-    setEditPostImage(post.image || '');
-    setShowEditPostModal(true);
-  };
-
-  // Chọn ảnh cho bài viết chỉnh sửa
-  const handleEditPostImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        alert('Kích thước ảnh quá lớn! Vui lòng chọn ảnh nhỏ hơn 5MB.');
-        return;
-      }
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setEditPostImage(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  // Gửi cập nhật bài viết
-  const handleUpdatePost = async (e) => {
-    e.preventDefault();
-    if (!editPostText.trim()) return;
-    setSavingPost(true);
-    try {
-      await postAPI.update(editingPostId, {
-        content: editPostText,
-        image: editPostImage || null
-      });
-      alert('Đã cập nhật bài viết thành công!');
-      setShowEditPostModal(false);
-      fetchPosts();
-    } catch (err) {
-      console.error(err);
-      alert(err.message || 'Lỗi khi cập nhật bài viết.');
-    } finally {
-      setSavingPost(false);
-    }
-  };
-
-  // Xóa bài viết
+  // Xóa bài viết (Admin hoặc Tác giả)
   const handleDeletePost = async (postId) => {
-    if (!confirm('Bạn có chắc chắn muốn xóa bài viết này không?')) return;
+    if (!window.confirm('Bạn có chắc chắn muốn xóa bài viết này không?')) return;
+
     try {
       await postAPI.delete(postId);
-      alert('Đã xóa bài viết thành công!');
-      fetchPosts();
-    } catch (err) {
-      console.error(err);
-      alert(err.message || 'Lỗi khi xóa bài viết.');
-    }
-  };
-
-  // 3. Xử lý ấn Thích (Like) bài viết
-  const handleLikePost = async (postId) => {
-    try {
-      const resData = await postAPI.like(postId, guestId);
-      if (resData && resData.post) {
-        // Cập nhật trực tiếp post trong danh sách để tránh load lại toàn bộ
-        setPosts(posts.map((post) => {
-          if (post._id === postId || post.id === postId) {
-            return resData.post;
-          }
-          return post;
-        }));
-      } else {
-        fetchPosts();
+      setPosts(posts.filter(p => p._id !== postId && p.id !== postId));
+      if (activePost && (activePost._id === postId || activePost.id === postId)) {
+        setActivePost(null);
       }
     } catch (error) {
-      console.error('Lỗi khi thích bài viết:', error);
+      alert(error.message || 'Lỗi khi xóa bài viết!');
     }
   };
 
-  // 4. Xử lý Đăng bình luận (Comment)
-  const handleAddComment = async (postId) => {
-    const commentText = commentInputs[postId];
-    if (!commentText || !commentText.trim()) return;
-
-    try {
-      await postAPI.comment(postId, {
-        author: isLoggedIn ? 'Ban Quản Trị CLB' : 'Khách',
-        text: commentText
-      });
-
-      // Tải lại bài đăng để cập nhật bình luận
-      fetchPosts();
-      
-      // Xóa text box bình luận của bài viết đó
-      setCommentInputs({ ...commentInputs, [postId]: '' });
-    } catch (error) {
-      console.error('Lỗi bình luận bài viết:', error);
-    }
+  // Hàm định dạng ngày hiển thị đẹp
+  const formatDate = (dateStr) => {
+    if (!dateStr) return 'Vừa xong';
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return dateStr;
+    return date.toLocaleDateString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
+  // 1. GIAO DIỆN XEM CHI TIẾT BÀI VIẾT (TRANG THÔNG TIN)
+  if (activePost) {
+    return (
+      <div className="bg-gray-50 text-gray-800 min-h-screen py-12">
+        <div className="max-w-4xl mx-auto px-4">
+          
+          <button
+            onClick={() => setActivePost(null)}
+            className="flex items-center space-x-2 text-[#0054A6] hover:text-[#003f7f] transition-colors mb-8 group font-semibold text-sm"
+          >
+            <FiArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+            <span>Quay lại danh sách bài viết</span>
+          </button>
+
+          <article className="bg-white border border-gray-200/80 rounded-3xl p-6 md:p-10 shadow-lg animate-fadeIn">
+            {activePost.image && (
+              <img
+                src={activePost.image}
+                alt={activePost.title}
+                className="w-full h-64 md:h-[400px] object-cover rounded-2xl mb-8 shadow-sm"
+              />
+            )}
+
+            <div className="flex items-center text-xs text-gray-400 mb-4 font-bold uppercase tracking-wider">
+              <FiCalendar className="w-4 h-4 mr-1.5" />
+              <span>{formatDate(activePost.createdAt || activePost.time)}</span>
+            </div>
+
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-black mb-6 leading-snug text-gray-800">
+              {activePost.title}
+            </h1>
+
+            <div className="text-gray-655 leading-relaxed text-sm md:text-base space-y-6 whitespace-pre-line border-t border-gray-100 pt-6">
+              {activePost.content}
+            </div>
+          </article>
+
+        </div>
+      </div>
+    );
+  }
+
+  // 2. GIAO DIỆN DANH SÁCH BÀI VIẾT
   return (
     <div className="bg-gray-50 text-gray-800 min-h-screen py-16">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Tiêu đề Fanpage */}
-        <div className="text-center mb-10">
-          <h1 className="text-3xl md:text-5xl font-black mb-3 text-gray-800">
-            Góc Tương Tác <span className="text-[#0054A6]">Fanpage</span>
+        {/* Banner tiêu đề chính */}
+        <div className="text-center max-w-3xl mx-auto mb-16 relative">
+          <h1 className="text-2xl sm:text-3xl md:text-5xl font-black mb-4 text-gray-800">
+            Tin Tức CLB <span className="text-[#0054A6]">Digi Heart</span>
           </h1>
-          <p className="text-gray-500 font-medium text-sm">
-            Nơi chia sẻ ý kiến, cập nhật nhanh các hoạt động đoàn và kết nối đoàn viên trực tuyến.
+          <p className="text-gray-500 font-medium">
+            Nơi kết nối và cập nhật tức thì các hoạt động, hình ảnh sôi nổi của Câu lạc bộ Chuyển đổi số Digi Heart.
           </p>
+
+          {/* Nút đăng bài cho thành viên đã đăng nhập */}
+          <div className="mt-6 flex justify-center animate-fadeIn">
+            {isLoggedIn ? (
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="px-6 py-2.5 bg-[#0054A6] hover:bg-[#003d80] text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center space-x-2 hover:scale-105"
+              >
+                <FiPlusCircle className="w-4 h-4 text-emerald-300" />
+                <span>Đăng Bài Viết Mới</span>
+              </button>
+            ) : (
+              <div className="text-xs text-gray-400 font-semibold bg-white px-4 py-2 rounded-xl border border-gray-200 shadow-sm">
+                💡 Đăng nhập để chia sẻ hoạt động chuyển đổi số của bạn cùng câu lạc bộ!
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* 📝 Biểu mẫu Đăng bài mới (Chỉ hiển thị khi đã đăng nhập) */}
-        {isLoggedIn ? (
-          <div className="bg-white border border-gray-200/80 rounded-2xl p-5 mb-8 shadow-sm">
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#0054A6] to-[#E30613] flex items-center justify-center font-bold text-white shadow-sm">
-                A
+        {/* Bố cục trang gồm Sidebar lọc và Timeline chính */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          {/* Cột trái (4 phần): Sidebar thông tin CLB & Lọc theo tháng */}
+          <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-20">
+            
+            {/* Card Giới thiệu Slogan CLB */}
+            <div className="bg-gradient-to-r from-[#002f6c] to-[#0054A6] text-white p-6 rounded-2xl md:rounded-3xl shadow-lg relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full blur-xl group-hover:bg-white/10 transition-all pointer-events-none"></div>
+              <div className="flex items-center space-x-2 mb-4">
+                <FiZap className="text-amber-300 w-5 h-5 animate-pulse" />
+                <span className="font-extrabold text-sm tracking-wider">DIGI HEART</span>
               </div>
-              <span className="font-bold text-sm text-gray-700">Đăng hoạt động chuyển đổi số mới</span>
+              <h4 className="text-lg font-black mb-2 text-amber-300">
+                &ldquo;Kết nối tri thức số – Dẫn lối tương lai&rdquo;
+              </h4>
+              <p className="text-xs text-blue-100 leading-relaxed font-light">
+                Mỗi thành viên CLB mang trong mình trái tim nhiệt huyết, sẵn sàng lan tỏa kiến thức và kỹ năng số đến cộng đồng MobiFone Cần Thơ.
+              </p>
             </div>
 
-            <form onSubmit={handleCreatePost} className="space-y-4">
-              <div>
-                <textarea
-                  placeholder="Hôm nay chi đoàn của bạn có hoạt động chuyển đổi số nào nổi bật không?"
-                  rows="3"
-                  value={newPostText}
-                  onChange={(e) => setNewPostText(e.target.value)}
-                  className="w-full bg-white border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:border-[#0054A6] focus:ring-1 focus:ring-[#0054A6] text-gray-800 placeholder-gray-400 resize-none shadow-inner"
-                  required
-                />
-              </div>
+            {/* Card Bộ lọc theo Tháng */}
+            <div className="bg-white border border-gray-200/80 p-5 rounded-2xl shadow-sm">
+              <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4 flex items-center space-x-2">
+                <FiFilter className="text-[#0054A6]" />
+                <span>Xem Post Theo Tháng</span>
+              </h3>
 
-              {/* Preview hình ảnh đã chọn */}
-              {newPostImage && (
-                <div className="relative inline-block border border-gray-200 rounded-xl p-1 bg-gray-50 shadow-sm max-w-[200px] mt-2">
-                  <img
-                    src={newPostImage}
-                    alt="Preview đính kèm"
-                    className="max-h-24 w-auto rounded-lg object-cover"
-                  />
+              <div className="flex flex-wrap lg:flex-col gap-2">
+                {availableMonths.map((month) => (
                   <button
-                    type="button"
-                    onClick={() => setNewPostImage('')}
-                    className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-650 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold shadow-md transition-colors"
+                    key={month}
+                    onClick={() => setSelectedMonth(month)}
+                    className={`px-4 py-2.5 rounded-xl text-xs md:text-sm font-semibold transition-all border text-left flex justify-between items-center ${
+                      selectedMonth === month
+                        ? 'bg-[#0054A6] text-white border-[#0054A6] shadow-md shadow-blue-500/10'
+                        : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50 hover:text-[#0054A6]'
+                    }`}
                   >
-                    ✕
+                    <span>{month === 'Tất cả' ? 'Tất cả các tháng' : `Tháng ${month}`}</span>
+                    {month !== 'Tất cả' && (
+                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${
+                        selectedMonth === month ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-400'
+                      }`}>
+                        {posts.filter(p => getMonthYear(p) === month).length}
+                      </span>
+                    )}
                   </button>
-                </div>
-              )}
-
-              <div className="flex flex-col sm:flex-row items-center gap-3 mt-4">
-                <input
-                  type="file"
-                  id="post-image-upload"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="hidden"
-                />
-                <label
-                  htmlFor="post-image-upload"
-                  className="w-full sm:w-auto flex-grow flex items-center justify-center space-x-2 px-4 py-2.5 border border-dashed border-gray-300 hover:border-[#0054A6] hover:bg-blue-50/20 rounded-xl text-xs text-gray-500 font-semibold cursor-pointer transition-all duration-200 bg-gray-50/50"
-                >
-                  <FiPlusCircle className="w-4 h-4 text-gray-405" />
-                  <span>{newPostImage ? 'Chọn ảnh khác' : 'Chọn ảnh đính kèm từ máy'}</span>
-                </label>
-                <button
-                  type="submit"
-                  className="w-full sm:w-auto px-5 py-2.5 bg-[#E30613] hover:bg-[#c2050f] rounded-xl text-sm font-bold text-white flex items-center justify-center space-x-1.5 transition-colors shrink-0 shadow-md shadow-red-500/10"
-                >
-                  <FiPlusCircle />
-                  <span>Đăng bài</span>
-                </button>
+                ))}
               </div>
-            </form>
-          </div>
-        ) : (
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-2xl p-5 mb-8 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="space-y-1 text-center sm:text-left">
-              <h3 className="font-bold text-sm text-gray-800">Bạn muốn chia sẻ hoạt động chuyển đổi số?</h3>
-              <p className="text-xs text-gray-500">Vui lòng đăng nhập tài khoản Quản trị để đăng bài viết lên dòng thời gian.</p>
             </div>
-            <Link
-              to="/admin/login"
-              className="px-5 py-2.5 bg-[#0054A6] hover:bg-[#003f7f] text-white text-xs font-bold rounded-xl shadow-md transition-all duration-300 shrink-0 flex items-center justify-center"
-            >
-              Đăng nhập để đăng bài
-            </Link>
-          </div>
-        )}
 
-        {/* 📱 Dòng thời gian bài đăng (Timeline Feed) */}
-        <div className="space-y-6">
-          {posts.map((post) => {
-            const postId = post._id || post.id;
-            const isLiked = checkIfLiked(post);
-            return (
-              <div
-                key={postId}
-                className="bg-white border border-gray-200/80 rounded-2xl p-5 shadow-sm space-y-4"
-              >
-                
-                {/* Header bài đăng */}
-                {(() => {
-                  const authorMatchName = currentUser?.role === 'admin' || currentUser?.role === 'superadmin' ? 'Ban Quản Trị CLB' : (currentUser?.fullName || currentUser?.username);
-                  const isMyPost = isLoggedIn && currentUser && post.author === authorMatchName;
-                  const canDelete = isMyPost || (isLoggedIn && currentUser && (currentUser.role === 'admin' || currentUser.role === 'superadmin'));
+          </div>
+
+          {/* Cột phải (8 phần): Danh sách các bài đăng */}
+          <div className="lg:col-span-8 space-y-6">
+            {loading ? (
+              <div className="bg-white border border-gray-200 rounded-3xl p-16 text-center shadow-sm max-w-md mx-auto">
+                <span className="inline-block w-8 h-8 border-4 border-[#0054A6] border-t-transparent rounded-full animate-spin"></span>
+                <p className="text-gray-400 text-xs font-bold mt-4 uppercase">Đang tải danh sách bài viết...</p>
+              </div>
+            ) : filteredPosts.length > 0 ? (
+              <div className="space-y-6">
+                {filteredPosts.map((post) => {
+                  const postId = post._id || post.id;
 
                   return (
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <img
-                          src={post.avatar}
-                          alt={post.author}
-                          className="w-10 h-10 rounded-full object-cover border border-gray-100"
-                        />
-                        <div>
-                          <h4 className="font-bold text-sm text-gray-800">{post.author}</h4>
-                          <span className="flex items-center text-xs text-gray-450 space-x-1 mt-0.5">
-                            <FiClock className="w-3.5 h-3.5 text-gray-400" />
-                            <span className="text-gray-400">{post.time}</span>
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Tác vụ sửa/xóa bài viết dưới dạng dropdown 3 chấm */}
-                      {isLoggedIn && currentUser && (isMyPost || canDelete) && (
-                        <div className="relative">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setActiveDropdownPostId(activeDropdownPostId === postId ? null : postId);
-                            }}
-                            className="p-1.5 hover:bg-gray-100 rounded-full text-gray-500 hover:text-gray-800 transition-all"
-                            title="Tác vụ bài viết"
-                          >
-                            <FiMoreHorizontal className="w-5 h-5" />
-                          </button>
-
-                          {activeDropdownPostId === postId && (
-                            <div className="absolute right-0 mt-1 w-32 bg-white border border-gray-200 rounded-xl shadow-lg py-1 z-20">
-                              {isMyPost && (
-                                <button
-                                  onClick={() => {
-                                    setActiveDropdownPostId(null);
-                                    handleOpenEditPost(post);
-                                  }}
-                                  className="w-full px-3.5 py-2 text-left text-xs text-gray-700 hover:bg-gray-50 hover:text-[#0054A6] font-semibold flex items-center space-x-1.5 transition-colors"
-                                >
-                                  <FiEdit className="w-3.5 h-3.5" />
-                                  <span>Chỉnh sửa</span>
-                                </button>
-                              )}
-                              {canDelete && (
-                                <button
-                                  onClick={() => {
-                                    setActiveDropdownPostId(null);
-                                    handleDeletePost(postId);
-                                  }}
-                                  className="w-full px-3.5 py-2 text-left text-xs text-red-600 hover:bg-red-50 font-semibold flex items-center space-x-1.5 transition-colors"
-                                >
-                                  <FiX className="w-3.5 h-3.5" />
-                                  <span>Xóa bài</span>
-                                </button>
-                              )}
-                            </div>
-                          )}
+                    <div
+                      key={postId}
+                      onClick={() => setActivePost(post)}
+                      className="bg-white border border-gray-200/80 rounded-2xl p-5 hover:border-[#0054A6]/30 hover:shadow-md transition-all duration-300 cursor-pointer group flex flex-col sm:flex-row gap-5 shadow-sm animate-fadeIn"
+                    >
+                      {post.image && (
+                        <div className="w-full sm:w-44 h-32 rounded-xl overflow-hidden shrink-0 bg-gray-50 border border-gray-100 flex items-center justify-center">
+                          <img 
+                            src={post.image} 
+                            alt={post.title} 
+                            className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500"
+                          />
                         </div>
                       )}
+                      
+                      <div className="flex-grow flex flex-col justify-between py-1">
+                        <div>
+                          <span className="text-[10px] text-gray-405 font-bold tracking-wider flex items-center mb-1.5 uppercase">
+                            <FiCalendar className="mr-1" />
+                            {formatDate(post.createdAt || post.time)}
+                          </span>
+                          <h3 className="text-base sm:text-lg font-bold text-gray-800 group-hover:text-[#0054A6] transition-colors leading-snug mb-2 line-clamp-2">
+                            {post.title}
+                          </h3>
+                          <p className="text-gray-500 text-xs sm:text-sm font-light leading-relaxed line-clamp-2">
+                            {post.content}
+                          </p>
+                        </div>
+                        
+                        <div className="flex items-center justify-between mt-4 border-t border-gray-50 pt-3">
+                          <span className="text-xs font-bold text-[#0054A6] flex items-center space-x-1 group-hover:underline">
+                            <span>Đọc chi tiết bài viết</span>
+                            <span>&rarr;</span>
+                          </span>
+                          {(isAdmin || (isLoggedIn && post.author === user?.fullName)) && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeletePost(postId);
+                              }}
+                              className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors z-10"
+                              title="Xóa bài viết"
+                            >
+                              <FiTrash2 className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   );
-                })()}
-
-                {/* Nội dung text bài viết */}
-                <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-line">
-                  {post.content}
-                </p>
-
-                {/* Hình ảnh đính kèm */}
-                {post.image && (
-                  <div className="overflow-hidden rounded-xl border border-gray-100 max-h-[500px] flex justify-center bg-gray-50/50">
-                    <img
-                      src={post.image}
-                      alt="Đính kèm bài đăng"
-                      className="max-h-[500px] w-auto object-contain"
-                    />
-                  </div>
-                )}
-
-                {/* Nút Tương tác */}
-                <div className="flex items-center justify-between border-y border-gray-100 py-2.5 text-xs text-gray-500">
-                  <div className="flex items-center space-x-3">
-                    <button
-                      onClick={() => handleLikePost(postId)}
-                      className={`flex items-center space-x-1.5 transition-colors ${
-                        isLiked ? 'text-[#0054A6] font-bold scale-105' : 'hover:text-[#0054A6]'
-                      }`}
-                    >
-                      <FiThumbsUp className={`w-4 h-4 ${isLiked ? 'fill-[#0054A6] text-[#0054A6]' : ''}`} />
-                      <span>{isLiked ? 'Đã thích' : 'Thích'}</span>
-                    </button>
-                    {post.likes > 0 && (
-                      <button
-                        onClick={() => handleOpenLikesModal(postId)}
-                        className="hover:underline hover:text-[#0054A6] transition-colors font-semibold"
-                      >
-                        ({post.likes} lượt thích)
-                      </button>
-                    )}
-                  </div>
-                  <div className="flex items-center space-x-1.5">
-                    <FiMessageSquare className="w-4 h-4 text-gray-455" />
-                    <span className="font-semibold">Bình luận ({post.comments?.length || 0})</span>
-                  </div>
-                </div>
-
-                {/* Khu vực Bình luận */}
-                <div className="space-y-3">
-                  
-                  {/* Danh sách bình luận */}
-                  {post.comments && post.comments.length > 0 && (
-                    <div className="space-y-2.5 max-h-48 overflow-y-auto pr-1">
-                      {post.comments.map((comment) => {
-                        const commentId = comment._id || comment.id;
-                        return (
-                          <div key={commentId} className="bg-gray-50 border border-gray-100 rounded-xl p-2.5 text-xs space-y-1">
-                            <div className="flex items-center space-x-1.5">
-                              <FiUser className="text-[#0054A6] w-3 h-3" />
-                              <span className="font-bold text-gray-700">{comment.author}</span>
-                            </div>
-                            <p className="text-gray-600 pl-4">{comment.text}</p>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-
-                  {/* Hộp viết bình luận mới */}
-                  <div className="flex items-center space-x-2 pt-2">
-                    <input
-                      type="text"
-                      placeholder="Viết bình luận của bạn..."
-                      value={commentInputs[postId] || ''}
-                      onChange={(e) =>
-                        setCommentInputs({ ...commentInputs, [postId]: e.target.value })
-                      }
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') handleAddComment(postId);
-                      }}
-                      className="flex-grow bg-white border border-gray-250 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#0054A6] text-gray-800 placeholder-gray-400 shadow-inner"
-                    />
-                    <button
-                      onClick={() => handleAddComment(postId)}
-                      className="p-2 bg-[#0054A6] hover:bg-[#003d80] rounded-xl text-white transition-colors shadow-sm"
-                      aria-label="Send comment"
-                    >
-                      <FiSend className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-
-                </div>
-
+                })}
               </div>
-            );
-          })}
+            ) : (
+              <div className="text-center py-16 bg-white border border-gray-200 rounded-3xl p-8 max-w-xl mx-auto shadow-sm space-y-4 animate-fadeIn">
+                <div className="w-12 h-12 bg-gray-50 text-gray-400 rounded-full flex items-center justify-center mx-auto text-xl shadow-inner">
+                  <FiInbox />
+                </div>
+                <p className="text-gray-400 text-sm">Không có bài viết nào thuộc {selectedMonth === 'Tất cả' ? 'danh sách' : `tháng ${selectedMonth}`}.</p>
+              </div>
+            )}
+          </div>
+
         </div>
 
       </div>
 
-      {/* Modal Chỉnh sửa bài viết */}
-      {showEditPostModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-md rounded-2xl shadow-xl overflow-hidden border border-gray-100">
-            <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-              <h3 className="font-bold text-gray-800 text-sm">Chỉnh sửa bài viết</h3>
-              <button
-                onClick={() => setShowEditPostModal(false)}
-                className="text-gray-400 hover:text-gray-600 transition-colors w-7 h-7 rounded-full bg-gray-50 flex items-center justify-center font-bold text-xs"
-              >
-                ✕
-              </button>
-            </div>
+      {/* 🔐 Modal Đăng Bài Viết Mới */}
+      {showAddModal && createPortal(
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/55 backdrop-blur-sm p-4 animate-fadeIn">
+          <div className="bg-white border border-gray-200/80 w-full max-w-lg rounded-3xl p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <h3 className="text-lg font-black text-gray-800 mb-5 flex items-center space-x-2 border-b border-gray-100 pb-3">
+              <FiPlusCircle className="text-[#0054A6] w-5 h-5" />
+              <span>Đăng Bài Viết Fanpage Mới</span>
+            </h3>
 
-            <form onSubmit={handleUpdatePost} className="p-5 space-y-4">
+            <form onSubmit={handleCreatePost} className="space-y-4">
               <div>
-                <textarea
-                  required
-                  rows="3"
-                  value={editPostText}
-                  onChange={(e) => setEditPostText(e.target.value)}
-                  className="w-full bg-white border border-gray-250 rounded-xl p-3 text-xs focus:outline-none focus:border-[#0054A6] text-gray-800 placeholder-gray-400 resize-none shadow-inner"
-                />
-              </div>
-
-              {/* Preview hình ảnh */}
-              {editPostImage && (
-                <div className="relative inline-block border border-gray-200 rounded-xl p-1 bg-gray-50 shadow-sm max-w-[150px]">
-                  <img
-                    src={editPostImage}
-                    alt="Preview chỉnh sửa"
-                    className="max-h-20 w-auto rounded-lg object-cover"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setEditPostImage('')}
-                    className="absolute -top-1.5 -right-1.5 bg-red-500 hover:bg-red-600 text-white rounded-full w-4.5 h-4.5 flex items-center justify-center text-[10px] font-bold shadow-md transition-colors"
-                  >
-                    ✕
-                  </button>
-                </div>
-              )}
-
-              <div className="flex items-center gap-3">
+                <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Tiêu đề bài viết *</label>
                 <input
-                  type="file"
-                  id="edit-post-image-upload"
-                  accept="image/*"
-                  onChange={handleEditPostImageChange}
-                  className="hidden"
+                  type="text"
+                  value={postForm.title}
+                  onChange={(e) => setPostForm({ ...postForm, title: e.target.value })}
+                  className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#0054A6] text-gray-800 shadow-inner"
+                  placeholder="Nhập tiêu đề nổi bật cho bài viết..."
+                  required
                 />
-                <label
-                  htmlFor="edit-post-image-upload"
-                  className="flex-grow flex items-center justify-center space-x-1.5 px-3 py-2 border border-dashed border-gray-300 hover:border-[#0054A6] hover:bg-blue-50/20 rounded-xl text-xs text-gray-550 font-semibold cursor-pointer transition-all duration-200 bg-gray-50/50"
-                >
-                  <FiPlusCircle className="w-3.5 h-3.5 text-gray-400" />
-                  <span>{editPostImage ? 'Chọn ảnh khác' : 'Chọn ảnh đính kèm'}</span>
-                </label>
               </div>
 
-              <div className="pt-2 flex justify-end space-x-3">
+              <div>
+                <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Nội dung bài đăng *</label>
+                <textarea
+                  rows="5"
+                  value={postForm.content}
+                  onChange={(e) => setPostForm({ ...postForm, content: e.target.value })}
+                  className="w-full bg-white border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:border-[#0054A6] text-gray-800 resize-none shadow-inner"
+                  placeholder="Hãy viết nội dung chia sẻ chi tiết tại đây..."
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Hình ảnh đính kèm</label>
+                
+                {postForm.image ? (
+                  /* Khung hiển thị ảnh xem trước (Preview) */
+                  <div className="relative rounded-xl overflow-hidden border border-gray-200 bg-gray-50 max-h-[220px] flex items-center justify-center group">
+                    <img 
+                      src={postForm.image} 
+                      alt="Xem trước ảnh tải lên" 
+                      className="w-full h-full object-cover max-h-[220px]"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setPostForm({ ...postForm, image: '' })}
+                      className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-black/80 text-white rounded-full transition-colors shadow"
+                      title="Xóa ảnh"
+                    >
+                      <FiX className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  /* Khung chọn ảnh */
+                  <div className="space-y-3">
+                    {/* Vùng tải file từ máy tính */}
+                    <label className="border-2 border-dashed border-gray-200 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer hover:border-[#0054A6]/50 hover:bg-blue-50/10 transition-all space-y-1">
+                      <FiUpload className="w-6 h-6 text-gray-400" />
+                      <span className="text-xs font-bold text-[#0054A6]">Tải ảnh lên từ thiết bị</span>
+                      <span className="text-[10px] text-gray-450">Hỗ trợ định dạng JPG, PNG, WEBP (Tối đa 4MB)</span>
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={handleFileChange} 
+                        className="hidden" 
+                      />
+                    </label>
+                    
+                    {/* Nhập link URL thay thế */}
+                    <div className="relative">
+                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-450 text-xs">
+                        <FiImage />
+                      </span>
+                      <input
+                        type="url"
+                        placeholder="Hoặc dán URL ảnh có sẵn vào đây..."
+                        value={postForm.image}
+                        onChange={(e) => setPostForm({ ...postForm, image: e.target.value })}
+                        className="w-full bg-white border border-gray-200 rounded-xl pl-9 pr-3 py-2.5 text-xs focus:outline-none focus:border-[#0054A6] text-gray-800 shadow-inner"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex items-center justify-end space-x-3 pt-3 border-t border-gray-100">
                 <button
                   type="button"
-                  onClick={() => setShowEditPostModal(false)}
-                  className="px-4 py-2 border border-gray-250 text-gray-650 hover:bg-gray-50 rounded-xl text-xs font-bold transition-colors"
+                  onClick={() => {
+                    setShowAddModal(false);
+                    setPostForm({ title: '', content: '', image: '' });
+                  }}
+                  className="px-4 py-2 text-xs font-bold text-gray-500 hover:bg-gray-100 rounded-xl transition-colors"
                 >
-                  Hủy
+                  Hủy bỏ
                 </button>
                 <button
                   type="submit"
-                  disabled={savingPost}
-                  className="px-4 py-2 bg-[#0054A6] hover:bg-[#003d80] text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center space-x-1"
+                  className="px-5 py-2 bg-[#0054A6] hover:bg-[#003d80] text-white text-xs font-bold rounded-xl shadow-md transition-colors"
                 >
-                  {savingPost ? 'Đang lưu...' : 'Lưu lại'}
+                  Đăng bài
                 </button>
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
-
-      {/* Modal hiển thị danh sách người thích bài viết */}
-      {showLikesModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-sm rounded-2xl shadow-xl overflow-hidden border border-gray-100">
-            <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-              <h3 className="font-bold text-gray-800 text-sm">Người đã thích bài viết</h3>
-              <button
-                onClick={() => setShowLikesModal(false)}
-                className="text-gray-400 hover:text-gray-600 transition-colors w-7 h-7 rounded-full bg-gray-50 flex items-center justify-center font-bold text-xs"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="px-5 py-3 max-h-[300px] overflow-y-auto space-y-2">
-              {loadingLikers ? (
-                <div className="flex items-center justify-center py-6">
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#0054A6]"></div>
-                </div>
-              ) : likersList.length === 0 ? (
-                <p className="text-center text-gray-400 py-6 text-xs">Chưa có lượt thích nào.</p>
-              ) : (
-                likersList.map((liker, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-xl transition-colors">
-                    <div className="flex items-center space-x-2.5">
-                      {liker.avatar ? (
-                        <img
-                          src={liker.avatar}
-                          alt={liker.fullName}
-                          className="w-8 h-8 rounded-full object-cover border border-gray-200"
-                        />
-                      ) : (
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold text-xs shadow-sm">
-                          {liker.fullName.charAt(0).toUpperCase()}
-                        </div>
-                      )}
-                      <div>
-                        <h5 className="font-bold text-xs text-gray-800">{liker.fullName}</h5>
-                        {liker.type === 'user' ? (
-                          <span className="text-[9px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded-full font-semibold">
-                            {liker.role === 'admin' || liker.role === 'superadmin' ? 'Ban Quản Trị' : 'Thành viên'}
-                          </span>
-                        ) : (
-                          <span className="text-[9px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded-full font-semibold">
-                            Khách
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
     </div>
   );
 }

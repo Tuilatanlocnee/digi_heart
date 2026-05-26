@@ -99,14 +99,10 @@ export default function Navbar() {
     { name: 'Tin tức', path: '/news' },
     { name: 'Dự án số', path: '/projects' },
     { name: 'Fanpage', path: '/fanpage' },
-    { name: 'Góc thành viên', path: '/join-us' },
     { name: 'Liên hệ', path: '/contact' },
   ];
 
-  // Ẩn tab "Góc thành viên" nếu đã đăng nhập thành công
-  const filteredNavLinks = isLoggedIn 
-    ? navLinks.filter(link => link.path !== '/join-us')
-    : navLinks;
+  const filteredNavLinks = navLinks;
 
   return (
     <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-200/80 text-gray-800 shadow-sm">
@@ -166,15 +162,13 @@ export default function Navbar() {
                   </NavLink>
                 )}
 
-                {/* Tên hiển thị người dùng dẫn đến trang Profile */}
-                <Link
-                  to="/profile"
-                  className="flex items-center space-x-1 px-2.5 py-1.5 bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-100 rounded-lg text-xs font-bold text-gray-700 max-w-[150px] truncate transition-all"
-                  title="Xem hồ sơ cá nhân"
+                {/* Tên hiển thị admin */}
+                <div
+                  className="flex items-center space-x-1 px-2.5 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold text-gray-700 max-w-[150px] truncate"
                 >
                   <FiUser className="w-3.5 h-3.5 text-[#0054A6]" />
-                  <span>{user?.fullName || user?.username}</span>
-                </Link>
+                  <span>{user?.username || 'Admin'}</span>
+                </div>
 
 
                 {/* Nút Đổi mật khẩu */}
@@ -252,17 +246,15 @@ export default function Navbar() {
             <div className="pt-2 border-t border-gray-100 mt-2">
               {isLoggedIn ? (
                 <div className="space-y-1.5">
-                  <Link
-                    to="/profile"
-                    onClick={() => setIsOpen(false)}
-                    className="px-3 py-2.5 rounded-xl text-sm font-bold text-[#0054A6] hover:text-[#003d80] bg-gray-50 hover:bg-blue-50/50 flex items-center space-x-2 transition-all border border-gray-150"
+                  <div
+                    className="px-3 py-2.5 rounded-xl text-sm font-bold text-[#0054A6] bg-gray-50 flex items-center space-x-2 border border-gray-150"
                   >
                     <FiUser className="text-[#0054A6] w-4 h-4" />
-                    <span className="font-extrabold">{user?.fullName || user?.username}</span>
+                    <span className="font-extrabold">{user?.username || 'Admin'}</span>
                     <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-100 text-[#0054A6]">
-                      {user?.role === 'admin' || user?.role === 'superadmin' ? 'Q.Trị' : 'T.Viên'}
+                      Q.Trị
                     </span>
-                  </Link>
+                  </div>
 
                   {isAdmin && (
                     <NavLink

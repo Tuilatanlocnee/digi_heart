@@ -35,9 +35,12 @@ router.get('/', async (req, res) => {
 
 // 2. API Tạo bài viết mới (Yêu cầu đăng nhập)
 router.post('/', authMiddleware, async (req, res) => {
-  const { content, image } = req.body;
+  const { title, content, image } = req.body;
 
   try {
+    if (!title) {
+      return res.status(400).json({ message: 'Tiêu đề bài viết không được để trống!' });
+    }
     if (!content) {
       return res.status(400).json({ message: 'Nội dung bài viết không được để trống!' });
     }
@@ -61,11 +64,12 @@ router.post('/', authMiddleware, async (req, res) => {
     }
 
     const newPost = new Post({
+      title,
       author: authorName,
       avatar: authorAvatar,
       content,
       image: image || null,
-      time: 'Vừa xong'
+      time: new Date().toISOString().split('T')[0]
     });
 
     const savedPost = await newPost.save();
@@ -211,9 +215,12 @@ router.post('/:id/comment', async (req, res) => {
 
 // 4.5 API Chỉnh sửa bài viết (Yêu cầu đăng nhập, chỉ chính tác giả mới được sửa)
 router.put('/:id', authMiddleware, async (req, res) => {
-  const { content, image } = req.body;
+  const { title, content, image } = req.body;
 
   try {
+    if (!title) {
+      return res.status(400).json({ message: 'Tiêu đề bài viết không được để trống!' });
+    }
     if (!content) {
       return res.status(400).json({ message: 'Nội dung bài viết không được để trống!' });
     }
@@ -231,6 +238,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
       return res.status(403).json({ message: 'Bạn không có quyền chỉnh sửa bài viết này!' });
     }
 
+    post.title = title;
     post.content = content;
     if (image !== undefined) {
       post.image = image;

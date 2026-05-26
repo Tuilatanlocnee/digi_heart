@@ -56,21 +56,18 @@ export default function Home() {
               {"DIGI HEART - TRÁI TIM S\u1ED0"}
             </span>
           </h1>
+
+          {/* Slogan của CLB */}
+          <div className="text-base sm:text-lg md:text-xl font-bold text-amber-300 mb-3 tracking-wide">
+            Kết nối tri thức số – Dẫn lối tương lai
+          </div>
           
           <p className="text-sm sm:text-base md:text-lg text-blue-100 max-w-3xl mx-auto mb-6 md:mb-8 leading-relaxed font-light px-2 sm:px-0">
-            Nơi hội tụ thế hệ trẻ MobiFone Cần Thơ mang trong mình tinh thần tiên phong, sẵn sàng đưa công nghệ và chuyển đổi số đi sâu vào đời sống, sản xuất kinh doanh và các phong trào Đoàn.
+            Nơi hội tụ thế hệ trẻ MobiFone Cần Thơ. Mỗi thành viên mang trong mình trái tim nhiệt huyết, tiên phong chuyển đổi số và lan tỏa kiến thức số đến cộng đồng.
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 max-w-xs sm:max-w-none mx-auto">
-            {!isLoggedIn && (
-              <Link
-                to="/join-us"
-                className="w-full sm:w-auto px-6 sm:px-8 py-2.5 bg-[#E30613] hover:bg-[#c2050f] rounded-xl font-bold shadow-lg shadow-red-900/20 hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2 text-white"
-              >
-                <span>Tham gia ngay</span>
-                <FiArrowRight className="w-5 h-5" />
-              </Link>
-            )}
+
             <Link
               to="/projects"
               className="w-full sm:w-auto px-6 sm:px-8 py-2.5 bg-white/10 border border-white/25 rounded-xl font-bold hover:bg-white/25 hover:border-white/40 transition-all duration-300 flex items-center justify-center space-x-2 text-white"
@@ -144,25 +141,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 📢 Kêu gọi hành động phụ (Nền xanh nhạt) */}
-      {!isLoggedIn && (
-        <section className="py-12 sm:py-16 bg-gradient-to-r from-blue-50/60 via-blue-50 to-blue-50/60 border-t border-gray-150 text-center">
-          <div className="max-w-4xl mx-auto px-4">
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-black mb-4 text-gray-800">Cùng chúng tôi tạo nên những bước đột phá số!</h2>
-            <p className="text-gray-600 mb-6 sm:mb-8 max-w-xl mx-auto text-xs sm:text-sm md:text-base leading-relaxed px-2">
-              Hãy đăng ký tham gia CLB Digi Heart ngay hôm nay để được tham gia các khóa đào tạo công nghệ miễn phí và đóng góp tài năng vào phong trào chuyển đổi số!
-            </p>
-            <div className="flex justify-center">
-              <Link
-                to="/join-us"
-                className="w-full sm:w-auto max-w-xs px-6 sm:px-8 py-3.5 bg-[#E30613] hover:bg-[#c2050f] text-white font-bold rounded-xl transition-all duration-300 shadow-md shadow-red-500/10 flex items-center justify-center"
-              >
-                Đăng ký Thành viên CLB
-              </Link>
-            </div>
-          </div>
-        </section>
-      )}
+
 
     </div>
   );

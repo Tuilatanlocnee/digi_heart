@@ -21,6 +21,11 @@ const commentSchema = new mongoose.Schema({
 
 // Định nghĩa lược đồ (Schema) cho bài viết trên dòng thời gian Fanpage
 const postSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: true,
+    trim: true
+  },
   author: {
     type: String,
     required: true,

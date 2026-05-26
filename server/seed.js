@@ -50,9 +50,75 @@ const seedDatabase = async () => {
     await Idea.insertMany(mockIdeas);
     console.log(`✅ Đã nạp thành công ${mockIdeas.length} ý tưởng sáng kiến mẫu.`);
 
-    // 5. Nạp danh sách bài viết Fanpage mẫu (Posts) - Đã dọn dẹp theo yêu cầu người dùng
+    // 5. Nạp danh sách bài viết Fanpage mẫu (Posts) - Chứa các mốc thời gian khác nhau
     console.log('Đang nạp dữ liệu bài đăng mẫu...');
-    const mockPosts = [];
+    const mockPosts = [
+      {
+        title: 'Chào mừng ra mắt Fanpage CLB Chuyển đổi số Digi Heart',
+        author: 'Ban Quản Trị CLB',
+        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
+        time: '2026-05-25',
+        content: '🎉 Chào mừng các bạn đến với Fanpage chính thức của CLB Chuyển đổi số Digi Heart MobiFone Cần Thơ! Hãy cùng nhau kết nối tri thức số, dẫn lối tương lai. Đừng ngần ngại đăng các ý kiến đóng góp hoặc bài viết chia sẻ công nghệ của bạn tại đây nhé! 💻✨',
+        image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80',
+        likes: 12,
+        likedBy: ['guest_1', 'guest_2'],
+        comments: [
+          { author: 'Huỳnh Tấn Lộc', text: 'Tuyệt vời quá! Chúc CLB ngày càng phát triển!' },
+          { author: 'Nguyễn Văn Nam', text: 'Kết nối tri thức số – Dẫn lối tương lai!' }
+        ],
+        createdAt: new Date('2026-05-25T08:00:00.000Z')
+      },
+      {
+        title: 'Chiến dịch Kỳ nghỉ hồng: Hướng dẫn sử dụng MobiFone Money tại Chợ Ninh Kiều',
+        author: 'Lê Thị Mai',
+        avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&q=80',
+        time: '2026-05-18',
+        content: 'Hôm nay CLB Digi Heart đã hoàn thành buổi hướng dẫn cài đặt và sử dụng ứng dụng thanh toán không dùng tiền mặt MobiFone Money cho bà con tiểu thương tại Chợ Ninh Kiều. Tinh thần của các bạn đoàn viên vô cùng nhiệt huyết! ❤️',
+        image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=800&q=80',
+        likes: 8,
+        likedBy: ['guest_3'],
+        comments: [
+          { author: 'Ban Quản Trị CLB', text: 'Cảm ơn sự đóng góp tích cực của đồng chí Mai!' }
+        ],
+        createdAt: new Date('2026-05-18T14:30:00.000Z')
+      },
+      {
+        title: 'Workshop số 02: Ứng dụng AI và ChatGPT nâng cao hiệu suất làm việc văn phòng',
+        author: 'Nguyễn Văn Nam',
+        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80',
+        time: '2026-04-22',
+        content: '🤖 Workshop chia sẻ kiến thức về ứng dụng Trí tuệ nhân tạo (AI) trong soạn thảo văn bản hành chính đã diễn ra vô cùng sôi nổi. Rất nhiều mẹo viết prompt hay đã được chia sẻ. Cảm ơn mọi người đã tham gia nhiệt tình!',
+        image: 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80',
+        likes: 15,
+        likedBy: [],
+        comments: [],
+        createdAt: new Date('2026-04-22T09:15:00.000Z')
+      },
+      {
+        title: 'Phát hành Cẩm nang Chuyển đổi số dành cho Đoàn viên năm 2026',
+        author: 'Trần Minh Hoàng',
+        avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80',
+        time: '2026-04-05',
+        content: 'Các bạn đã quét mã QR để tải "Cẩm nang Chuyển đổi số dành cho Đoàn viên năm 2026" chưa? Rất nhiều kiến thức bổ ích về an toàn thông tin và các công cụ thiết kế cơ bản trên đó nhé! 🛡️🛡️',
+        image: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=800&q=80',
+        likes: 5,
+        likedBy: [],
+        comments: [],
+        createdAt: new Date('2026-04-05T10:00:00.000Z')
+      },
+      {
+        title: 'Chào mừng Kỷ niệm 95 năm ngày thành lập Đoàn TNCS Hồ Chí Minh',
+        author: 'Ban Quản Trị CLB',
+        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
+        time: '2026-03-26',
+        content: 'Chúc mừng Kỷ niệm 95 năm Ngày thành lập Đoàn TNCS Hồ Chí Minh (26/3/1931 - 26/3/2026)! CLB Digi Heart quyết tâm mang sức trẻ, trí tuệ số đóng góp vào sự phát triển chung của MobiFone Cần Thơ! 🇻🇳✨',
+        image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80',
+        likes: 25,
+        likedBy: [],
+        comments: [],
+        createdAt: new Date('2026-03-26T07:30:00.000Z')
+      }
+    ];
     await Post.insertMany(mockPosts);
     console.log(`✅ Đã nạp thành công ${mockPosts.length} bài đăng Fanpage mẫu.`);
 

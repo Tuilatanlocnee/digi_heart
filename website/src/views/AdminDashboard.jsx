@@ -13,13 +13,13 @@ import { candidateAPI, ideaAPI, postAPI, newsAPI } from '../utils/api';
 export default function AdminDashboard() {
   const navigate = useNavigate();
   
-  // Trạng thái các tab quản lý: 'candidates' | 'ideas' | 'posts'
-  const [activeTab, setActiveTab] = useState('candidates');
+  // Trạng thái các tab quản lý: 'ideas' | 'news'
+  const [activeTab, setActiveTab] = useState('ideas');
 
   // Dữ liệu lấy từ API
-  const [candidates, setCandidates] = useState([]);
+  const [candidates] = useState([]); // Giữ làm mảng rỗng tương thích ngược
   const [ideas, setIdeas] = useState([]);
-  const [posts, setPosts] = useState([]);
+  const [posts] = useState([]);      // Giữ làm mảng rỗng tương thích ngược
   const [news, setNews] = useState([]);
   
   // Trạng thái đăng tin tức mới
@@ -55,15 +55,11 @@ export default function AdminDashboard() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [candidatesData, ideasData, postsData, newsData] = await Promise.all([
-        candidateAPI.getAll(),
+      const [ideasData, newsData] = await Promise.all([
         ideaAPI.getAll(),
-        postAPI.getAll(),
         newsAPI.getAll()
       ]);
-      setCandidates(candidatesData);
       setIdeas(ideasData);
-      setPosts(postsData);
       setNews(newsData);
     } catch (error) {
       showNotify('Không thể kết nối đến máy chủ. Hệ thống đang chạy ở chế độ offline LocalStorage Fallback!', 'warning');
@@ -228,11 +224,9 @@ export default function AdminDashboard() {
 
   // Tính toán nhanh số liệu thống kê
   const stats = {
-    totalCandidates: candidates.length,
-    pendingCandidates: candidates.filter(c => c.status === 'Chờ duyệt').length,
-    approvedCandidates: candidates.filter(c => c.status === 'Đã duyệt').length,
     totalIdeas: ideas.length,
-    totalPosts: posts.length,
+    pendingIdeas: ideas.filter(i => i.status === 'Chờ duyệt').length,
+    appliedIdeas: ideas.filter(i => i.status === 'Đã áp dụng').length,
     totalNews: news.length
   };
 
@@ -277,35 +271,13 @@ export default function AdminDashboard() {
         )}
 
         {/* 📊 Thẻ Thống Kê Nhanh (Stats Cards) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
           
           <div className="bg-white border border-gray-200/80 rounded-2xl p-5 shadow-sm flex items-center justify-between">
             <div>
-              <span className="text-[10px] uppercase font-bold text-gray-450 tracking-wider">Đăng ký gia nhập</span>
-              <h3 className="text-2xl font-black text-gray-800 mt-1">{stats.totalCandidates}</h3>
-              <p className="text-[10px] text-gray-400 mt-1">Có <span className="font-bold text-amber-500">{stats.pendingCandidates}</span> hồ sơ chờ duyệt</p>
-            </div>
-            <div className="p-3.5 bg-blue-50 text-[#0054A6] rounded-xl shadow-sm">
-              <FiUsers className="w-6 h-6" />
-            </div>
-          </div>
-
-          <div className="bg-white border border-gray-200/80 rounded-2xl p-5 shadow-sm flex items-center justify-between">
-            <div>
-              <span className="text-[10px] uppercase font-bold text-gray-450 tracking-wider">Ứng viên đã duyệt</span>
-              <h3 className="text-2xl font-black text-emerald-600 mt-1">{stats.approvedCandidates}</h3>
-              <p className="text-[10px] text-gray-400 mt-1">Đã sẵn sàng hoạt động</p>
-            </div>
-            <div className="p-3.5 bg-emerald-50 text-emerald-500 rounded-xl shadow-sm">
-              <FiCheck className="w-6 h-6" />
-            </div>
-          </div>
-
-          <div className="bg-white border border-gray-200/80 rounded-2xl p-5 shadow-sm flex items-center justify-between">
-            <div>
-              <span className="text-[10px] uppercase font-bold text-gray-450 tracking-wider">Ý tưởng sáng tạo số</span>
+              <span className="text-[10px] uppercase font-bold text-gray-450 tracking-wider">Tổng ý tưởng sáng tạo</span>
               <h3 className="text-2xl font-black text-gray-800 mt-1">{stats.totalIdeas}</h3>
-              <p className="text-[10px] text-gray-400 mt-1">Sáng kiến đóng góp từ các chi đoàn</p>
+              <p className="text-[10px] text-gray-400 mt-1">Có <span className="font-bold text-amber-500">{stats.pendingIdeas}</span> ý tưởng chờ duyệt</p>
             </div>
             <div className="p-3.5 bg-amber-50 text-amber-500 rounded-xl shadow-sm">
               <FiZap className="w-6 h-6" />
@@ -314,12 +286,23 @@ export default function AdminDashboard() {
 
           <div className="bg-white border border-gray-200/80 rounded-2xl p-5 shadow-sm flex items-center justify-between">
             <div>
-              <span className="text-[10px] uppercase font-bold text-gray-450 tracking-wider">Bài viết Fanpage</span>
-              <h3 className="text-2xl font-black text-gray-800 mt-1">{stats.totalPosts}</h3>
-              <p className="text-[10px] text-gray-400 mt-1">Bài viết hiển thị trên bảng tin</p>
+              <span className="text-[10px] uppercase font-bold text-gray-450 tracking-wider">Ý tưởng đã áp dụng</span>
+              <h3 className="text-2xl font-black text-emerald-600 mt-1">{stats.appliedIdeas}</h3>
+              <p className="text-[10px] text-gray-400 mt-1">Đã đưa vào thực tế hoạt động</p>
             </div>
-            <div className="p-3.5 bg-red-50 text-[#E30613] rounded-xl shadow-sm">
-              <FiGrid className="w-6 h-6" />
+            <div className="p-3.5 bg-emerald-50 text-emerald-500 rounded-xl shadow-sm">
+              <FiCheck className="w-6 h-6" />
+            </div>
+          </div>
+
+          <div className="bg-white border border-gray-200/80 rounded-2xl p-5 shadow-sm flex items-center justify-between">
+            <div>
+              <span className="text-[10px] uppercase font-bold text-gray-450 tracking-wider">Bài viết tin tức</span>
+              <h3 className="text-2xl font-black text-gray-800 mt-1">{stats.totalNews}</h3>
+              <p className="text-[10px] text-gray-400 mt-1">Đã đăng lên cổng tin tức & sự kiện</p>
+            </div>
+            <div className="p-3.5 bg-blue-50 text-[#0054A6] rounded-xl shadow-sm">
+              <FiFileText className="w-6 h-6" />
             </div>
           </div>
 
@@ -327,17 +310,6 @@ export default function AdminDashboard() {
 
         {/* 🗂️ Menu Tab Quản Lý */}
         <div className="flex overflow-x-auto whitespace-nowrap border-b border-gray-200 mb-6 bg-white p-2 rounded-2xl border border-gray-150 shadow-sm space-x-1 scrollbar-none">
-          <button
-            onClick={() => setActiveTab('candidates')}
-            className={`shrink-0 px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-1.5 ${
-              activeTab === 'candidates' 
-                ? 'bg-blue-50 text-[#0054A6] shadow-sm border border-blue-100/50' 
-                : 'text-gray-550 hover:bg-gray-50'
-            }`}
-          >
-            <FiUsers className="w-4 h-4" />
-            <span>Hồ Sơ Đăng Ký ({stats.pendingCandidates} Chờ)</span>
-          </button>
           <button
             onClick={() => setActiveTab('ideas')}
             className={`shrink-0 px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-1.5 ${
@@ -348,17 +320,6 @@ export default function AdminDashboard() {
           >
             <FiZap className="w-4 h-4" />
             <span>Sáng Kiến Số Hóa ({stats.totalIdeas})</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('posts')}
-            className={`shrink-0 px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-1.5 ${
-              activeTab === 'posts' 
-                ? 'bg-emerald-50 text-[#0054A6] shadow-sm border border-emerald-100' 
-                : 'text-gray-550 hover:bg-gray-50'
-            }`}
-          >
-            <FiGrid className="w-4 h-4" />
-            <span>Bài viết Fanpage ({stats.totalPosts})</span>
           </button>
           <button
             onClick={() => setActiveTab('news')}
@@ -382,95 +343,7 @@ export default function AdminDashboard() {
         ) : (
           <div className="bg-white border border-gray-200/80 rounded-3xl p-5 md:p-6 shadow-sm">
             
-            {/* TAB 1: QUẢN LÝ ỨNG VIÊN */}
-            {activeTab === 'candidates' && (
-              <div>
-                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center space-x-2">
-                  <FiUsers className="text-[#0054A6]" />
-                  <span>Danh sách hồ sơ đăng ký thành viên</span>
-                </h3>
 
-                {candidates.length === 0 ? (
-                  <div className="py-12 text-center text-gray-400 text-xs">Hiện tại chưa có hồ sơ đăng ký nào.</div>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs text-gray-600 min-w-[800px]">
-                      <thead className="text-[10px] uppercase bg-gray-50 text-gray-500 border-b border-gray-200">
-                        <tr>
-                          <th className="px-4 py-3.5">Họ và tên</th>
-                          <th className="px-4 py-3.5">Đơn vị công tác</th>
-                          <th className="px-4 py-3.5">Ban ứng tuyển</th>
-                          <th className="px-4 py-3.5">Kỹ năng & Lý do</th>
-                          <th className="px-4 py-3.5 text-center">Trạng thái</th>
-                          <th className="px-4 py-3.5 text-center">Thao tác</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-155">
-                        {candidates.map((cand) => {
-                          const candId = cand._id || cand.id;
-                          return (
-                            <tr key={candId} className="hover:bg-gray-50/50">
-                              <td className="px-4 py-4">
-                                <p className="font-bold text-gray-800">{cand.fullName}</p>
-                                <p className="text-gray-400 text-[10px] mt-0.5">{cand.email} • {cand.phone}</p>
-                              </td>
-                              <td className="px-4 py-4 font-semibold text-gray-700">{cand.department}</td>
-                              <td className="px-4 py-4">
-                                <span className="px-2.5 py-1 bg-blue-50/80 text-[#0054A6] rounded-md font-bold text-[10px]">
-                                  {cand.targetBan}
-                                </span>
-                              </td>
-                              <td className="px-4 py-4 max-w-[280px]">
-                                <p className="text-gray-700 line-clamp-1" title={cand.skills}><strong>Sở trường:</strong> {cand.skills || 'Không có'}</p>
-                                <p className="text-gray-450 line-clamp-2 mt-1 text-[11px]" title={cand.reason}><strong>Lý do:</strong> {cand.reason}</p>
-                              </td>
-                              <td className="px-4 py-4 text-center">
-                                <span className={`px-2.5 py-1.5 rounded-full font-bold text-[9px] ${
-                                  cand.status === 'Đã duyệt' ? 'bg-emerald-50 text-emerald-600' :
-                                  cand.status === 'Từ chối' ? 'bg-red-50 text-red-500' :
-                                  'bg-amber-50 text-amber-600'
-                                }`}>
-                                  {cand.status}
-                                </span>
-                              </td>
-                              <td className="px-4 py-4 text-center">
-                                <div className="flex items-center justify-center space-x-1.5">
-                                  {cand.status === 'Chờ duyệt' && (
-                                    <>
-                                      <button
-                                        onClick={() => handleUpdateCandidate(candId, 'Đã duyệt')}
-                                        className="p-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 rounded-lg transition-colors"
-                                        title="Phê duyệt hồ sơ"
-                                      >
-                                        <FiCheck className="w-4 h-4" />
-                                      </button>
-                                      <button
-                                        onClick={() => handleUpdateCandidate(candId, 'Từ chối')}
-                                        className="p-1.5 bg-red-50 hover:bg-red-100 text-red-500 rounded-lg transition-colors"
-                                        title="Từ chối hồ sơ"
-                                      >
-                                        <FiX className="w-4 h-4" />
-                                      </button>
-                                    </>
-                                  )}
-                                  <button
-                                    onClick={() => handleDeleteCandidate(candId)}
-                                    className="p-1.5 bg-gray-50 hover:bg-gray-150 hover:text-red-500 text-gray-400 rounded-lg transition-colors"
-                                    title="Xóa hồ sơ"
-                                  >
-                                    <FiTrash2 className="w-4 h-4" />
-                                  </button>
-                                </div>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </div>
-            )}
 
             {/* TAB 2: QUẢN LÝ SÁNG KIẾN */}
             {activeTab === 'ideas' && (
@@ -568,67 +441,7 @@ export default function AdminDashboard() {
               </div>
             )}
 
-            {/* TAB 3: QUẢN LÝ BÀI ĐĂNG FANPAGE */}
-            {activeTab === 'posts' && (
-              <div>
-                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center space-x-2">
-                  <FiGrid className="text-emerald-500" />
-                  <span>Danh sách các bài viết hiển thị trên Fanpage</span>
-                </h3>
 
-                {posts.length === 0 ? (
-                  <div className="py-12 text-center text-gray-400 text-xs">Hiện tại chưa có bài đăng nào.</div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {posts.map((post) => {
-                      const postId = post._id || post.id;
-                      return (
-                        <div key={postId} className="border border-gray-200 rounded-2xl p-4 flex flex-col justify-between hover:shadow-md transition-shadow">
-                          <div>
-                            <div className="flex items-center justify-between mb-3">
-                              <div className="flex items-center space-x-2.5">
-                                <img
-                                  src={post.avatar}
-                                  alt={post.author}
-                                  className="w-8 h-8 rounded-full object-cover"
-                                />
-                                <div>
-                                  <h4 className="font-bold text-xs text-gray-800">{post.author}</h4>
-                                  <span className="text-[9px] text-gray-400">{post.time}</span>
-                                </div>
-                              </div>
-                              <button
-                                onClick={() => handleDeletePost(postId)}
-                                className="p-1.5 bg-red-50 hover:bg-red-100 text-red-500 rounded-lg transition-colors"
-                                title="Xóa bài viết vi phạm"
-                              >
-                                <FiTrash2 className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
-                            <p className="text-xs text-gray-600 line-clamp-3 leading-relaxed whitespace-pre-line mb-3">
-                              {post.content}
-                            </p>
-                            {post.image && (
-                              <div className="h-28 overflow-hidden rounded-xl border border-gray-100 mb-3">
-                                <img
-                                  src={post.image}
-                                  alt="Mẫu đính kèm"
-                                  className="w-full h-full object-cover"
-                                />
-                              </div>
-                            )}
-                          </div>
-                          <div className="border-t border-gray-100 pt-2.5 text-[10px] text-gray-450 font-bold flex items-center justify-between">
-                            <span>Lượt thích: {post.likes}</span>
-                            <span>Bình luận: {post.comments?.length || 0}</span>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            )}
 
             {/* TAB 4: QUẢN LÝ TIN TỨC */}
             {activeTab === 'news' && (
@@ -774,14 +587,45 @@ export default function AdminDashboard() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Link ảnh đại diện (URL)</label>
-                    <input
-                      type="url"
-                      value={newsForm.image}
-                      onChange={(e) => setNewsForm({ ...newsForm, image: e.target.value })}
-                      className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#0054A6] text-gray-800 shadow-inner"
-                      placeholder="https://images.unsplash.com/..."
-                    />
+                    <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Ảnh đại diện bài viết</label>
+                    {newsForm.image ? (
+                      <div className="relative w-full h-24 rounded-xl border border-gray-200 overflow-hidden group">
+                        <img
+                          src={newsForm.image}
+                          alt="Preview"
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <button
+                            type="button"
+                            onClick={() => setNewsForm({ ...newsForm, image: '' })}
+                            className="bg-red-500 hover:bg-red-600 text-white font-bold text-[10px] px-3 py-1.5 rounded-lg transition-colors shadow-md"
+                          >
+                            Xóa ảnh
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <label className="w-full h-24 border border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-[#0054A6] hover:bg-blue-50/20 transition-all">
+                        <span className="text-gray-550 text-[11px] font-bold">Chọn ảnh từ thiết bị</span>
+                        <span className="text-[9px] text-gray-400 mt-1">Hỗ trợ JPG, PNG, WEBP</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files[0];
+                            if (file) {
+                              const reader = new FileReader();
+                              reader.onloadend = () => {
+                                setNewsForm({ ...newsForm, image: reader.result });
+                              };
+                              reader.readAsDataURL(file);
+                            }
+                          }}
+                        />
+                      </label>
+                    )}
                   </div>
                 </div>
 
@@ -889,14 +733,45 @@ export default function AdminDashboard() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Link ảnh đại diện (URL)</label>
-                    <input
-                      type="url"
-                      value={newsForm.image}
-                      onChange={(e) => setNewsForm({ ...newsForm, image: e.target.value })}
-                      className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#0054A6] text-gray-800 shadow-inner"
-                      placeholder="https://images.unsplash.com/..."
-                    />
+                    <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Ảnh đại diện bài viết</label>
+                    {newsForm.image ? (
+                      <div className="relative w-full h-24 rounded-xl border border-gray-200 overflow-hidden group">
+                        <img
+                          src={newsForm.image}
+                          alt="Preview"
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <button
+                            type="button"
+                            onClick={() => setNewsForm({ ...newsForm, image: '' })}
+                            className="bg-red-500 hover:bg-red-600 text-white font-bold text-[10px] px-3 py-1.5 rounded-lg transition-colors shadow-md"
+                          >
+                            Xóa ảnh
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <label className="w-full h-24 border border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-[#0054A6] hover:bg-blue-50/20 transition-all">
+                        <span className="text-gray-550 text-[11px] font-bold">Chọn ảnh từ thiết bị</span>
+                        <span className="text-[9px] text-gray-400 mt-1">Hỗ trợ JPG, PNG, WEBP</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files[0];
+                            if (file) {
+                              const reader = new FileReader();
+                              reader.onloadend = () => {
+                                setNewsForm({ ...newsForm, image: reader.result });
+                              };
+                              reader.readAsDataURL(file);
+                            }
+                          }}
+                        />
+                      </label>
+                    )}
                   </div>
                 </div>
 

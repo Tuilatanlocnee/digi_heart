@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
+    "predev": "node kill_port.js",
     "dev": "node --watch server.js",
     "seed": "node seed.js"
   },
