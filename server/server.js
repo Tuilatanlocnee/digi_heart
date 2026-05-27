@@ -64,3 +64,5 @@ app.listen(PORT, () => {
   console.log(`🚀 Server đang chạy trên port: ${PORT}`);
   console.log(`Đường dẫn API chính: http://localhost:${PORT}`);
 });
+
+// Trigger reload for watch mode

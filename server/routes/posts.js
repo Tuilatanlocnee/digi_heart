@@ -23,13 +23,27 @@ const getOptionalUser = (req) => {
   return null;
 };
 
-// 1. API Lấy toàn bộ bài đăng trên Fanpage (Công khai)
+// 1. API Lấy toàn bộ bài đăng trên Fanpage (Công khai, chỉ lấy những bài chưa bị xóa)
 router.get('/', async (req, res) => {
   try {
-    const posts = await Post.find().sort({ createdAt: -1 }); // Bài mới nhất xếp trước
+    const posts = await Post.find({ isDeleted: { $ne: true } }).sort({ createdAt: -1 }); // Bài mới nhất xếp trước
     res.json(posts);
   } catch (error) {
     res.status(500).json({ message: 'Lỗi lấy danh sách bài viết!', error: error.message });
+  }
+});
+
+// 1.5 API Lấy danh sách bài viết đã bị xóa tạm thời (Chỉ dành cho Admin truy cập Thùng rác)
+router.get('/deleted', authMiddleware, async (req, res) => {
+  try {
+    const isAdmin = req.user.role === 'admin' || req.user.role === 'superadmin';
+    if (!isAdmin) {
+      return res.status(403).json({ message: 'Bạn không có quyền truy cập Thùng rác!' });
+    }
+    const posts = await Post.find({ isDeleted: true }).sort({ updatedAt: -1 });
+    res.json(posts);
+  } catch (error) {
+    res.status(500).json({ message: 'Lỗi lấy danh sách bài viết đã xóa!', error: error.message });
   }
 });
 
@@ -255,7 +269,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
   }
 });
 
-// 5. API Xóa bài đăng Fanpage (Chỉ tác giả hoặc Admin mới được quyền xóa các bài đăng vi phạm)
+// 5. API Xóa bài đăng Fanpage - Chuyển sang Soft Delete (Chỉ tác giả hoặc Admin mới được quyền xóa)
 router.delete('/:id', authMiddleware, async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
@@ -272,10 +286,52 @@ router.delete('/:id', authMiddleware, async (req, res) => {
       return res.status(403).json({ message: 'Bạn không có quyền xóa bài viết này!' });
     }
 
-    const deletedPost = await Post.findByIdAndDelete(req.params.id);
-    res.json({ message: 'Đã xóa bài viết thành công!', post: deletedPost });
+    post.isDeleted = true;
+    const savedPost = await post.save();
+    res.json({ message: 'Đã chuyển bài viết vào Thùng rác thành công!', post: savedPost });
   } catch (error) {
     res.status(500).json({ message: 'Lỗi xóa bài đăng!', error: error.message });
+  }
+});
+
+// 5.5 API Khôi phục bài viết đã xóa tạm thời từ Thùng rác (Chỉ Admin)
+router.post('/:id/restore', authMiddleware, async (req, res) => {
+  try {
+    const isAdmin = req.user.role === 'admin' || req.user.role === 'superadmin';
+    if (!isAdmin) {
+      return res.status(403).json({ message: 'Bạn không có quyền khôi phục bài viết!' });
+    }
+
+    const post = await Post.findById(req.params.id);
+    if (!post) {
+      return res.status(404).json({ message: 'Không tìm thấy bài viết.' });
+    }
+
+    post.isDeleted = false;
+    const restoredPost = await post.save();
+    res.json({ message: 'Khôi phục bài viết thành công!', post: restoredPost });
+  } catch (error) {
+    res.status(500).json({ message: 'Lỗi khôi phục bài viết!', error: error.message });
+  }
+});
+
+// 5.6 API Xóa vĩnh viễn bài viết khỏi database (Chỉ Admin)
+router.delete('/:id/force', authMiddleware, async (req, res) => {
+  try {
+    const isAdmin = req.user.role === 'admin' || req.user.role === 'superadmin';
+    if (!isAdmin) {
+      return res.status(403).json({ message: 'Bạn không có quyền xóa vĩnh viễn bài viết!' });
+    }
+
+    const post = await Post.findById(req.params.id);
+    if (!post) {
+      return res.status(404).json({ message: 'Không tìm thấy bài viết.' });
+    }
+
+    await Post.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Đã xóa vĩnh viễn bài viết thành công!', id: req.params.id });
+  } catch (error) {
+    res.status(500).json({ message: 'Lỗi xóa vĩnh viễn bài viết!', error: error.message });
   }
 });
 

@@ -55,7 +55,12 @@ const postSchema = new mongoose.Schema({
     type: [String],
     default: []
   },
-  comments: [commentSchema]
+  comments: [commentSchema],
+  // Thêm cờ đánh dấu bài viết đã bị xóa tạm thời (Soft Delete)
+  isDeleted: {
+    type: Boolean,
+    default: false
+  }
 }, {
   timestamps: true
 });

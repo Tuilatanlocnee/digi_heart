@@ -11,7 +11,9 @@ import {
   FiZap,
   FiUpload,
   FiX,
-  FiArrowLeft
+  FiArrowLeft,
+  FiChevronDown,
+  FiChevronRight
 } from 'react-icons/fi';
 import { postAPI } from '../utils/api';
 
@@ -24,7 +26,8 @@ import { postAPI } from '../utils/api';
 export default function Fanpage() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedMonth, setSelectedMonth] = useState('Tất cả');
+  const [filter, setFilter] = useState({ type: 'all', value: null });
+  const [expandedYears, setExpandedYears] = useState({});
   
   // Bài viết đang được đọc chi tiết (null: đang xem danh sách)
   const [activePost, setActivePost] = useState(null);
@@ -76,43 +79,107 @@ export default function Fanpage() {
     }
   }, []);
 
-  // Hàm chuyển đổi ngày thành định dạng Tháng/Năm
-  const getMonthYear = (post) => {
+  // Helper lấy thông tin năm, tháng của bài viết
+  const getPostDateInfo = (post) => {
+    let year = 'Khác';
+    let month = 'Khác';
+    let monthYear = 'Khác';
+
     if (post.createdAt) {
       const date = new Date(post.createdAt);
       if (!isNaN(date.getTime())) {
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const year = date.getFullYear();
-        return `${month}/${year}`;
+        year = date.getFullYear().toString();
+        month = String(date.getMonth() + 1).padStart(2, '0');
+        monthYear = `${month}/${year}`;
       }
-    }
-    if (post.time && /^\d{4}-\d{2}-\d{2}$/.test(post.time)) {
+    } else if (post.time && /^\d{4}-\d{2}-\d{2}$/.test(post.time)) {
       const parts = post.time.split('-');
-      return `${parts[1]}/${parts[0]}`;
+      year = parts[0];
+      month = parts[1];
+      monthYear = `${parts[1]}/${parts[0]}`;
     }
-    return 'Khác';
+
+    return { year, month, monthYear };
   };
 
-  // Trích xuất danh sách các tháng duy nhất có bài đăng
-  const availableMonths = [
-    'Tất cả',
-    ...new Set(
-      posts
-        .map(post => getMonthYear(post))
-        .filter(m => m !== 'Khác')
-        .sort((a, b) => {
-          const [mA, yA] = a.split('/').map(Number);
-          const [mB, yB] = b.split('/').map(Number);
-          return yB - yA || mB - mA; // Sắp xếp tháng gần nhất lên đầu
-        })
-    )
-  ];
+  // Tự động mở rộng tất cả các năm có bài đăng khi danh sách posts thay đổi
+  useEffect(() => {
+    if (posts.length > 0) {
+      const initialExpanded = {};
+      posts.forEach(post => {
+        const { year } = getPostDateInfo(post);
+        if (year !== 'Khác') {
+          initialExpanded[year] = true;
+        }
+      });
+      setExpandedYears(initialExpanded);
+    }
+  }, [posts]);
 
-  // Lọc danh sách bài đăng
+  // Phân tích posts để xây dựng cấu trúc bộ lọc Năm & Tháng
+  const getFilterStructure = () => {
+    const structure = {};
+    posts.forEach(post => {
+      const { year, month, monthYear } = getPostDateInfo(post);
+      if (year === 'Khác') return;
+
+      if (!structure[year]) {
+        structure[year] = {
+          year,
+          postCount: 0,
+          months: {}
+        };
+      }
+
+      structure[year].postCount += 1;
+
+      if (!structure[year].months[monthYear]) {
+        structure[year].months[monthYear] = {
+          monthYear,
+          label: `Tháng ${month}/${year}`,
+          postCount: 0,
+          monthNum: Number(month)
+        };
+      }
+      structure[year].months[monthYear].postCount += 1;
+    });
+
+    // Chuyển object thành array, sắp xếp năm giảm dần và tháng giảm dần
+    return Object.values(structure)
+      .sort((a, b) => Number(b.year) - Number(a.year))
+      .map(yGroup => {
+        const sortedMonths = Object.values(yGroup.months)
+          .sort((a, b) => b.monthNum - a.monthNum);
+        return {
+          ...yGroup,
+          months: sortedMonths
+        };
+      });
+  };
+
+  const filterStructure = getFilterStructure();
+
+  // Lọc danh sách bài đăng dựa trên bộ lọc đã chọn
   const filteredPosts = posts.filter(post => {
-    if (selectedMonth === 'Tất cả') return true;
-    return getMonthYear(post) === selectedMonth;
+    if (filter.type === 'all') return true;
+    
+    const { year, monthYear } = getPostDateInfo(post);
+    if (filter.type === 'year') {
+      return year === filter.value;
+    }
+    if (filter.type === 'month') {
+      return monthYear === filter.value;
+    }
+    return true;
   });
+
+  // Label hiển thị khi không có bài đăng
+  const getFilterLabel = () => {
+    if (filter.type === 'all') return 'danh sách';
+    if (filter.type === 'year') return `năm ${filter.value}`;
+    if (filter.type === 'month') return `tháng ${filter.value}`;
+    return '';
+  };
 
   // Xử lý khi người dùng chọn file ảnh từ máy tính
   const handleFileChange = (e) => {
@@ -280,34 +347,111 @@ export default function Fanpage() {
               </p>
             </div>
 
-            {/* Card Bộ lọc theo Tháng */}
+            {/* Card Bộ lọc theo Năm & Tháng */}
             <div className="bg-white border border-gray-200/80 p-5 rounded-2xl shadow-sm">
               <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4 flex items-center space-x-2">
                 <FiFilter className="text-[#0054A6]" />
-                <span>Xem Post Theo Tháng</span>
+                <span>Xem Post Theo Thời Gian</span>
               </h3>
 
-              <div className="flex flex-wrap lg:flex-col gap-2">
-                {availableMonths.map((month) => (
-                  <button
-                    key={month}
-                    onClick={() => setSelectedMonth(month)}
-                    className={`px-4 py-2.5 rounded-xl text-xs md:text-sm font-semibold transition-all border text-left flex justify-between items-center ${
-                      selectedMonth === month
-                        ? 'bg-[#0054A6] text-white border-[#0054A6] shadow-md shadow-blue-500/10'
-                        : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50 hover:text-[#0054A6]'
-                    }`}
-                  >
-                    <span>{month === 'Tất cả' ? 'Tất cả các tháng' : `Tháng ${month}`}</span>
-                    {month !== 'Tất cả' && (
-                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${
-                        selectedMonth === month ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-400'
-                      }`}>
-                        {posts.filter(p => getMonthYear(p) === month).length}
-                      </span>
-                    )}
-                  </button>
-                ))}
+              <div className="space-y-3">
+                {/* Nút lọc Tất cả bài viết */}
+                <button
+                  onClick={() => setFilter({ type: 'all', value: null })}
+                  className={`w-full px-4 py-2.5 rounded-xl text-xs md:text-sm font-semibold transition-all border text-left flex justify-between items-center ${
+                    filter.type === 'all'
+                      ? 'bg-[#0054A6] text-white border-[#0054A6] shadow-md shadow-blue-500/10'
+                      : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50 hover:text-[#0054A6]'
+                  }`}
+                >
+                  <span className="flex items-center space-x-2">
+                    <FiCalendar className="w-4 h-4" />
+                    <span>Tất cả bài viết</span>
+                  </span>
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${
+                    filter.type === 'all' ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-400'
+                  }`}>
+                    {posts.length}
+                  </span>
+                </button>
+
+                {/* Danh sách các Năm dạng Accordion */}
+                <div className="space-y-2">
+                  {filterStructure.map((yearGroup) => {
+                    const isExpanded = !!expandedYears[yearGroup.year];
+                    const isYearActive = filter.type === 'year' && filter.value === yearGroup.year;
+
+                    return (
+                      <div key={yearGroup.year} className="border border-gray-100 rounded-xl overflow-hidden shadow-sm">
+                        {/* Header của Năm */}
+                        <button
+                          onClick={() => setExpandedYears(prev => ({
+                            ...prev,
+                            [yearGroup.year]: !prev[yearGroup.year]
+                          }))}
+                          className="w-full px-3 py-2.5 bg-gray-50/50 hover:bg-gray-50 text-gray-700 font-bold text-xs transition-all flex justify-between items-center border-b border-gray-100"
+                        >
+                          <span className="flex items-center space-x-1.5">
+                            {isExpanded ? (
+                              <FiChevronDown className="w-3.5 h-3.5 text-gray-400" />
+                            ) : (
+                              <FiChevronRight className="w-3.5 h-3.5 text-gray-400" />
+                            )}
+                            <span>Năm {yearGroup.year}</span>
+                          </span>
+                          <span className="text-[9px] bg-gray-200/60 text-gray-500 px-2 py-0.5 rounded-full font-extrabold">
+                            {yearGroup.postCount} bài
+                          </span>
+                        </button>
+
+                        {/* Danh sách các tháng thuộc năm */}
+                        {isExpanded && (
+                          <div className="p-1.5 bg-white space-y-1">
+                            {/* Option chọn toàn bộ năm */}
+                            <button
+                              onClick={() => setFilter({ type: 'year', value: yearGroup.year })}
+                              className={`w-full px-2.5 py-2 rounded-lg text-xs font-medium transition-all text-left flex justify-between items-center ${
+                                isYearActive
+                                  ? 'bg-[#0054A6]/10 text-[#0054A6] font-bold border-l-2 border-[#0054A6] pl-2'
+                                  : 'text-gray-500 hover:bg-gray-50 hover:text-[#0054A6]'
+                              }`}
+                            >
+                              <span>Tất cả bài viết năm {yearGroup.year}</span>
+                              <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold ${
+                                isYearActive ? 'bg-[#0054A6]/20 text-[#0054A6]' : 'bg-gray-100 text-gray-400'
+                              }`}>
+                                {yearGroup.postCount}
+                              </span>
+                            </button>
+
+                            {/* Từng tháng cụ thể */}
+                            {yearGroup.months.map((mGroup) => {
+                              const isMonthActive = filter.type === 'month' && filter.value === mGroup.monthYear;
+                              return (
+                                <button
+                                  key={mGroup.monthYear}
+                                  onClick={() => setFilter({ type: 'month', value: mGroup.monthYear })}
+                                  className={`w-full px-2.5 py-2 rounded-lg text-xs font-medium transition-all text-left flex justify-between items-center ${
+                                    isMonthActive
+                                      ? 'bg-[#0054A6]/10 text-[#0054A6] font-bold border-l-2 border-[#0054A6] pl-2'
+                                      : 'text-gray-500 hover:bg-gray-50 hover:text-[#0054A6]'
+                                  }`}
+                                >
+                                  <span>{mGroup.label}</span>
+                                  <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold ${
+                                    isMonthActive ? 'bg-[#0054A6]/20 text-[#0054A6]' : 'bg-gray-100 text-gray-400'
+                                  }`}>
+                                    {mGroup.postCount}
+                                  </span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
 
@@ -383,7 +527,7 @@ export default function Fanpage() {
                 <div className="w-12 h-12 bg-gray-50 text-gray-400 rounded-full flex items-center justify-center mx-auto text-xl shadow-inner">
                   <FiInbox />
                 </div>
-                <p className="text-gray-400 text-sm">Không có bài viết nào thuộc {selectedMonth === 'Tất cả' ? 'danh sách' : `tháng ${selectedMonth}`}.</p>
+                <p className="text-gray-400 text-sm">Không có bài viết nào thuộc {getFilterLabel()}.</p>
               </div>
             )}
           </div>

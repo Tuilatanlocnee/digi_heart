@@ -376,7 +376,7 @@ export const ideaAPI = {
 // 4. BẢNG TIN FANPAGE TƯƠNG TÁC (POSTS API)
 // ==========================================
 export const postAPI = {
-  // Lấy danh sách bài viết
+  // Lấy danh sách bài viết (Chỉ những bài chưa bị xóa)
   getAll: async () => {
     try {
       const response = await api.get('/posts');
@@ -385,7 +385,12 @@ export const postAPI = {
       if (isNetworkError(error)) {
         console.warn('⚠️ Backend offline. Đang sử dụng LocalStorage cho Posts.');
         const local = localStorage.getItem('digiheart_posts');
-        return local ? JSON.parse(local) : [];
+        if (local) {
+          const list = JSON.parse(local);
+          // Lọc ra các bài chưa bị xóa tạm thời khi offline
+          return list.filter(post => post.isDeleted !== true);
+        }
+        return [];
       }
       throw error;
     }
@@ -409,7 +414,8 @@ export const postAPI = {
           content: postData.content,
           image: postData.image || null,
           likes: 0,
-          comments: []
+          comments: [],
+          isDeleted: false
         };
         const updatedList = [newPost, ...list];
         localStorage.setItem('digiheart_posts', JSON.stringify(updatedList));
@@ -564,7 +570,7 @@ export const postAPI = {
     }
   },
 
-  // Admin xóa bài viết
+  // Admin xóa tạm thời bài viết (Soft Delete)
   delete: async (id) => {
     try {
       const response = await api.delete(`/posts/${id}`);
@@ -574,9 +580,75 @@ export const postAPI = {
         const local = localStorage.getItem('digiheart_posts');
         if (local) {
           const list = JSON.parse(local);
+          const updated = list.map(post => {
+            if (post.id === id || post._id === id) {
+              return { ...post, isDeleted: true };
+            }
+            return post;
+          });
+          localStorage.setItem('digiheart_posts', JSON.stringify(updated));
+          return { message: 'Xóa tạm thời bài viết cục bộ thành công!' };
+        }
+      }
+      throw error;
+    }
+  },
+
+  // Admin lấy danh sách bài viết bị xóa tạm thời (Thùng rác)
+  getDeleted: async () => {
+    try {
+      const response = await api.get('/posts/deleted');
+      return response.data;
+    } catch (error) {
+      if (isNetworkError(error)) {
+        const local = localStorage.getItem('digiheart_posts');
+        if (local) {
+          const list = JSON.parse(local);
+          return list.filter(post => post.isDeleted === true);
+        }
+        return [];
+      }
+      throw error;
+    }
+  },
+
+  // Admin khôi phục bài viết đã xóa tạm thời
+  restore: async (id) => {
+    try {
+      const response = await api.post(`/posts/${id}/restore`);
+      return response.data;
+    } catch (error) {
+      if (isNetworkError(error)) {
+        const local = localStorage.getItem('digiheart_posts');
+        if (local) {
+          const list = JSON.parse(local);
+          const updated = list.map(post => {
+            if (post.id === id || post._id === id) {
+              return { ...post, isDeleted: false };
+            }
+            return post;
+          });
+          localStorage.setItem('digiheart_posts', JSON.stringify(updated));
+          return { message: 'Khôi phục bài viết cục bộ thành công!' };
+        }
+      }
+      throw error;
+    }
+  },
+
+  // Admin xóa vĩnh viễn bài viết khỏi database
+  forceDelete: async (id) => {
+    try {
+      const response = await api.delete(`/posts/${id}/force`);
+      return response.data;
+    } catch (error) {
+      if (isNetworkError(error)) {
+        const local = localStorage.getItem('digiheart_posts');
+        if (local) {
+          const list = JSON.parse(local);
           const filtered = list.filter(post => post.id !== id && post._id !== id);
           localStorage.setItem('digiheart_posts', JSON.stringify(filtered));
-          return { message: 'Xóa bài viết cục bộ thành công!' };
+          return { message: 'Xóa vĩnh viễn bài viết cục bộ thành công!' };
         }
       }
       throw error;
