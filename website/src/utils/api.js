@@ -296,7 +296,7 @@ export const ideaAPI = {
         const local = localStorage.getItem('digiheart_ideas');
         if (local) {
           const list = JSON.parse(local);
-          return list.filter(idea => idea.status !== 'Chờ duyệt');
+          return list.filter(idea => idea.status !== 'Chờ duyệt' && idea.type !== 'Góp ý');
         }
         return [];
       }

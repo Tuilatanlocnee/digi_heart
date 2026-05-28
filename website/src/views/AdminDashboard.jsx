@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   FiUsers, FiZap, FiGrid, FiCheck, FiX, FiTrash2, 
-  FiRefreshCw, FiArrowRight, FiShield, FiFileText, FiEdit
+  FiRefreshCw, FiArrowRight, FiShield, FiFileText, FiEdit, FiMail
 } from 'react-icons/fi';
 import { candidateAPI, ideaAPI, postAPI } from '../utils/api';
 
@@ -61,7 +61,17 @@ export default function AdminDashboard() {
       setPosts(postsData);
       setDeletedPosts(deletedPostsData);
     } catch (error) {
-      showNotify('Không thể kết nối đến máy chủ. Hệ thống đang chạy ở chế độ offline LocalStorage Fallback!', 'warning');
+      console.error('Lỗi tải dữ liệu admin:', error);
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        showNotify('Phiên đăng nhập đã hết hạn hoặc token không hợp lệ. Vui lòng đăng nhập lại!', 'danger');
+        localStorage.removeItem('digiheart_admin_token');
+        localStorage.removeItem('digiheart_admin_user');
+        setTimeout(() => {
+          navigate('/admin/login');
+        }, 2000);
+      } else {
+        showNotify('Không thể kết nối đến máy chủ. Hệ thống đang chạy ở chế độ offline LocalStorage Fallback!', 'warning');
+      }
     } finally {
       setLoading(false);
     }
@@ -233,9 +243,11 @@ export default function AdminDashboard() {
 
   // Tính toán nhanh số liệu thống kê
   const stats = {
-    totalIdeas: ideas.length,
-    pendingIdeas: ideas.filter(i => i.status === 'Chờ duyệt').length,
-    appliedIdeas: ideas.filter(i => i.status === 'Đã áp dụng').length,
+    totalIdeas: ideas.filter(i => i.type !== 'Góp ý').length,
+    pendingIdeas: ideas.filter(i => i.type !== 'Góp ý' && i.status === 'Chờ duyệt').length,
+    appliedIdeas: ideas.filter(i => i.type !== 'Góp ý' && i.status === 'Đã áp dụng').length,
+    totalFeedbacks: ideas.filter(i => i.type === 'Góp ý').length,
+    pendingFeedbacks: ideas.filter(i => i.type === 'Góp ý' && i.status === 'Chờ duyệt').length,
     totalNews: posts.length
   };
 
@@ -280,11 +292,11 @@ export default function AdminDashboard() {
         )}
 
         {/* 📊 Thẻ Thống Kê Nhanh (Stats Cards) */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
           
           <div className="bg-white border border-gray-200/80 rounded-2xl p-5 shadow-sm flex items-center justify-between">
             <div>
-              <span className="text-[10px] uppercase font-bold text-gray-450 tracking-wider">Tổng ý tưởng sáng tạo</span>
+              <span className="text-[10px] uppercase font-bold text-gray-450 tracking-wider">Ý tưởng sáng tạo</span>
               <h3 className="text-2xl font-black text-gray-800 mt-1">{stats.totalIdeas}</h3>
               <p className="text-[10px] text-gray-400 mt-1">Có <span className="font-bold text-amber-500">{stats.pendingIdeas}</span> ý tưởng chờ duyệt</p>
             </div>
@@ -297,7 +309,7 @@ export default function AdminDashboard() {
             <div>
               <span className="text-[10px] uppercase font-bold text-gray-450 tracking-wider">Ý tưởng đã áp dụng</span>
               <h3 className="text-2xl font-black text-emerald-600 mt-1">{stats.appliedIdeas}</h3>
-              <p className="text-[10px] text-gray-400 mt-1">Đã đưa vào thực tế hoạt động</p>
+              <p className="text-[10px] text-gray-400 mt-1">Đã đưa vào áp dụng thực tế</p>
             </div>
             <div className="p-3.5 bg-emerald-50 text-emerald-500 rounded-xl shadow-sm">
               <FiCheck className="w-6 h-6" />
@@ -306,9 +318,20 @@ export default function AdminDashboard() {
 
           <div className="bg-white border border-gray-200/80 rounded-2xl p-5 shadow-sm flex items-center justify-between">
             <div>
+              <span className="text-[10px] uppercase font-bold text-gray-450 tracking-wider">Liên hệ & Góp ý</span>
+              <h3 className="text-2xl font-black text-purple-600 mt-1">{stats.totalFeedbacks}</h3>
+              <p className="text-[10px] text-gray-400 mt-1">Có <span className="font-bold text-amber-500">{stats.pendingFeedbacks}</span> góp ý chưa xử lý</p>
+            </div>
+            <div className="p-3.5 bg-purple-50 text-purple-500 rounded-xl shadow-sm">
+              <FiMail className="w-6 h-6" />
+            </div>
+          </div>
+
+          <div className="bg-white border border-gray-200/80 rounded-2xl p-5 shadow-sm flex items-center justify-between">
+            <div>
               <span className="text-[10px] uppercase font-bold text-gray-450 tracking-wider">Bài viết tin tức</span>
               <h3 className="text-2xl font-black text-gray-800 mt-1">{stats.totalNews}</h3>
-              <p className="text-[10px] text-gray-400 mt-1">Đã đăng lên cổng tin tức & sự kiện</p>
+              <p className="text-[10px] text-gray-400 mt-1">Đã đăng lên cổng tin tức</p>
             </div>
             <div className="p-3.5 bg-blue-50 text-[#0054A6] rounded-xl shadow-sm">
               <FiFileText className="w-6 h-6" />
@@ -330,6 +353,19 @@ export default function AdminDashboard() {
             <FiZap className="w-4 h-4" />
             <span>Sáng Kiến Số Hóa ({stats.totalIdeas})</span>
           </button>
+          
+          <button
+            onClick={() => setActiveTab('feedbacks')}
+            className={`shrink-0 px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-1.5 ${
+              activeTab === 'feedbacks' 
+                ? 'bg-purple-55 text-purple-600 shadow-sm border border-purple-100/50' 
+                : 'text-gray-550 hover:bg-gray-50'
+            }`}
+          >
+            <FiMail className="w-4 h-4" />
+            <span>Liên Hệ & Góp Ý ({stats.totalFeedbacks})</span>
+          </button>
+
           <button
             onClick={() => setActiveTab('news')}
             className={`shrink-0 px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-1.5 ${
@@ -341,6 +377,7 @@ export default function AdminDashboard() {
             <FiFileText className="w-4 h-4" />
             <span>Quản lý Tin Tức ({stats.totalNews})</span>
           </button>
+          
           <button
             onClick={() => setActiveTab('trash')}
             className={`shrink-0 px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-1.5 ${
@@ -373,7 +410,7 @@ export default function AdminDashboard() {
                   <span>Danh sách ý tưởng, sáng kiến chuyển đổi số</span>
                 </h3>
 
-                {ideas.length === 0 ? (
+                {ideas.filter(i => i.type !== 'Góp ý').length === 0 ? (
                   <div className="py-12 text-center text-gray-400 text-xs">Hiện tại chưa có ý tưởng đóng góp nào.</div>
                 ) : (
                   <div className="overflow-x-auto">
@@ -389,7 +426,7 @@ export default function AdminDashboard() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-155">
-                        {ideas.map((idea) => {
+                        {ideas.filter(i => i.type !== 'Góp ý').map((idea) => {
                           const ideaId = idea._id || idea.id;
                           return (
                             <tr key={ideaId} className="hover:bg-gray-50/50">
@@ -447,6 +484,97 @@ export default function AdminDashboard() {
                                   onClick={() => handleDeleteIdea(ideaId)}
                                   className="p-1.5 bg-gray-50 hover:bg-red-50 hover:text-red-500 text-gray-400 rounded-lg transition-colors"
                                   title="Xóa ý tưởng đóng góp"
+                                >
+                                  <FiTrash2 className="w-4 h-4" />
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            )}
+
+
+
+            {/* TAB 3: QUẢN LÝ LIÊN HỆ & GÓP Ý */}
+            {activeTab === 'feedbacks' && (
+              <div>
+                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center space-x-2">
+                  <FiMail className="text-purple-650" />
+                  <span>Danh sách liên hệ, ý kiến đóng góp chung</span>
+                </h3>
+
+                {ideas.filter(i => i.type === 'Góp ý').length === 0 ? (
+                  <div className="py-12 text-center text-gray-400 text-xs">Hiện tại chưa có liên hệ góp ý nào.</div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs text-gray-600 min-w-[800px]">
+                      <thead className="text-[10px] uppercase bg-gray-50 text-gray-500 border-b border-gray-200">
+                        <tr>
+                          <th className="px-4 py-3.5">Người đóng góp</th>
+                          <th className="px-4 py-3.5">Tiêu đề góp ý</th>
+                          <th className="px-4 py-3.5">Nội dung chi tiết</th>
+                          <th className="px-4 py-3.5 text-center">Trạng thái</th>
+                          <th className="px-4 py-3.5 text-center">Cập nhật trạng thái</th>
+                          <th className="px-4 py-3.5 text-center">Xóa</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-155">
+                        {ideas.filter(i => i.type === 'Góp ý').map((idea) => {
+                          const ideaId = idea._id || idea.id;
+                          return (
+                            <tr key={ideaId} className="hover:bg-gray-50/50">
+                              <td className="px-4 py-4">
+                                <p className="font-bold text-gray-800">{idea.fullName}</p>
+                                <p className="text-gray-400 text-[10px] mt-0.5">{idea.email || 'Không để lại email'}</p>
+                                <p className="text-gray-400 text-[9px] mt-0.5">Ngày gửi: {idea.date}</p>
+                              </td>
+                              <td className="px-4 py-4 font-bold text-[#0054A6] max-w-[180px]">{idea.title}</td>
+                              <td className="px-4 py-4 max-w-[280px]">
+                                <p className="text-gray-600 line-clamp-3 leading-relaxed" title={idea.description}>
+                                  {idea.description}
+                                </p>
+                              </td>
+                              <td className="px-4 py-4 text-center">
+                                <span className={`px-2.5 py-1.5 rounded-full font-bold text-[9px] ${
+                                  idea.status === 'Đã phản hồi' ? 'bg-blue-50 text-blue-600 border border-blue-150' :
+                                  idea.status === 'Đã tiếp nhận' ? 'bg-emerald-50 text-emerald-600 border border-emerald-150' :
+                                  'bg-amber-50 text-amber-650 border border-amber-150'
+                                }`}>
+                                  {idea.status === 'Đã phản hồi' ? 'Đã phản hồi' : 
+                                   idea.status === 'Đã tiếp nhận' ? 'Đã tiếp nhận' : 'Chưa xử lý'}
+                                </span>
+                              </td>
+                              <td className="px-4 py-4 text-center">
+                                {idea.status === 'Chờ duyệt' && (
+                                  <button
+                                    onClick={() => handleUpdateIdea(ideaId, 'Đã tiếp nhận')}
+                                    className="px-2 py-1 bg-purple-50 hover:bg-purple-100 text-purple-650 rounded-md text-[9px] font-bold transition-all w-28"
+                                  >
+                                    Xác nhận tiếp nhận
+                                  </button>
+                                )}
+                                {idea.status === 'Đã tiếp nhận' && (
+                                  <button
+                                    onClick={() => handleUpdateIdea(ideaId, 'Đã phản hồi')}
+                                    className="px-2 py-1 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-md text-[9px] font-bold transition-all w-28"
+                                  >
+                                    Xác nhận phản hồi
+                                  </button>
+                                )}
+                                {idea.status === 'Đã phản hồi' && (
+                                  <span className="text-gray-450 text-[9px] font-bold">Đã phản hồi đóng góp</span>
+                                )}
+                              </td>
+                              <td className="px-4 py-4 text-center">
+                                <button
+                                  onClick={() => handleDeleteIdea(ideaId)}
+                                  className="p-1.5 bg-gray-50 hover:bg-red-50 hover:text-red-500 text-gray-400 rounded-lg transition-colors"
+                                  title="Xóa ý kiến đóng góp"
                                 >
                                   <FiTrash2 className="w-4 h-4" />
                                 </button>

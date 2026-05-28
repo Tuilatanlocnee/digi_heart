@@ -24,7 +24,12 @@ const ideaSchema = new mongoose.Schema({
   status: {
     type: String,
     default: 'Chờ duyệt',
-    enum: ['Chờ duyệt', 'Đã tiếp nhận', 'Đang thử nghiệm', 'Đã áp dụng']
+    enum: ['Chờ duyệt', 'Đã tiếp nhận', 'Đang thử nghiệm', 'Đã áp dụng', 'Đã phản hồi']
+  },
+  type: {
+    type: String,
+    enum: ['Sáng kiến', 'Góp ý'],
+    default: 'Sáng kiến'
   },
   date: {
     type: String,

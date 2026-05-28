@@ -35,9 +35,6 @@ export default function Footer() {
               <li>
                 <Link to="/projects" className="hover:text-[#0054A6] transition-colors duration-200">Dự án số</Link>
               </li>
-              <li>
-                <Link to="/join-us" className="hover:text-[#0054A6] transition-colors duration-200">Gia nhập CLB</Link>
-              </li>
             </ul>
           </div>
 

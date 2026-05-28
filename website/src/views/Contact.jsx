@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FiMapPin, FiPhone, FiMail, FiSend, FiZap } from 'react-icons/fi';
+import { FiMapPin, FiPhone, FiMail, FiSend, FiZap, FiShield } from 'react-icons/fi';
 import { ideaAPI } from '../utils/api';
 
 /**
@@ -7,6 +7,12 @@ import { ideaAPI } from '../utils/api';
  * Kết nối dữ liệu MongoDB thông qua Backend API (hỗ trợ offline LocalStorage Fallback).
  */
 export default function Contact() {
+  // Trạng thái loại form: 'sangkien' | 'gopy'
+  const [formType, setFormType] = useState('sangkien');
+
+  // Trạng thái kiểm tra tài khoản quản trị
+  const [isAdmin, setIsAdmin] = useState(false);
+
   // Trạng thái nhập liệu cho form
   const [formData, setFormData] = useState({
     fullName: '',
@@ -18,7 +24,22 @@ export default function Contact() {
   // Trạng thái hiện popup báo gửi thành công
   const [showSuccess, setShowSuccess] = useState(false);
 
-  // 2. Xử lý khi Submit gửi ý tưởng
+  // Kiểm tra tài khoản quản lý khi component mount
+  useEffect(() => {
+    const userStr = localStorage.getItem('digiheart_admin_user');
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        if (user.role === 'admin' || user.role === 'superadmin') {
+          setIsAdmin(true);
+        }
+      } catch (e) {
+        console.error('Lỗi phân tích thông tin user:', e);
+      }
+    }
+  }, []);
+
+  // Xử lý khi Submit gửi ý tưởng/góp ý
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.fullName || !formData.title || !formData.description) return;
@@ -28,10 +49,9 @@ export default function Contact() {
         fullName: formData.fullName,
         email: formData.email,
         title: formData.title,
-        description: formData.description
+        description: formData.description,
+        type: formType === 'sangkien' ? 'Sáng kiến' : 'Góp ý'
       });
-
-
 
       // Reset form
       setFormData({
@@ -47,8 +67,8 @@ export default function Contact() {
       }, 4500);
 
     } catch (error) {
-      console.error('Lỗi khi gửi sáng kiến:', error);
-      alert('Không thể gửi sáng kiến số. Vui lòng thử lại!');
+      console.error('Lỗi khi gửi đóng góp:', error);
+      alert('Không thể gửi đóng góp. Vui lòng thử lại!');
     }
   };
 
@@ -116,84 +136,143 @@ export default function Contact() {
             </div>
           </div>
 
-          {/* Cột phải (7 phần): Form gửi sáng kiến */}
+          {/* Cột phải (7 phần): Form gửi sáng kiến hoặc liên hệ góp ý */}
           <div className="lg:col-span-7 bg-white border border-gray-200/80 rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-lg">
-            <h3 className="text-xl font-bold mb-6 flex items-center space-x-2 text-gray-800">
-              <FiZap className="text-[#E30613]" />
-              <span>Hộp thư Sáng tạo Số</span>
-            </h3>
-
-            {showSuccess && (
-              <div className="mb-6 p-4 bg-emerald-50 border border-emerald-250 text-emerald-700 rounded-xl text-sm font-semibold animate-fadeIn">
-                🚀 Cảm ơn bạn! Ý tưởng của bạn đã được lưu lại và gửi tới Hộp thư sáng tạo của Đoàn MobiFone Cần Thơ.
+            {isAdmin ? (
+              <div className="min-h-[350px] flex flex-col justify-center items-center text-center p-6 bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">
+                <div className="p-4 bg-amber-50 text-amber-500 rounded-full mb-4 shadow-sm">
+                  <FiShield className="w-10 h-10" />
+                </div>
+                <h3 className="text-lg font-bold text-gray-800 mb-2">Tài khoản Quản trị viên</h3>
+                <p className="text-gray-500 text-xs max-w-sm leading-relaxed mb-6 font-medium">
+                  Bạn đang đăng nhập hệ thống với tư cách Quản lý CLB. 
+                  Tài khoản Quản trị viên không hỗ trợ tính năng gửi sáng kiến hoặc liên hệ góp ý.
+                </p>
+                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">
+                  Vui lòng đăng xuất để gửi đóng góp dưới dạng đoàn viên/khách
+                </span>
               </div>
+            ) : (
+              <>
+                {/* Bộ chuyển đổi loại đóng góp (Tab Switcher) */}
+                <div className="flex bg-gray-100 p-1 rounded-xl mb-6 border border-gray-200/50">
+                  <button
+                    type="button"
+                    onClick={() => setFormType('sangkien')}
+                    className={`flex-1 py-2.5 px-3 text-xs font-bold rounded-lg transition-all duration-300 flex items-center justify-center space-x-2 ${
+                      formType === 'sangkien'
+                        ? 'bg-[#0054A6] text-white shadow-sm'
+                        : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
+                    }`}
+                  >
+                    <FiZap className="w-3.5 h-3.5" />
+                    <span>Ý Tưởng Sáng Kiến Số</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormType('gopy')}
+                    className={`flex-1 py-2.5 px-3 text-xs font-bold rounded-lg transition-all duration-300 flex items-center justify-center space-x-2 ${
+                      formType === 'gopy'
+                        ? 'bg-[#0054A6] text-white shadow-sm'
+                        : 'text-gray-550 hover:text-gray-700 hover:bg-white/50'
+                    }`}
+                  >
+                    <FiMail className="w-3.5 h-3.5" />
+                    <span>Liên Hệ & Góp Ý Chung</span>
+                  </button>
+                </div>
+
+                <h3 className="text-xl font-bold mb-6 flex items-center space-x-2 text-gray-800">
+                  {formType === 'sangkien' ? (
+                    <>
+                      <FiZap className="text-[#E30613]" />
+                      <span>Hộp thư Sáng tạo Số</span>
+                    </>
+                  ) : (
+                    <>
+                      <FiMail className="text-[#0054A6]" />
+                      <span>Hộp thư Liên hệ & Góp ý</span>
+                    </>
+                  )}
+                </h3>
+
+                {showSuccess && (
+                  <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl text-sm font-semibold animate-fadeIn">
+                    {formType === 'sangkien' 
+                      ? '🚀 Cảm ơn bạn! Ý tưởng của bạn đã được lưu lại và gửi tới Hộp thư sáng tạo của Đoàn MobiFone Cần Thơ.'
+                      : '🚀 Cảm ơn bạn! Ý kiến đóng góp của bạn đã được gửi tới Ban quản trị Đoàn MobiFone Cần Thơ.'}
+                  </div>
+                )}
+
+                <form onSubmit={handleSubmit} className="space-y-5">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-500 mb-2 uppercase">Họ và tên người đóng góp *</label>
+                    <input
+                      type="text"
+                      name="fullName"
+                      value={formData.fullName}
+                      onChange={handleChange}
+                      className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#0054A6] focus:ring-1 focus:ring-[#0054A6] text-gray-800 placeholder-gray-450 shadow-inner"
+                      placeholder="Nhập họ và tên..."
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-gray-500 mb-2 uppercase">Email nhận phản hồi (tùy chọn)</label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#0054A6] focus:ring-1 focus:ring-[#0054A6] text-gray-800 placeholder-gray-450 shadow-inner"
+                      placeholder="username@mobifone.vn"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-gray-500 mb-2 uppercase">
+                      {formType === 'sangkien' ? 'Tên ý tưởng / Sáng kiến số hóa *' : 'Tiêu đề liên hệ / góp ý *'}
+                    </label>
+                    <input
+                      type="text"
+                      name="title"
+                      value={formData.title}
+                      onChange={handleChange}
+                      className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#0054A6] focus:ring-1 focus:ring-[#0054A6] text-gray-800 placeholder-gray-450 shadow-inner"
+                      placeholder={formType === 'sangkien' ? "Ví dụ: Tích hợp mã QR tra cứu cẩm nang tại sảnh tiếp khách..." : "Ví dụ: Góp ý hoạt động CLB, Đề xuất liên hệ..."}
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-gray-500 mb-2 uppercase">
+                      {formType === 'sangkien' ? 'Mô tả chi tiết giải pháp & Hiệu quả mong đợi *' : 'Nội dung liên hệ & Đóng góp ý kiến *'}
+                    </label>
+                    <textarea
+                      name="description"
+                      rows="4"
+                      value={formData.description}
+                      onChange={handleChange}
+                      className="w-full bg-white border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:border-[#0054A6] focus:ring-1 focus:ring-[#0054A6] text-gray-800 placeholder-gray-450 resize-none shadow-inner"
+                      placeholder={formType === 'sangkien' ? "Mô tả cụ thể cách thức triển khai và lợi ích mang lại..." : "Nhập nội dung chi tiết bạn muốn gửi tới CLB..."}
+                      required
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full py-3 bg-[#E30613] hover:bg-[#c2050f] text-white font-bold rounded-xl text-sm transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg shadow-red-500/10"
+                  >
+                    <FiSend className="w-4 h-4" />
+                    <span>{formType === 'sangkien' ? 'Gửi Ý Tưởng Chuyển Đổi Số' : 'Gửi Liên Hệ & Góp Ý'}</span>
+                  </button>
+                </form>
+              </>
             )}
-
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div>
-                <label className="block text-xs font-bold text-gray-500 mb-2 uppercase">Họ và tên người đóng góp *</label>
-                <input
-                  type="text"
-                  name="fullName"
-                  value={formData.fullName}
-                  onChange={handleChange}
-                  className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#0054A6] focus:ring-1 focus:ring-[#0054A6] text-gray-800 placeholder-gray-400 shadow-inner"
-                  placeholder="Nhập họ và tên..."
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-gray-500 mb-2 uppercase">Email nhận phản hồi (tùy chọn)</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#0054A6] focus:ring-1 focus:ring-[#0054A6] text-gray-800 placeholder-gray-400 shadow-inner"
-                  placeholder="username@mobifone.vn"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-gray-500 mb-2 uppercase">Tên ý tưởng / Sáng kiến số hóa *</label>
-                <input
-                  type="text"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleChange}
-                  className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#0054A6] focus:ring-1 focus:ring-[#0054A6] text-gray-800 placeholder-gray-400 shadow-inner"
-                  placeholder="Ví dụ: Tích hợp mã QR tra cứu cẩm nang tại sảnh tiếp khách..."
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-gray-500 mb-2 uppercase">Mô tả chi tiết giải pháp & Hiệu quả mong đợi *</label>
-                <textarea
-                  name="description"
-                  rows="4"
-                  value={formData.description}
-                  onChange={handleChange}
-                  className="w-full bg-white border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:border-[#0054A6] focus:ring-1 focus:ring-[#0054A6] text-gray-800 placeholder-gray-400 resize-none shadow-inner"
-                  placeholder="Mô tả cụ thể cách thức triển khai và lợi ích mang lại..."
-                  required
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full py-3 bg-[#E30613] hover:bg-[#c2050f] text-white font-bold rounded-xl text-sm transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg shadow-red-500/10"
-              >
-                <FiSend className="w-4 h-4" />
-                <span>Gửi Ý Tưởng Chuyển Đổi Số</span>
-              </button>
-            </form>
           </div>
 
         </div>
-
-
 
       </div>
     </div>

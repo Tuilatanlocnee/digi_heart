@@ -7,7 +7,10 @@ const router = express.Router();
 // 1.2 API Lấy danh sách ý tưởng đã được duyệt/tiếp nhận (Công khai)
 router.get('/approved', async (req, res) => {
   try {
-    const ideas = await Idea.find({ status: { $ne: 'Chờ duyệt' } }).sort({ createdAt: -1 });
+    const ideas = await Idea.find({ 
+      status: { $ne: 'Chờ duyệt' },
+      type: { $ne: 'Góp ý' } // Chỉ hiển thị Sáng kiến, không hiển thị Góp ý liên hệ chung
+    }).sort({ createdAt: -1 });
     res.json(ideas);
   } catch (error) {
     res.status(500).json({ message: 'Lỗi lấy danh sách sáng kiến số!', error: error.message });
@@ -26,7 +29,7 @@ router.get('/', authMiddleware, async (req, res) => {
 
 // 2. API Gửi ý tưởng mới (Công khai cho đoàn viên)
 router.post('/', async (req, res) => {
-  const { fullName, email, title, description } = req.body;
+  const { fullName, email, title, description, type } = req.body;
 
   try {
     if (!fullName || !title || !description) {
@@ -37,7 +40,8 @@ router.post('/', async (req, res) => {
       fullName,
       email,
       title,
-      description
+      description,
+      type: type || 'Sáng kiến'
     });
 
     const savedIdea = await newIdea.save();
@@ -55,7 +59,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
   const { status } = req.body;
 
   try {
-    const validStatuses = ['Chờ duyệt', 'Đã tiếp nhận', 'Đang thử nghiệm', 'Đã áp dụng'];
+    const validStatuses = ['Chờ duyệt', 'Đã tiếp nhận', 'Đang thử nghiệm', 'Đã áp dụng', 'Đã phản hồi'];
     if (!status || !validStatuses.includes(status)) {
       return res.status(400).json({ message: 'Trạng thái xử lý không hợp lệ!' });
     }

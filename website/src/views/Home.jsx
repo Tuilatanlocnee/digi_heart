@@ -52,8 +52,11 @@ export default function Home() {
           
           <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold leading-tight tracking-tight mb-3 md:mb-4">
             Đoàn Thanh Niên <br className="hidden sm:inline" />
-            <span className="bg-gradient-to-r from-white via-blue-100 to-red-200 bg-clip-text text-transparent inline-block py-2 px-1 leading-normal">
-              {"DIGI HEART - TRÁI TIM S\u1ED0"}
+            <span className="bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent inline-block py-2 px-1 leading-normal">
+              {"DIGI HEART - "}
+            </span>
+            <span className="bg-gradient-to-r from-[#ff8a93] via-[#E30613] to-[#ff4d5a] bg-clip-text text-transparent inline-block py-2 px-1 leading-normal font-extrabold drop-shadow-[0_2px_10px_rgba(227,6,19,0.4)]">
+              {"TRÁI TIM SỐ"}
             </span>
           </h1>
 
