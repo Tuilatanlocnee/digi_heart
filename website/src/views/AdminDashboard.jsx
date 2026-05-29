@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  FiUsers, FiZap, FiGrid, FiCheck, FiX, FiTrash2, 
-  FiRefreshCw, FiArrowRight, FiShield, FiFileText, FiEdit, FiMail
+  FiZap, FiCheck, FiTrash2, 
+  FiRefreshCw, FiShield, FiFileText, FiEdit, FiMail
 } from 'react-icons/fi';
-import { candidateAPI, ideaAPI, postAPI } from '../utils/api';
+import { ideaAPI, postAPI } from '../utils/api';
 
 /**
  * View AdminDashboard - Trang quản trị trung tâm dành cho Ban chủ nhiệm CLB Digi Heart.
@@ -17,7 +17,6 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('ideas');
 
   // Dữ liệu lấy từ API
-  const [candidates] = useState([]); // Giữ làm mảng rỗng tương thích ngược
   const [ideas, setIdeas] = useState([]);
   const [posts, setPosts] = useState([]);
   const [deletedPosts, setDeletedPosts] = useState([]);
@@ -38,18 +37,15 @@ export default function AdminDashboard() {
   // Thông báo hành động
   const [message, setMessage] = useState({ text: '', type: '' });
 
-  // 1. Kiểm tra quyền truy cập Admin & Tải dữ liệu ban đầu
-  useEffect(() => {
-    const token = localStorage.getItem('digiheart_admin_token');
-    if (!token) {
-      navigate('/admin/login');
-      return;
-    }
-    fetchData();
-  }, [navigate]);
+  // Hàm hiển thị thông báo phản hồi nhanh
+  const showNotify = useCallback((text, type = 'success') => {
+    setMessage({ text, type });
+    setTimeout(() => setMessage({ text: '', type: '' }), 4500);
+  }, []);
 
   // Hàm tải dữ liệu đồng thời từ API
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
+    await Promise.resolve();
     setLoading(true);
     try {
       const [ideasData, postsData, deletedPostsData] = await Promise.all([
@@ -75,40 +71,18 @@ export default function AdminDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [navigate, showNotify]);
 
-  // Hàm hiển thị thông báo phản hồi nhanh
-  const showNotify = (text, type = 'success') => {
-    setMessage({ text, type });
-    setTimeout(() => setMessage({ text: '', type: '' }), 4500);
-  };
-
-  // ==========================================
-  // XỬ LÝ CANDIDATES (ỨNG VIÊN GIA NHẬP)
-  // ==========================================
-  const handleUpdateCandidate = async (id, status) => {
-    try {
-      await candidateAPI.updateStatus(id, status);
-      showNotify(`Đã cập nhật trạng thái ứng viên thành công!`);
-      // Update local state
-      setCandidates(candidates.map(cand => 
-        (cand._id === id || cand.id === id) ? { ...cand, status } : cand
-      ));
-    } catch (error) {
-      showNotify('Gặp lỗi khi cập nhật trạng thái ứng viên!', 'danger');
+  // 1. Kiểm tra quyền truy cập Admin & Tải dữ liệu ban đầu
+  useEffect(() => {
+    const token = localStorage.getItem('digiheart_admin_token');
+    if (!token) {
+      navigate('/admin/login');
+      return;
     }
-  };
-
-  const handleDeleteCandidate = async (id) => {
-    if (!window.confirm('Bạn có chắc chắn muốn xóa hồ sơ ứng viên này không?')) return;
-    try {
-      await candidateAPI.delete(id);
-      showNotify('Đã xóa hồ sơ ứng viên thành công!');
-      setCandidates(candidates.filter(cand => cand._id !== id && cand.id !== id));
-    } catch (error) {
-      showNotify('Gặp lỗi khi xóa ứng viên!', 'danger');
-    }
-  };
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchData();
+  }, [navigate, fetchData]);
 
   // ==========================================
   // XỬ LÝ IDEAS (Ý TƯỞNG SÁNG KIẾN SỐ)
@@ -121,6 +95,7 @@ export default function AdminDashboard() {
         (idea._id === id || idea.id === id) ? { ...idea, status } : idea
       ));
     } catch (error) {
+      console.error('Lỗi cập nhật sáng kiến:', error);
       showNotify('Lỗi cập nhật tiến trình sáng kiến!', 'danger');
     }
   };
@@ -132,6 +107,7 @@ export default function AdminDashboard() {
       showNotify('Đã xóa ý tưởng thành công!');
       setIdeas(ideas.filter(idea => idea._id !== id && idea.id !== id));
     } catch (error) {
+      console.error('Lỗi xóa ý tưởng:', error);
       showNotify('Lỗi xóa ý tưởng!', 'danger');
     }
   };
@@ -156,6 +132,7 @@ export default function AdminDashboard() {
       setShowAddPost(false);
       setPostForm({ title: '', content: '', image: '' });
     } catch (error) {
+      console.error('Lỗi đăng bài viết:', error);
       showNotify(error.message || 'Lỗi khi đăng bài viết!', 'danger');
     }
   };
@@ -173,6 +150,7 @@ export default function AdminDashboard() {
         fetchData();
       }
     } catch (error) {
+      console.error('Lỗi xóa bài đăng:', error);
       showNotify('Lỗi xóa bài đăng!', 'danger');
     }
   };
@@ -189,6 +167,7 @@ export default function AdminDashboard() {
         fetchData();
       }
     } catch (error) {
+      console.error('Lỗi khôi phục bài viết:', error);
       showNotify('Lỗi khôi phục bài viết!', 'danger');
     }
   };
@@ -200,6 +179,7 @@ export default function AdminDashboard() {
       showNotify('Đã xóa vĩnh viễn bài viết thành công khỏi cơ sở dữ liệu!');
       setDeletedPosts(deletedPosts.filter(post => post._id !== id && post.id !== id));
     } catch (error) {
+      console.error('Lỗi xóa vĩnh viễn bài viết:', error);
       showNotify('Lỗi xóa vĩnh viễn bài viết!', 'danger');
     }
   };
@@ -237,6 +217,7 @@ export default function AdminDashboard() {
       setEditingPostId(null);
       setPostForm({ title: '', content: '', image: '' });
     } catch (error) {
+      console.error('Lỗi cập nhật bài viết:', error);
       showNotify(error.message || 'Lỗi khi cập nhật bài viết!', 'danger');
     }
   };
@@ -493,7 +474,28 @@ export default function AdminDashboard() {
                                       Áp dụng thực tế
                                     </button>
                                   )}
-                                           {/* TAB 3: QUẢN LÝ LIÊN HỆ & GÓP Ý */}
+                                </div>
+                              </td>
+                              <td className="px-5 py-4 text-center">
+                                <button
+                                  onClick={() => handleDeleteIdea(ideaId)}
+                                  className="p-2 bg-slate-50 hover:bg-red-50 hover:text-red-600 text-slate-400 rounded-xl transition-all shadow-sm active:scale-90"
+                                  title="Xóa ý tưởng"
+                                >
+                                  <FiTrash2 className="w-4 h-4" />
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* TAB 3: QUẢN LÝ LIÊN HỆ & GÓP Ý */}
             {activeTab === 'feedbacks' && (
               <div>
                 <h3 className="text-lg font-black text-slate-800 mb-6 flex items-center space-x-2 pb-4 border-b border-slate-100">

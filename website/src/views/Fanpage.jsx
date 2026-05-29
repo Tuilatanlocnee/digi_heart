@@ -3,7 +3,6 @@ import { createPortal } from 'react-dom';
 import { 
   FiImage, 
   FiCalendar, 
-  FiUser, 
   FiPlusCircle, 
   FiFilter, 
   FiInbox, 
@@ -60,6 +59,7 @@ export default function Fanpage() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchPosts();
 
     // Kiểm tra đăng nhập
@@ -112,6 +112,7 @@ export default function Fanpage() {
           initialExpanded[year] = true;
         }
       });
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setExpandedYears(initialExpanded);
     }
   }, [posts]);

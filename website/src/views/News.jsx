@@ -48,6 +48,7 @@ export default function News() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchNews();
 
     // Kiểm tra tư cách Admin

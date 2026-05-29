@@ -1,19 +1,10 @@
-import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FiCpu, FiUsers, FiAward, FiArrowRight, FiBookOpen } from 'react-icons/fi';
+import { FiCpu, FiUsers, FiAward, FiBookOpen } from 'react-icons/fi';
 
 /**
  * View Home - Trang chủ giới thiệu về CLB Digi Heart (Light Mode).
  */
 export default function Home() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-    /* eslint-disable react-hooks/set-state-in-effect */
-    const token = localStorage.getItem('digiheart_admin_token');
-    setIsLoggedIn(!!token);
-    /* eslint-enable react-hooks/set-state-in-effect */
-  }, []);
 
   // Danh sách các mục tiêu hành động chính của CLB
   const keyObjectives = [

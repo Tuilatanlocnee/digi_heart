@@ -23,7 +23,7 @@ export default function AdminLogin() {
         if (user.role === 'admin' || user.role === 'superadmin') {
           navigate('/admin');
         }
-      } catch (e) {
+      } catch {
         // Bỏ qua lỗi
       }
     }

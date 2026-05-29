@@ -31,6 +31,7 @@ export default function Contact() {
       try {
         const user = JSON.parse(userStr);
         if (user.role === 'admin' || user.role === 'superadmin') {
+          // eslint-disable-next-line react-hooks/set-state-in-effect
           setIsAdmin(true);
         }
       } catch (e) {

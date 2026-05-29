@@ -70,9 +70,9 @@ export const authAPI = {
             user: mockUser
           };
         }
-        throw new Error('Tài khoản hoặc mật khẩu không chính xác (Chế độ offline)!');
+        throw new Error('Tài khoản hoặc mật khẩu không chính xác (Chế độ offline)!', { cause: error });
       }
-      throw new Error(error.response?.data?.message || 'Tài khoản hoặc mật khẩu không chính xác!');
+      throw new Error(error.response?.data?.message || 'Tài khoản hoặc mật khẩu không chính xác!', { cause: error });
     }
   },
 
@@ -105,7 +105,7 @@ export const authAPI = {
       if (isNetworkError(error)) {
         return { message: 'Đổi mật khẩu thành công (Mô phỏng offline)!' };
       }
-      throw new Error(error.response?.data?.message || 'Lỗi hệ thống khi đổi mật khẩu!');
+      throw new Error(error.response?.data?.message || 'Lỗi hệ thống khi đổi mật khẩu!', { cause: error });
     }
   }
 };
@@ -159,7 +159,7 @@ export const candidateAPI = {
         }
         return { message: 'Cập nhật thành công (Mô phỏng offline)!', avatar: profileData.avatar };
       }
-      throw new Error(error.response?.data?.message || 'Lỗi cập nhật hồ sơ cá nhân!');
+      throw new Error(error.response?.data?.message || 'Lỗi cập nhật hồ sơ cá nhân!', { cause: error });
     }
   },
 
@@ -218,7 +218,7 @@ export const candidateAPI = {
         localStorage.setItem('digiheart_candidates', JSON.stringify(updatedList));
         return { message: 'Đăng ký thành công (Lưu trữ cục bộ LocalStorage)!', candidate: newCand };
       }
-      throw new Error(error.response?.data?.message || 'Lỗi gửi đăng ký!');
+      throw new Error(error.response?.data?.message || 'Lỗi gửi đăng ký!', { cause: error });
     }
   },
 
@@ -324,7 +324,7 @@ export const ideaAPI = {
         localStorage.setItem('digiheart_ideas', JSON.stringify(updatedList));
         return { message: 'Gửi ý tưởng thành công (Lưu cục bộ)!', idea: newIdea };
       }
-      throw new Error(error.response?.data?.message || 'Lỗi gửi ý tưởng!');
+      throw new Error(error.response?.data?.message || 'Lỗi gửi ý tưởng!', { cause: error });
     }
   },
 
@@ -421,7 +421,7 @@ export const postAPI = {
         localStorage.setItem('digiheart_posts', JSON.stringify(updatedList));
         return { message: 'Đăng bài thành công (Lưu cục bộ)!', post: newPost };
       }
-      throw new Error(error.response?.data?.message || 'Lỗi đăng bài viết!');
+      throw new Error(error.response?.data?.message || 'Lỗi đăng bài viết!', { cause: error });
     }
   },
 
@@ -444,7 +444,7 @@ export const postAPI = {
               const currentLikedBy = post.likedBy || [];
               const identifier = `guest_${guestId}`;
               
-              let newLikes = currentLikes;
+              let newLikes;
               let newLikedBy = [...currentLikedBy];
 
               if (isLocalLiked) {
@@ -694,7 +694,7 @@ export const newsAPI = {
         localStorage.setItem('digiheart_news', JSON.stringify(updatedList));
         return { message: 'Đăng bài viết thành công (Offline)!', news: newNews };
       }
-      throw new Error(error.response?.data?.message || 'Lỗi đăng bài viết tin tức!');
+      throw new Error(error.response?.data?.message || 'Lỗi đăng bài viết tin tức!', { cause: error });
     }
   },
 
@@ -737,7 +737,7 @@ export const newsAPI = {
           return { message: 'Chỉnh sửa bài viết cục bộ thành công!', news: { id, ...newsData } };
         }
       }
-      throw new Error(error.response?.data?.message || 'Lỗi cập nhật bài viết tin tức!');
+      throw new Error(error.response?.data?.message || 'Lỗi cập nhật bài viết tin tức!', { cause: error });
     }
   }
 };

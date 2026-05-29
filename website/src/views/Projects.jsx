@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FiCheckCircle, FiActivity, FiUser, FiCalendar, FiInbox, FiZap } from 'react-icons/fi';
+import { FiActivity, FiUser, FiCalendar, FiInbox, FiZap } from 'react-icons/fi';
 import { ideaAPI } from '../utils/api';
 
 /**
