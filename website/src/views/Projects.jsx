@@ -29,7 +29,7 @@ export default function Projects() {
   return (
     <div className="bg-gray-50 text-gray-800 min-h-screen py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* Tiêu đề chính */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h1 className="text-2xl sm:text-3xl md:text-5xl font-black mb-4 text-gray-800">
@@ -73,17 +73,16 @@ export default function Projects() {
                 key={idea._id || idea.id}
                 className="bg-white border border-gray-200/80 rounded-2xl sm:rounded-3xl p-5 sm:p-8 hover:border-[#0054A6]/30 hover:shadow-xl transition-all duration-300 shadow-sm flex flex-col relative group overflow-hidden"
               >
-                
+
                 {/* Trang trí hiệu ứng ánh sáng mờ khi hover */}
                 <div className="absolute top-0 right-0 w-24 h-24 bg-[#0054A6]/5 rounded-full blur-2xl group-hover:bg-[#0054A6]/10 transition-all pointer-events-none"></div>
-                
+
                 {/* Trạng thái dự án */}
                 <div className="flex items-center justify-between mb-6">
-                  <span className={`px-3 py-1 rounded-full text-xs font-bold border ${
-                    idea.status === 'Đã áp dụng' ? 'bg-emerald-50 text-emerald-600 border-emerald-250' :
-                    idea.status === 'Đang thử nghiệm' ? 'bg-blue-50 text-blue-500 border-blue-250' :
-                    'bg-purple-50 text-purple-600 border-purple-250'
-                  }`}>
+                  <span className={`px-3 py-1 rounded-full text-xs font-bold border ${idea.status === 'Đã áp dụng' ? 'bg-emerald-50 text-emerald-600 border-emerald-250' :
+                      idea.status === 'Đang thử nghiệm' ? 'bg-blue-50 text-blue-500 border-blue-250' :
+                        'bg-purple-50 text-purple-600 border-purple-250'
+                    }`}>
                     {idea.status}
                   </span>
                   <FiActivity className="w-5 h-5 text-gray-400" />

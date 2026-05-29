@@ -256,29 +256,31 @@ export default function AdminDashboard() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header Dashboard */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 pb-6 border-b border-slate-200/60">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 pb-6 border-b border-slate-200/50">
           <div>
-            <div className="inline-flex items-center space-x-1.5 px-2.5 py-1 bg-blue-50 text-[#0054A6] rounded-lg text-[10px] font-bold uppercase tracking-wider mb-2">
+            <div className="inline-flex items-center space-x-1.5 px-3 py-1 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 text-[#0054A6] rounded-full text-[10px] font-bold uppercase tracking-wider mb-2.5 shadow-sm">
               <span className="w-1.5 h-1.5 rounded-full bg-[#0054A6] animate-pulse"></span>
-              <span>Hệ thống Quản lý</span>
+              <span>Doanh Nghiệp • Digi Heart Portal</span>
             </div>
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-800 flex items-center space-x-2.5">
-              <FiShield className="text-[#0054A6] w-6 h-6 md:w-8 md:h-8 shrink-0" />
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-800 flex items-center space-x-3 tracking-tight">
+              <div className="p-2 bg-[#0054A6]/5 rounded-xl border border-[#0054A6]/10">
+                <FiShield className="text-[#0054A6] w-6 h-6 md:w-7 md:h-7 shrink-0" />
+              </div>
               <span>Bảng Điều Khiển Quản Lý</span>
             </h1>
-            <p className="text-slate-400 text-xs mt-1 font-semibold uppercase tracking-wider">
+            <p className="text-slate-400 text-xs mt-1.5 font-semibold uppercase tracking-widest pl-1">
               Hệ thống quản lý CLB Digi Heart • MobiFone Cần Thơ
             </p>
           </div>
-          <div className="flex items-center space-x-3 mt-4 md:mt-0">
+          <div className="flex items-center space-x-3 mt-5 md:mt-0">
             <button
               onClick={fetchData}
-              className="px-4 py-2.5 bg-white border border-slate-200 hover:border-slate-300 hover:text-slate-900 text-slate-600 rounded-xl transition-all shadow-sm hover:shadow flex items-center space-x-2 text-xs font-bold active:scale-95"
+              className="px-5 py-2.5 bg-white border border-slate-200/80 hover:border-[#0054A6]/30 hover:text-[#0054A6] text-slate-600 rounded-xl transition-all shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:shadow-md flex items-center space-x-2 text-xs font-bold active:scale-95 duration-200"
               disabled={loading}
               title="Làm mới dữ liệu"
             >
-              <FiRefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-              <span>Tải lại dữ liệu</span>
+              <FiRefreshCw className={`w-4 h-4 text-[#0054A6] ${loading ? 'animate-spin' : ''}`} />
+              <span>Đồng bộ dữ liệu</span>
             </button>
           </div>
         </div>
@@ -298,60 +300,70 @@ export default function AdminDashboard() {
         {/* 📊 Thẻ Thống Kê Nhanh (Stats Cards) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           
-          <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group">
+          <div className="bg-white border-l-4 border-l-amber-500 border border-y-slate-100 border-r-slate-100 rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group">
             <div>
-              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Ý tưởng sáng tạo</span>
-              <h3 className="text-3xl font-black text-slate-800 mt-1.5">{stats.totalIdeas}</h3>
-              <p className="text-[10px] text-slate-400 mt-1.5">Có <span className="font-bold text-amber-500 bg-amber-50 px-1.5 py-0.5 rounded-md">{stats.pendingIdeas}</span> ý tưởng chờ duyệt</p>
+              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block mb-1">Ý tưởng sáng tạo</span>
+              <h3 className="text-3xl font-black text-slate-800 mt-1">{stats.totalIdeas}</h3>
+              <div className="text-[10px] text-slate-450 mt-2 flex items-center space-x-1">
+                <span>Chờ duyệt:</span>
+                <span className="font-extrabold text-amber-650 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-100/30">{stats.pendingIdeas}</span>
+              </div>
             </div>
-            <div className="p-4 bg-gradient-to-br from-amber-50 to-amber-100/50 text-amber-500 rounded-2xl shadow-sm group-hover:scale-110 transition-transform duration-300">
-              <FiZap className="w-6 h-6" />
+            <div className="p-4 bg-gradient-to-br from-amber-50 to-amber-100/30 text-amber-500 rounded-xl shadow-inner group-hover:scale-105 transition-transform duration-300">
+              <FiZap className="w-5 h-5" />
             </div>
           </div>
 
-          <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group">
+          <div className="bg-white border-l-4 border-l-emerald-500 border border-y-slate-100 border-r-slate-100 rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group">
             <div>
-              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Ý tưởng đã áp dụng</span>
-              <h3 className="text-3xl font-black text-emerald-600 mt-1.5">{stats.appliedIdeas}</h3>
-              <p className="text-[10px] text-slate-400 mt-1.5">Đã đưa vào áp dụng thực tế</p>
+              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block mb-1">Ý tưởng đã áp dụng</span>
+              <h3 className="text-3xl font-black text-emerald-600 mt-1">{stats.appliedIdeas}</h3>
+              <div className="text-[10px] text-slate-450 mt-2">
+                <span className="bg-emerald-50/50 text-emerald-650 px-2 py-0.5 rounded-md border border-emerald-100/30 font-bold">Đã đưa vào thực tế</span>
+              </div>
             </div>
-            <div className="p-4 bg-gradient-to-br from-emerald-50 to-emerald-100/50 text-emerald-500 rounded-2xl shadow-sm group-hover:scale-110 transition-transform duration-300">
-              <FiCheck className="w-6 h-6" />
+            <div className="p-4 bg-gradient-to-br from-emerald-50 to-emerald-100/30 text-emerald-500 rounded-xl shadow-inner group-hover:scale-105 transition-transform duration-300">
+              <FiCheck className="w-5 h-5" />
             </div>
           </div>
 
-          <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group">
+          <div className="bg-white border-l-4 border-l-purple-500 border border-y-slate-100 border-r-slate-100 rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group">
             <div>
-              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Liên hệ & Góp ý</span>
-              <h3 className="text-3xl font-black text-purple-650 mt-1.5">{stats.totalFeedbacks}</h3>
-              <p className="text-[10px] text-slate-400 mt-1.5">Có <span className="font-bold text-amber-500 bg-amber-50 px-1.5 py-0.5 rounded-md">{stats.pendingFeedbacks}</span> chưa xử lý</p>
+              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block mb-1">Liên hệ & Góp ý</span>
+              <h3 className="text-3xl font-black text-purple-650 mt-1">{stats.totalFeedbacks}</h3>
+              <div className="text-[10px] text-slate-450 mt-2 flex items-center space-x-1">
+                <span>Chưa xử lý:</span>
+                <span className="font-extrabold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-md border border-purple-100/30">{stats.pendingFeedbacks}</span>
+              </div>
             </div>
-            <div className="p-4 bg-gradient-to-br from-purple-50 to-purple-100/50 text-purple-500 rounded-2xl shadow-sm group-hover:scale-110 transition-transform duration-300">
-              <FiMail className="w-6 h-6" />
+            <div className="p-4 bg-gradient-to-br from-purple-50 to-purple-100/30 text-purple-500 rounded-xl shadow-inner group-hover:scale-105 transition-transform duration-300">
+              <FiMail className="w-5 h-5" />
             </div>
           </div>
 
-          <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group">
+          <div className="bg-white border-l-4 border-l-[#0054A6] border border-y-slate-100 border-r-slate-100 rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group">
             <div>
-              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Bài viết tin tức</span>
-              <h3 className="text-3xl font-black text-slate-800 mt-1.5">{stats.totalNews}</h3>
-              <p className="text-[10px] text-slate-400 mt-1.5">Đã đăng lên cổng tin tức</p>
+              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block mb-1">Bài viết tin tức</span>
+              <h3 className="text-3xl font-black text-[#0054A6] mt-1">{stats.totalNews}</h3>
+              <div className="text-[10px] text-slate-455 mt-2">
+                <span className="bg-blue-50/50 text-[#0054A6] px-2 py-0.5 rounded-md border border-blue-100/30 font-bold">Đã đăng lên tin tức</span>
+              </div>
             </div>
-            <div className="p-4 bg-gradient-to-br from-blue-50 to-blue-100/50 text-[#0054A6] rounded-2xl shadow-sm group-hover:scale-110 transition-transform duration-300">
-              <FiFileText className="w-6 h-6" />
+            <div className="p-4 bg-gradient-to-br from-blue-50 to-blue-100/30 text-[#0054A6] rounded-xl shadow-inner group-hover:scale-105 transition-transform duration-300">
+              <FiFileText className="w-5 h-5" />
             </div>
           </div>
 
         </div>
 
         {/* 🗂️ Menu Tab Quản Lý */}
-        <div className="flex overflow-x-auto whitespace-nowrap mb-8 bg-slate-100/85 p-1.5 rounded-2xl space-x-1.5 scrollbar-none border border-slate-200/20">
+        <div className="flex overflow-x-auto whitespace-nowrap border-b border-slate-200 mb-8 space-x-8 scrollbar-none pl-2">
           <button
             onClick={() => setActiveTab('ideas')}
-            className={`shrink-0 px-5 py-3 rounded-xl text-xs font-bold transition-all duration-300 flex items-center justify-center space-x-2 ${
+            className={`shrink-0 pb-4 px-1 text-sm font-bold transition-all duration-300 flex items-center space-x-2 border-b-2 ${
               activeTab === 'ideas' 
-                ? 'bg-white text-[#E30613] shadow-[0_2px_10px_rgba(0,0,0,0.06)] border border-slate-200/20' 
-                : 'text-slate-600 hover:bg-white/40'
+                ? 'border-[#0054A6] text-[#0054A6]' 
+                : 'border-transparent text-slate-400 hover:text-slate-700'
             }`}
           >
             <FiZap className="w-4 h-4" />
@@ -360,10 +372,10 @@ export default function AdminDashboard() {
           
           <button
             onClick={() => setActiveTab('feedbacks')}
-            className={`shrink-0 px-5 py-3 rounded-xl text-xs font-bold transition-all duration-300 flex items-center justify-center space-x-2 ${
+            className={`shrink-0 pb-4 px-1 text-sm font-bold transition-all duration-300 flex items-center space-x-2 border-b-2 ${
               activeTab === 'feedbacks' 
-                ? 'bg-white text-purple-650 shadow-[0_2px_10px_rgba(0,0,0,0.06)] border border-slate-200/20' 
-                : 'text-slate-600 hover:bg-white/40'
+                ? 'border-purple-500 text-purple-600' 
+                : 'border-transparent text-slate-400 hover:text-slate-700'
             }`}
           >
             <FiMail className="w-4 h-4" />
@@ -372,10 +384,10 @@ export default function AdminDashboard() {
 
           <button
             onClick={() => setActiveTab('news')}
-            className={`shrink-0 px-5 py-3 rounded-xl text-xs font-bold transition-all duration-300 flex items-center justify-center space-x-2 ${
+            className={`shrink-0 pb-4 px-1 text-sm font-bold transition-all duration-300 flex items-center space-x-2 border-b-2 ${
               activeTab === 'news' 
-                ? 'bg-white text-[#0054A6] shadow-[0_2px_10px_rgba(0,0,0,0.06)] border border-slate-200/20' 
-                : 'text-slate-600 hover:bg-white/40'
+                ? 'border-[#0054A6] text-[#0054A6]' 
+                : 'border-transparent text-slate-400 hover:text-slate-700'
             }`}
           >
             <FiFileText className="w-4 h-4" />
@@ -384,10 +396,10 @@ export default function AdminDashboard() {
           
           <button
             onClick={() => setActiveTab('trash')}
-            className={`shrink-0 px-5 py-3 rounded-xl text-xs font-bold transition-all duration-300 flex items-center justify-center space-x-2 ${
+            className={`shrink-0 pb-4 px-1 text-sm font-bold transition-all duration-300 flex items-center space-x-2 border-b-2 ${
               activeTab === 'trash' 
-                ? 'bg-white text-red-600 shadow-[0_2px_10px_rgba(0,0,0,0.06)] border border-slate-200/20' 
-                : 'text-slate-600 hover:bg-white/40'
+                ? 'border-red-500 text-red-600' 
+                : 'border-transparent text-slate-400 hover:text-slate-700'
             }`}
           >
             <FiTrash2 className="w-4 h-4" />
@@ -409,8 +421,8 @@ export default function AdminDashboard() {
             {/* TAB 2: QUẢN LÝ SÁNG KIẾN */}
             {activeTab === 'ideas' && (
               <div>
-                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center space-x-2">
-                  <FiZap className="text-[#E30613]" />
+                <h3 className="text-lg font-black text-slate-800 mb-6 flex items-center space-x-2 pb-4 border-b border-slate-100">
+                  <FiZap className="text-[#0054A6] w-5 h-5" />
                   <span>Danh sách ý tưởng, sáng kiến chuyển đổi số</span>
                 </h3>
 
@@ -481,103 +493,82 @@ export default function AdminDashboard() {
                                       Áp dụng thực tế
                                     </button>
                                   )}
+                                           {/* TAB 3: QUẢN LÝ LIÊN HỆ & GÓP Ý */}
+            {activeTab === 'feedbacks' && (
+              <div>
+                <h3 className="text-lg font-black text-slate-800 mb-6 flex items-center space-x-2 pb-4 border-b border-slate-100">
+                  <FiMail className="text-purple-650 w-5 h-5" />
+                  <span>Danh sách liên hệ, ý kiến đóng góp chung</span>
+                </h3>
+
+                {ideas.filter(i => i.type === 'Góp ý').length === 0 ? (
+                  <div className="py-12 text-center text-slate-400 text-xs">Hiện tại chưa có liên hệ góp ý nào.</div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs text-slate-650 min-w-[800px] border-collapse">
+                      <thead className="text-[10px] uppercase bg-slate-50/80 text-slate-400 border-b border-slate-100">
+                        <tr>
+                          <th className="px-5 py-4 font-bold tracking-wider rounded-l-2xl">Người đóng góp</th>
+                          <th className="px-5 py-4 font-bold tracking-wider">Tiêu đề góp ý</th>
+                          <th className="px-5 py-4 font-bold tracking-wider">Nội dung chi tiết</th>
+                          <th className="px-5 py-4 font-bold tracking-wider text-center">Trạng thái</th>
+                          <th className="px-5 py-4 font-bold tracking-wider text-center">Cập nhật trạng thái</th>
+                          <th className="px-5 py-4 font-bold tracking-wider text-center rounded-r-2xl">Xóa</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {ideas.filter(i => i.type === 'Góp ý').map((idea) => {
+                          const ideaId = idea._id || idea.id;
+                          return (
+                            <tr key={ideaId} className="hover:bg-slate-50/60 transition-colors duration-200">
+                              <td className="px-5 py-4">
+                                <p className="font-bold text-slate-800 text-sm">{idea.fullName}</p>
+                                <p className="text-slate-400 text-[10px] mt-1">{idea.email || 'Không để lại email'}</p>
+                                <p className="text-slate-400 text-[9px] mt-1">Ngày gửi: {idea.date}</p>
+                              </td>
+                              <td className="px-5 py-4 font-bold text-[#0054A6] text-sm max-w-[180px]">{idea.title}</td>
+                              <td className="px-5 py-4 max-w-[280px]">
+                                <p className="text-slate-600 line-clamp-3 leading-relaxed text-xs" title={idea.description}>
+                                  {idea.description}
+                                </p>
+                              </td>
+                              <td className="px-5 py-4 text-center">
+                                <span className={`px-3 py-1.5 rounded-full font-bold text-[10px] inline-block ${
+                                  idea.status === 'Đã phản hồi' ? 'bg-blue-50 text-blue-600 border border-blue-100/50' :
+                                  idea.status === 'Đã tiếp nhận' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100/50' :
+                                  'bg-amber-50 text-amber-650 border border-amber-100/50'
+                                }`}>
+                                  {idea.status === 'Đã phản hồi' ? 'Đã phản hồi' : 
+                                   idea.status === 'Đã tiếp nhận' ? 'Đã tiếp nhận' : 'Chưa xử lý'}
+                                </span>
+                              </td>
+                              <td className="px-5 py-4 text-center">
+                                <div className="flex justify-center">
+                                  {idea.status === 'Chờ duyệt' && (
+                                    <button
+                                      onClick={() => handleUpdateIdea(ideaId, 'Đã tiếp nhận')}
+                                      className="px-2.5 py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-655 rounded-lg text-[10px] font-bold transition-all w-32 shadow-sm active:scale-95"
+                                    >
+                                      Xác nhận tiếp nhận
+                                    </button>
+                                  )}
+                                  {idea.status === 'Đã tiếp nhận' && (
+                                    <button
+                                      onClick={() => handleUpdateIdea(ideaId, 'Đã phản hồi')}
+                                      className="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg text-[10px] font-bold transition-all w-32 shadow-sm active:scale-95"
+                                    >
+                                      Xác nhận phản hồi
+                                    </button>
+                                  )}
+                                  {idea.status === 'Đã phản hồi' && (
+                                    <span className="text-slate-400 text-[10px] font-bold bg-slate-50 px-2 py-1 rounded-md">Đã phản hồi đóng góp</span>
+                                  )}
                                 </div>
                               </td>
                               <td className="px-5 py-4 text-center">
                                 <button
                                   onClick={() => handleDeleteIdea(ideaId)}
                                   className="p-2 bg-slate-50 hover:bg-red-50 hover:text-red-600 text-slate-400 rounded-xl transition-all shadow-sm active:scale-90"
-                                  title="Xóa ý tưởng đóng góp"
-                                >
-                                  <FiTrash2 className="w-4 h-4" />
-                                </button>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </div>
-            )}
-
-
-
-            {/* TAB 3: QUẢN LÝ LIÊN HỆ & GÓP Ý */}
-            {activeTab === 'feedbacks' && (
-              <div>
-                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center space-x-2">
-                  <FiMail className="text-purple-650" />
-                  <span>Danh sách liên hệ, ý kiến đóng góp chung</span>
-                </h3>
-
-                {ideas.filter(i => i.type === 'Góp ý').length === 0 ? (
-                  <div className="py-12 text-center text-gray-400 text-xs">Hiện tại chưa có liên hệ góp ý nào.</div>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs text-gray-600 min-w-[800px]">
-                      <thead className="text-[10px] uppercase bg-gray-50 text-gray-500 border-b border-gray-200">
-                        <tr>
-                          <th className="px-4 py-3.5">Người đóng góp</th>
-                          <th className="px-4 py-3.5">Tiêu đề góp ý</th>
-                          <th className="px-4 py-3.5">Nội dung chi tiết</th>
-                          <th className="px-4 py-3.5 text-center">Trạng thái</th>
-                          <th className="px-4 py-3.5 text-center">Cập nhật trạng thái</th>
-                          <th className="px-4 py-3.5 text-center">Xóa</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-155">
-                        {ideas.filter(i => i.type === 'Góp ý').map((idea) => {
-                          const ideaId = idea._id || idea.id;
-                          return (
-                            <tr key={ideaId} className="hover:bg-gray-50/50">
-                              <td className="px-4 py-4">
-                                <p className="font-bold text-gray-800">{idea.fullName}</p>
-                                <p className="text-gray-400 text-[10px] mt-0.5">{idea.email || 'Không để lại email'}</p>
-                                <p className="text-gray-400 text-[9px] mt-0.5">Ngày gửi: {idea.date}</p>
-                              </td>
-                              <td className="px-4 py-4 font-bold text-[#0054A6] max-w-[180px]">{idea.title}</td>
-                              <td className="px-4 py-4 max-w-[280px]">
-                                <p className="text-gray-600 line-clamp-3 leading-relaxed" title={idea.description}>
-                                  {idea.description}
-                                </p>
-                              </td>
-                              <td className="px-4 py-4 text-center">
-                                <span className={`px-2.5 py-1.5 rounded-full font-bold text-[9px] ${
-                                  idea.status === 'Đã phản hồi' ? 'bg-blue-50 text-blue-600 border border-blue-150' :
-                                  idea.status === 'Đã tiếp nhận' ? 'bg-emerald-50 text-emerald-600 border border-emerald-150' :
-                                  'bg-amber-50 text-amber-650 border border-amber-150'
-                                }`}>
-                                  {idea.status === 'Đã phản hồi' ? 'Đã phản hồi' : 
-                                   idea.status === 'Đã tiếp nhận' ? 'Đã tiếp nhận' : 'Chưa xử lý'}
-                                </span>
-                              </td>
-                              <td className="px-4 py-4 text-center">
-                                {idea.status === 'Chờ duyệt' && (
-                                  <button
-                                    onClick={() => handleUpdateIdea(ideaId, 'Đã tiếp nhận')}
-                                    className="px-2 py-1 bg-purple-50 hover:bg-purple-100 text-purple-650 rounded-md text-[9px] font-bold transition-all w-28"
-                                  >
-                                    Xác nhận tiếp nhận
-                                  </button>
-                                )}
-                                {idea.status === 'Đã tiếp nhận' && (
-                                  <button
-                                    onClick={() => handleUpdateIdea(ideaId, 'Đã phản hồi')}
-                                    className="px-2 py-1 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-md text-[9px] font-bold transition-all w-28"
-                                  >
-                                    Xác nhận phản hồi
-                                  </button>
-                                )}
-                                {idea.status === 'Đã phản hồi' && (
-                                  <span className="text-gray-450 text-[9px] font-bold">Đã phản hồi đóng góp</span>
-                                )}
-                              </td>
-                              <td className="px-4 py-4 text-center">
-                                <button
-                                  onClick={() => handleDeleteIdea(ideaId)}
-                                  className="p-1.5 bg-gray-50 hover:bg-red-50 hover:text-red-500 text-gray-400 rounded-lg transition-colors"
                                   title="Xóa ý kiến đóng góp"
                                 >
                                   <FiTrash2 className="w-4 h-4" />

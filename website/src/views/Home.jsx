@@ -36,20 +36,20 @@ export default function Home() {
 
   return (
     <div className="bg-white text-gray-800 min-h-screen">
-      
+
       {/* 🚀 Hero Section (Banner lớn phong cách mobifone.vn) */}
       <section className="relative overflow-hidden py-8 sm:py-12 md:py-16 bg-gradient-to-r from-[#002f6c] via-[#0054A6] to-[#002f6c] text-white">
-        
+
         {/* Điểm nhấn vệt sáng công nghệ nhẹ nhàng */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] md:w-[600px] md:h-[600px] bg-blue-400/20 rounded-full blur-3xl -z-10 pointer-events-none"></div>
         <div className="absolute top-1/2 left-1/3 w-[200px] h-[200px] md:w-[400px] md:h-[400px] bg-red-400/10 rounded-full blur-3xl -z-10 pointer-events-none"></div>
-        
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           {/* Nhãn nhỏ mang Slogan MobiFone */}
           <span className="inline-block px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-white/10 border border-white/20 text-[10px] sm:text-xs font-semibold text-blue-200 mb-3 md:mb-4 uppercase tracking-wider max-w-full truncate sm:overflow-visible">
             MobiFone Cần Thơ • Kết nối giá trị - Khơi dậy tiềm năng
           </span>
-          
+
           <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold leading-tight tracking-tight mb-3 md:mb-4">
             <span className="inline-flex items-center gap-2 sm:gap-3 justify-center align-middle">
               <img src="/doanthanhnien.jpg?v=2" alt="Logo Đoàn" className="w-8 h-8 sm:w-11 sm:h-11 md:w-14 md:h-14 rounded-full object-cover border-2 border-white/90 shadow-md shrink-0" />
@@ -68,11 +68,11 @@ export default function Home() {
           <div className="text-base sm:text-lg md:text-xl font-bold text-amber-300 mb-3 tracking-wide">
             Kết nối tri thức số – Dẫn lối tương lai
           </div>
-          
+
           <p className="text-sm sm:text-base md:text-lg text-blue-100 max-w-3xl mx-auto mb-6 md:mb-8 leading-relaxed font-light px-2 sm:px-0">
             Nơi hội tụ thế hệ trẻ MobiFone Cần Thơ. Mỗi thành viên mang trong mình trái tim nhiệt huyết, tiên phong chuyển đổi số và lan tỏa kiến thức số đến cộng đồng.
           </p>
-          
+
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 max-w-xs sm:max-w-none mx-auto">
 
             <Link
@@ -90,7 +90,7 @@ export default function Home() {
       <section className="py-8 sm:py-12 border-b border-gray-200 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 text-center">
-            
+
             <div className="p-4 sm:p-5 bg-white rounded-2xl border border-gray-200/60 shadow-sm">
               <span className="block text-2xl sm:text-3xl md:text-4xl font-black text-[#0054A6] mb-1">50+</span>
               <span className="text-[10px] sm:text-[11px] text-gray-500 uppercase tracking-wider font-bold block min-h-[32px] flex items-center justify-center">Thành viên nòng cốt</span>
@@ -118,7 +118,7 @@ export default function Home() {
       {/* 🎯 Section: Mục tiêu và Sứ mệnh (Nền trắng tinh) */}
       <section className="py-12 sm:py-20 md:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
+
           <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-16">
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-black mb-4 text-gray-800">
               Chúng Tôi Làm Gì Tại <span className="text-[#0054A6]">Digi Heart?</span>

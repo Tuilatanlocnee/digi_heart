@@ -88,7 +88,7 @@ export default function News() {
       alert(error.message || 'Lỗi khi đăng tin tức!');
     }
   };
-  
+
   // Xóa bài viết tin tức trực tiếp
   const handleDeleteNews = async (id) => {
     if (!window.confirm('Bạn có chắc chắn muốn xóa bài viết tin tức này không?')) return;
@@ -127,11 +127,11 @@ export default function News() {
     try {
       const response = await newsAPI.update(editingNewsId, newsForm);
       const updatedNews = response.news || { ...newsForm, _id: editingNewsId };
-      
-      setNewsList(newsList.map(item => 
+
+      setNewsList(newsList.map(item =>
         (item._id === editingNewsId || item.id === editingNewsId) ? { ...item, ...updatedNews } : item
       ));
-      
+
       setShowEditModal(false);
       setEditingNewsId(null);
       setNewsForm({
@@ -155,8 +155,8 @@ export default function News() {
   // Tiến hành lọc bài viết dựa trên Danh mục và Từ khóa tìm kiếm
   const filteredNews = newsList.filter((post) => {
     const matchesCategory = selectedCategory === 'Tất cả' || post.category === selectedCategory;
-    const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          post.summary.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      post.summary.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
@@ -165,7 +165,7 @@ export default function News() {
     return (
       <div className="bg-gray-50 text-gray-800 min-h-screen py-12">
         <div className="max-w-4xl mx-auto px-4">
-          
+
           <button
             onClick={() => setActivePost(null)}
             className="flex items-center space-x-2 text-[#0054A6] hover:text-[#003f7f] transition-colors mb-8 group font-semibold"
@@ -214,7 +214,7 @@ export default function News() {
   return (
     <div className="bg-gray-50 text-gray-800 min-h-screen py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* Tiêu đề trang */}
         <div className="text-center max-w-3xl mx-auto mb-12 relative">
           <h1 className="text-2xl sm:text-3xl md:text-5xl font-black mb-4 text-gray-800">
@@ -246,18 +246,17 @@ export default function News() {
 
         {/* Thanh tìm kiếm và bộ lọc */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-12 bg-white border border-gray-200/80 p-4 rounded-2xl shadow-sm">
-          
+
           {/* Nhóm Bộ lọc Category */}
           <div className="flex flex-wrap gap-2 w-full md:w-auto">
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-4 py-2 rounded-xl text-xs md:text-sm font-semibold transition-all border ${
-                  selectedCategory === cat
+                className={`px-4 py-2 rounded-xl text-xs md:text-sm font-semibold transition-all border ${selectedCategory === cat
                     ? 'bg-[#0054A6] text-white border-[#0054A6] shadow-md shadow-blue-500/10'
                     : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50 hover:text-[#0054A6]'
-                }`}
+                  }`}
               >
                 {cat}
               </button>
@@ -325,21 +324,21 @@ export default function News() {
                       </div>
                     )}
                   </div>
-                  
+
                   <div className="p-6 flex flex-col flex-grow">
                     <div className="flex items-center space-x-1 text-xs text-gray-400 mb-3">
                       <FiCalendar className="w-3.5 h-3.5" />
                       <span>{post.date}</span>
                     </div>
-                    
+
                     <h3 className="text-lg md:text-xl font-bold mb-3 text-gray-800 group-hover:text-[#0054A6] transition-colors line-clamp-2 leading-tight">
                       {post.title}
                     </h3>
-                    
+
                     <p className="text-gray-500 text-sm leading-relaxed mb-4 line-clamp-3">
                       {post.summary}
                     </p>
-                    
+
                     <span className="text-xs font-bold text-[#0054A6] mt-auto flex items-center space-x-1 group-hover:underline">
                       <span>Xem chi tiết bài viết</span>
                       <span>&rarr;</span>
