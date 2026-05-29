@@ -41,7 +41,7 @@ export default function AdminLogin() {
       if (response.user.role === 'admin' || response.user.role === 'superadmin') {
         navigate('/admin');
       } else {
-        setError('Tài khoản của bạn không có quyền quản trị!');
+        setError('Tài khoản của bạn không có quyền quản lý!');
         authAPI.logout();
       }
     } catch (err) {
@@ -57,12 +57,11 @@ export default function AdminLogin() {
         
         {/* Header Form */}
         <div className="text-center mb-6">
-          <div className="inline-flex items-center bg-gray-50 border border-gray-200 px-4 py-1.5 rounded-xl shadow-sm mb-4">
-            <span className="font-black text-lg text-[#0054A6] tracking-tighter">mobi</span>
-            <span className="font-black text-lg text-[#E30613] tracking-tighter">fone</span>
+          <div className="flex justify-center mb-4">
+            <img src="/mobifone.jpg?v=2" alt="MobiFone" className="h-28 object-contain" />
           </div>
           <h2 className="text-2xl font-black text-gray-800">
-            Đăng Nhập Quản Trị
+            Đăng Nhập Quản Lý
           </h2>
           <p className="text-gray-400 text-xs mt-1.5 font-semibold uppercase tracking-wider">
             Hệ thống CLB chuyển đổi số Digi Heart
@@ -81,7 +80,7 @@ export default function AdminLogin() {
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label className="block text-xs font-bold text-gray-500 mb-2 uppercase">
-              Tên tài khoản admin
+              Tên tài khoản
             </label>
             <div className="relative">
               <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-gray-400">
@@ -92,7 +91,7 @@ export default function AdminLogin() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className="w-full bg-white border border-gray-200 rounded-xl pl-10 pr-3 py-2.5 text-sm focus:outline-none focus:border-[#0054A6] focus:ring-1 focus:ring-[#0054A6] text-gray-800 placeholder-gray-400 shadow-inner"
-                placeholder="Nhập tên tài khoản (admin)..."
+                placeholder="Nhập tên tài khoản..."
                 required
                 disabled={isLoading}
               />
@@ -112,7 +111,7 @@ export default function AdminLogin() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full bg-white border border-gray-200 rounded-xl pl-10 pr-3 py-2.5 text-sm focus:outline-none focus:border-[#0054A6] focus:ring-1 focus:ring-[#0054A6] text-gray-800 placeholder-gray-400 shadow-inner"
-                placeholder="Nhập mật khẩu (admin123)..."
+                placeholder="Nhập mật khẩu..."
                 required
                 disabled={isLoading}
               />

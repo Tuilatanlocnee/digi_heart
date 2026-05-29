@@ -252,24 +252,28 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="bg-gray-50 text-gray-800 min-h-screen py-10">
+    <div className="bg-[#f8fafc] text-slate-800 min-h-screen py-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header Dashboard */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 pb-5 border-b border-gray-200">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 pb-6 border-b border-slate-200/60">
           <div>
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-gray-800 flex items-center space-x-2">
+            <div className="inline-flex items-center space-x-1.5 px-2.5 py-1 bg-blue-50 text-[#0054A6] rounded-lg text-[10px] font-bold uppercase tracking-wider mb-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#0054A6] animate-pulse"></span>
+              <span>Hệ thống Quản lý</span>
+            </div>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-800 flex items-center space-x-2.5">
               <FiShield className="text-[#0054A6] w-6 h-6 md:w-8 md:h-8 shrink-0" />
-              <span>Bảng Điều Khiển Quản Trị</span>
+              <span>Bảng Điều Khiển Quản Lý</span>
             </h1>
-            <p className="text-gray-400 text-xs mt-1.5 font-semibold uppercase tracking-wider">
+            <p className="text-slate-400 text-xs mt-1 font-semibold uppercase tracking-wider">
               Hệ thống quản lý CLB Digi Heart • MobiFone Cần Thơ
             </p>
           </div>
           <div className="flex items-center space-x-3 mt-4 md:mt-0">
             <button
               onClick={fetchData}
-              className="p-2.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-600 rounded-xl transition-all shadow-sm flex items-center space-x-1.5 text-xs font-bold"
+              className="px-4 py-2.5 bg-white border border-slate-200 hover:border-slate-300 hover:text-slate-900 text-slate-600 rounded-xl transition-all shadow-sm hover:shadow flex items-center space-x-2 text-xs font-bold active:scale-95"
               disabled={loading}
               title="Làm mới dữ liệu"
             >
@@ -292,48 +296,48 @@ export default function AdminDashboard() {
         )}
 
         {/* 📊 Thẻ Thống Kê Nhanh (Stats Cards) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           
-          <div className="bg-white border border-gray-200/80 rounded-2xl p-5 shadow-sm flex items-center justify-between">
+          <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group">
             <div>
-              <span className="text-[10px] uppercase font-bold text-gray-450 tracking-wider">Ý tưởng sáng tạo</span>
-              <h3 className="text-2xl font-black text-gray-800 mt-1">{stats.totalIdeas}</h3>
-              <p className="text-[10px] text-gray-400 mt-1">Có <span className="font-bold text-amber-500">{stats.pendingIdeas}</span> ý tưởng chờ duyệt</p>
+              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Ý tưởng sáng tạo</span>
+              <h3 className="text-3xl font-black text-slate-800 mt-1.5">{stats.totalIdeas}</h3>
+              <p className="text-[10px] text-slate-400 mt-1.5">Có <span className="font-bold text-amber-500 bg-amber-50 px-1.5 py-0.5 rounded-md">{stats.pendingIdeas}</span> ý tưởng chờ duyệt</p>
             </div>
-            <div className="p-3.5 bg-amber-50 text-amber-500 rounded-xl shadow-sm">
+            <div className="p-4 bg-gradient-to-br from-amber-50 to-amber-100/50 text-amber-500 rounded-2xl shadow-sm group-hover:scale-110 transition-transform duration-300">
               <FiZap className="w-6 h-6" />
             </div>
           </div>
 
-          <div className="bg-white border border-gray-200/80 rounded-2xl p-5 shadow-sm flex items-center justify-between">
+          <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group">
             <div>
-              <span className="text-[10px] uppercase font-bold text-gray-450 tracking-wider">Ý tưởng đã áp dụng</span>
-              <h3 className="text-2xl font-black text-emerald-600 mt-1">{stats.appliedIdeas}</h3>
-              <p className="text-[10px] text-gray-400 mt-1">Đã đưa vào áp dụng thực tế</p>
+              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Ý tưởng đã áp dụng</span>
+              <h3 className="text-3xl font-black text-emerald-600 mt-1.5">{stats.appliedIdeas}</h3>
+              <p className="text-[10px] text-slate-400 mt-1.5">Đã đưa vào áp dụng thực tế</p>
             </div>
-            <div className="p-3.5 bg-emerald-50 text-emerald-500 rounded-xl shadow-sm">
+            <div className="p-4 bg-gradient-to-br from-emerald-50 to-emerald-100/50 text-emerald-500 rounded-2xl shadow-sm group-hover:scale-110 transition-transform duration-300">
               <FiCheck className="w-6 h-6" />
             </div>
           </div>
 
-          <div className="bg-white border border-gray-200/80 rounded-2xl p-5 shadow-sm flex items-center justify-between">
+          <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group">
             <div>
-              <span className="text-[10px] uppercase font-bold text-gray-450 tracking-wider">Liên hệ & Góp ý</span>
-              <h3 className="text-2xl font-black text-purple-600 mt-1">{stats.totalFeedbacks}</h3>
-              <p className="text-[10px] text-gray-400 mt-1">Có <span className="font-bold text-amber-500">{stats.pendingFeedbacks}</span> góp ý chưa xử lý</p>
+              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Liên hệ & Góp ý</span>
+              <h3 className="text-3xl font-black text-purple-650 mt-1.5">{stats.totalFeedbacks}</h3>
+              <p className="text-[10px] text-slate-400 mt-1.5">Có <span className="font-bold text-amber-500 bg-amber-50 px-1.5 py-0.5 rounded-md">{stats.pendingFeedbacks}</span> chưa xử lý</p>
             </div>
-            <div className="p-3.5 bg-purple-50 text-purple-500 rounded-xl shadow-sm">
+            <div className="p-4 bg-gradient-to-br from-purple-50 to-purple-100/50 text-purple-500 rounded-2xl shadow-sm group-hover:scale-110 transition-transform duration-300">
               <FiMail className="w-6 h-6" />
             </div>
           </div>
 
-          <div className="bg-white border border-gray-200/80 rounded-2xl p-5 shadow-sm flex items-center justify-between">
+          <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group">
             <div>
-              <span className="text-[10px] uppercase font-bold text-gray-450 tracking-wider">Bài viết tin tức</span>
-              <h3 className="text-2xl font-black text-gray-800 mt-1">{stats.totalNews}</h3>
-              <p className="text-[10px] text-gray-400 mt-1">Đã đăng lên cổng tin tức</p>
+              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Bài viết tin tức</span>
+              <h3 className="text-3xl font-black text-slate-800 mt-1.5">{stats.totalNews}</h3>
+              <p className="text-[10px] text-slate-400 mt-1.5">Đã đăng lên cổng tin tức</p>
             </div>
-            <div className="p-3.5 bg-blue-50 text-[#0054A6] rounded-xl shadow-sm">
+            <div className="p-4 bg-gradient-to-br from-blue-50 to-blue-100/50 text-[#0054A6] rounded-2xl shadow-sm group-hover:scale-110 transition-transform duration-300">
               <FiFileText className="w-6 h-6" />
             </div>
           </div>
@@ -341,13 +345,13 @@ export default function AdminDashboard() {
         </div>
 
         {/* 🗂️ Menu Tab Quản Lý */}
-        <div className="flex overflow-x-auto whitespace-nowrap border-b border-gray-200 mb-6 bg-white p-2 rounded-2xl border border-gray-150 shadow-sm space-x-1 scrollbar-none">
+        <div className="flex overflow-x-auto whitespace-nowrap mb-8 bg-slate-100/85 p-1.5 rounded-2xl space-x-1.5 scrollbar-none border border-slate-200/20">
           <button
             onClick={() => setActiveTab('ideas')}
-            className={`shrink-0 px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-1.5 ${
+            className={`shrink-0 px-5 py-3 rounded-xl text-xs font-bold transition-all duration-300 flex items-center justify-center space-x-2 ${
               activeTab === 'ideas' 
-                ? 'bg-[#E30613]/5 text-[#E30613] shadow-sm border border-[#E30613]/10' 
-                : 'text-gray-550 hover:bg-gray-50'
+                ? 'bg-white text-[#E30613] shadow-[0_2px_10px_rgba(0,0,0,0.06)] border border-slate-200/20' 
+                : 'text-slate-600 hover:bg-white/40'
             }`}
           >
             <FiZap className="w-4 h-4" />
@@ -356,10 +360,10 @@ export default function AdminDashboard() {
           
           <button
             onClick={() => setActiveTab('feedbacks')}
-            className={`shrink-0 px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-1.5 ${
+            className={`shrink-0 px-5 py-3 rounded-xl text-xs font-bold transition-all duration-300 flex items-center justify-center space-x-2 ${
               activeTab === 'feedbacks' 
-                ? 'bg-purple-55 text-purple-600 shadow-sm border border-purple-100/50' 
-                : 'text-gray-550 hover:bg-gray-50'
+                ? 'bg-white text-purple-650 shadow-[0_2px_10px_rgba(0,0,0,0.06)] border border-slate-200/20' 
+                : 'text-slate-600 hover:bg-white/40'
             }`}
           >
             <FiMail className="w-4 h-4" />
@@ -368,10 +372,10 @@ export default function AdminDashboard() {
 
           <button
             onClick={() => setActiveTab('news')}
-            className={`shrink-0 px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-1.5 ${
+            className={`shrink-0 px-5 py-3 rounded-xl text-xs font-bold transition-all duration-300 flex items-center justify-center space-x-2 ${
               activeTab === 'news' 
-                ? 'bg-blue-50 text-[#0054A6] shadow-sm border border-blue-100/50' 
-                : 'text-gray-550 hover:bg-gray-50'
+                ? 'bg-white text-[#0054A6] shadow-[0_2px_10px_rgba(0,0,0,0.06)] border border-slate-200/20' 
+                : 'text-slate-600 hover:bg-white/40'
             }`}
           >
             <FiFileText className="w-4 h-4" />
@@ -380,10 +384,10 @@ export default function AdminDashboard() {
           
           <button
             onClick={() => setActiveTab('trash')}
-            className={`shrink-0 px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-1.5 ${
+            className={`shrink-0 px-5 py-3 rounded-xl text-xs font-bold transition-all duration-300 flex items-center justify-center space-x-2 ${
               activeTab === 'trash' 
-                ? 'bg-red-55 text-red-600 shadow-sm border border-red-100/50' 
-                : 'text-gray-550 hover:bg-gray-50'
+                ? 'bg-white text-red-600 shadow-[0_2px_10px_rgba(0,0,0,0.06)] border border-slate-200/20' 
+                : 'text-slate-600 hover:bg-white/40'
             }`}
           >
             <FiTrash2 className="w-4 h-4" />
@@ -398,7 +402,7 @@ export default function AdminDashboard() {
             <p className="text-gray-400 text-xs font-bold mt-4 uppercase">Đang tải dữ liệu từ máy chủ...</p>
           </div>
         ) : (
-          <div className="bg-white border border-gray-200/80 rounded-3xl p-5 md:p-6 shadow-sm">
+          <div className="bg-white border border-slate-100 rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.02)]">
             
 
 
@@ -414,49 +418,49 @@ export default function AdminDashboard() {
                   <div className="py-12 text-center text-gray-400 text-xs">Hiện tại chưa có ý tưởng đóng góp nào.</div>
                 ) : (
                   <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs text-gray-600 min-w-[800px]">
-                      <thead className="text-[10px] uppercase bg-gray-50 text-gray-500 border-b border-gray-200">
+                    <table className="w-full text-left text-xs text-slate-650 min-w-[800px] border-collapse">
+                      <thead className="text-[10px] uppercase bg-slate-50/80 text-slate-400 border-b border-slate-100">
                         <tr>
-                          <th className="px-4 py-3.5">Người đóng góp</th>
-                          <th className="px-4 py-3.5">Tên sáng kiến</th>
-                          <th className="px-4 py-3.5">Mô tả giải pháp</th>
-                          <th className="px-4 py-3.5 text-center">Tiến trình</th>
-                          <th className="px-4 py-3.5 text-center">Cập nhật tiến trình</th>
-                          <th className="px-4 py-3.5 text-center">Xóa</th>
+                          <th className="px-5 py-4 font-bold tracking-wider rounded-l-2xl">Người đóng góp</th>
+                          <th className="px-5 py-4 font-bold tracking-wider">Tên sáng kiến</th>
+                          <th className="px-5 py-4 font-bold tracking-wider">Mô tả giải pháp</th>
+                          <th className="px-5 py-4 font-bold tracking-wider text-center">Tiến trình</th>
+                          <th className="px-5 py-4 font-bold tracking-wider text-center">Cập nhật tiến trình</th>
+                          <th className="px-5 py-4 font-bold tracking-wider text-center rounded-r-2xl">Xóa</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-gray-155">
+                      <tbody className="divide-y divide-slate-100">
                         {ideas.filter(i => i.type !== 'Góp ý').map((idea) => {
                           const ideaId = idea._id || idea.id;
                           return (
-                            <tr key={ideaId} className="hover:bg-gray-50/50">
-                              <td className="px-4 py-4">
-                                <p className="font-bold text-gray-800">{idea.fullName}</p>
-                                <p className="text-gray-400 text-[10px] mt-0.5">{idea.email || 'Không để lại email'}</p>
-                                <p className="text-gray-400 text-[9px] mt-0.5">Ngày gửi: {idea.date}</p>
+                            <tr key={ideaId} className="hover:bg-slate-50/60 transition-colors duration-200">
+                              <td className="px-5 py-4">
+                                <p className="font-bold text-slate-800 text-sm">{idea.fullName}</p>
+                                <p className="text-slate-400 text-[10px] mt-1">{idea.email || 'Không để lại email'}</p>
+                                <p className="text-slate-400 text-[9px] mt-1">Ngày gửi: {idea.date}</p>
                               </td>
-                              <td className="px-4 py-4 font-bold text-[#0054A6] max-w-[180px]">{idea.title}</td>
-                              <td className="px-4 py-4 max-w-[280px]">
-                                <p className="text-gray-600 line-clamp-3 leading-relaxed" title={idea.description}>
+                              <td className="px-5 py-4 font-bold text-[#0054A6] text-sm max-w-[180px]">{idea.title}</td>
+                              <td className="px-5 py-4 max-w-[280px]">
+                                <p className="text-slate-600 line-clamp-3 leading-relaxed text-xs" title={idea.description}>
                                   {idea.description}
                                 </p>
                               </td>
-                              <td className="px-4 py-4 text-center">
-                                <span className={`px-2.5 py-1.5 rounded-full font-bold text-[9px] ${
-                                  idea.status === 'Đã áp dụng' ? 'bg-emerald-50 text-emerald-600' :
-                                  idea.status === 'Đang thử nghiệm' ? 'bg-blue-50 text-blue-500' :
-                                  idea.status === 'Đã tiếp nhận' ? 'bg-purple-50 text-purple-600' :
-                                  'bg-amber-50 text-amber-600'
+                              <td className="px-5 py-4 text-center">
+                                <span className={`px-3 py-1.5 rounded-full font-bold text-[10px] inline-block ${
+                                  idea.status === 'Đã áp dụng' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100/50' :
+                                  idea.status === 'Đang thử nghiệm' ? 'bg-blue-50 text-blue-500 border border-blue-100/50' :
+                                  idea.status === 'Đã tiếp nhận' ? 'bg-purple-50 text-purple-600 border border-purple-100/50' :
+                                  'bg-amber-50 text-amber-600 border border-amber-100/50'
                                 }`}>
                                   {idea.status}
                                 </span>
                               </td>
-                              <td className="px-4 py-4 text-center">
-                                <div className="flex flex-col space-y-1 items-center justify-center">
+                              <td className="px-5 py-4 text-center">
+                                <div className="flex flex-col space-y-1.5 items-center justify-center">
                                   {idea.status === 'Chờ duyệt' && (
                                     <button
                                       onClick={() => handleUpdateIdea(ideaId, 'Đã tiếp nhận')}
-                                      className="px-2 py-1 bg-purple-50 hover:bg-purple-100 text-purple-600 rounded-md text-[9px] font-bold transition-all w-24"
+                                      className="px-2.5 py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-600 rounded-lg text-[10px] font-bold transition-all w-28 shadow-sm active:scale-95"
                                     >
                                       Tiếp nhận
                                     </button>
@@ -464,7 +468,7 @@ export default function AdminDashboard() {
                                   {(idea.status === 'Đã tiếp nhận' || idea.status === 'Chờ duyệt') && (
                                     <button
                                       onClick={() => handleUpdateIdea(ideaId, 'Đang thử nghiệm')}
-                                      className="px-2 py-1 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-md text-[9px] font-bold transition-all w-24"
+                                      className="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg text-[10px] font-bold transition-all w-28 shadow-sm active:scale-95"
                                     >
                                       Thử nghiệm
                                     </button>
@@ -472,17 +476,17 @@ export default function AdminDashboard() {
                                   {idea.status === 'Đang thử nghiệm' && (
                                     <button
                                       onClick={() => handleUpdateIdea(ideaId, 'Đã áp dụng')}
-                                      className="px-2 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 rounded-md text-[9px] font-bold transition-all w-24"
+                                      className="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 rounded-lg text-[10px] font-bold transition-all w-28 shadow-sm active:scale-95"
                                     >
                                       Áp dụng thực tế
                                     </button>
                                   )}
                                 </div>
                               </td>
-                              <td className="px-4 py-4 text-center">
+                              <td className="px-5 py-4 text-center">
                                 <button
                                   onClick={() => handleDeleteIdea(ideaId)}
-                                  className="p-1.5 bg-gray-50 hover:bg-red-50 hover:text-red-500 text-gray-400 rounded-lg transition-colors"
+                                  className="p-2 bg-slate-50 hover:bg-red-50 hover:text-red-600 text-slate-400 rounded-xl transition-all shadow-sm active:scale-90"
                                   title="Xóa ý tưởng đóng góp"
                                 >
                                   <FiTrash2 className="w-4 h-4" />
@@ -594,33 +598,33 @@ export default function AdminDashboard() {
             {/* TAB 4: QUẢN LÝ BÀI VIẾT TIN TỨC FANPAGE */}
             {activeTab === 'news' && (
               <div>
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-gray-100 pb-4 animate-fadeIn">
-                  <h3 className="text-lg font-bold text-gray-800 flex items-center space-x-2">
-                    <FiFileText className="text-[#0054A6]" />
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-slate-100 pb-4 animate-fadeIn">
+                  <h3 className="text-lg font-black text-slate-800 flex items-center space-x-2">
+                    <FiFileText className="text-[#0054A6] w-5 h-5" />
                     <span>Danh sách bài viết Tin tức CLB</span>
                   </h3>
                   <button
                     onClick={() => setShowAddPost(true)}
-                    className="px-4 py-2 bg-[#0054A6] hover:bg-[#003d80] text-white text-xs font-bold rounded-xl shadow-md transition-colors flex items-center space-x-1.5 self-start"
+                    className="px-4 py-2.5 bg-[#0054A6] hover:bg-[#003d80] text-white text-xs font-bold rounded-xl shadow-md hover:shadow-lg transition-all flex items-center space-x-1.5 self-start active:scale-95"
                   >
                     <span>+ Đăng bài viết mới</span>
                   </button>
                 </div>
 
                 {posts.length === 0 ? (
-                  <div className="py-12 text-center text-gray-400 text-xs animate-fadeIn">Hiện tại chưa có bài viết nào được đăng.</div>
+                  <div className="py-12 text-center text-slate-400 text-xs animate-fadeIn">Hiện tại chưa có bài viết nào được đăng.</div>
                 ) : (
                   <div className="overflow-x-auto animate-fadeIn">
-                    <table className="w-full text-left text-xs text-gray-600 min-w-[800px]">
-                      <thead className="text-[10px] uppercase bg-gray-50 text-gray-500 border-b border-gray-200">
+                    <table className="w-full text-left text-xs text-slate-650 min-w-[800px] border-collapse">
+                      <thead className="text-[10px] uppercase bg-slate-50/80 text-slate-400 border-b border-slate-100">
                         <tr>
-                          <th className="px-4 py-3.5">Tiêu đề bài viết</th>
-                          <th className="px-4 py-3.5">Người đăng / Ngày đăng</th>
-                          <th className="px-4 py-3.5">Nội dung tóm tắt</th>
-                          <th className="px-4 py-3.5 text-center">Thao tác</th>
+                          <th className="px-5 py-4 font-bold tracking-wider rounded-l-2xl">Tiêu đề bài viết</th>
+                          <th className="px-5 py-4 font-bold tracking-wider">Người đăng / Ngày đăng</th>
+                          <th className="px-5 py-4 font-bold tracking-wider">Nội dung tóm tắt</th>
+                          <th className="px-5 py-4 font-bold tracking-wider text-center rounded-r-2xl">Thao tác</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-gray-155">
+                      <tbody className="divide-y divide-slate-100">
                         {posts.map((item) => {
                           const itemId = item._id || item.id;
                           const formatDate = (dateStr) => {
@@ -635,43 +639,43 @@ export default function AdminDashboard() {
                           };
 
                           return (
-                            <tr key={itemId} className="hover:bg-gray-50/50">
-                              <td className="px-4 py-4">
+                            <tr key={itemId} className="hover:bg-slate-50/60 transition-colors duration-200">
+                              <td className="px-5 py-4">
                                 <div className="flex items-center space-x-3 max-w-[280px]">
                                   {item.image && (
                                     <img
                                       src={item.image}
                                       alt="Cover"
-                                      className="w-10 h-10 object-cover rounded-lg shrink-0 border border-gray-100"
+                                      className="w-12 h-12 object-cover rounded-xl shrink-0 border border-slate-100 shadow-sm"
                                     />
                                   )}
-                                  <p className="font-bold text-gray-800 line-clamp-2" title={item.title}>
+                                  <p className="font-bold text-slate-800 text-sm line-clamp-2" title={item.title}>
                                     {item.title}
                                   </p>
                                 </div>
                               </td>
-                              <td className="px-4 py-4">
-                                <p className="font-bold text-gray-700">{item.author}</p>
-                                <p className="text-gray-400 text-[10px] mt-0.5">{formatDate(item.createdAt || item.time)}</p>
+                              <td className="px-5 py-4">
+                                <p className="font-bold text-slate-700">{item.author}</p>
+                                <p className="text-slate-400 text-[10px] mt-1">{formatDate(item.createdAt || item.time)}</p>
                               </td>
-                              <td className="px-4 py-4 max-w-[280px]">
-                                <p className="text-gray-500 line-clamp-2" title={item.content}>
+                              <td className="px-5 py-4 max-w-[280px]">
+                                <p className="text-slate-500 line-clamp-2 leading-relaxed text-xs" title={item.content}>
                                   {item.content}
                                 </p>
                               </td>
 
-                              <td className="px-4 py-4 text-center">
-                                <div className="flex items-center justify-center space-x-1.5">
+                              <td className="px-5 py-4 text-center">
+                                <div className="flex items-center justify-center space-x-2">
                                   <button
                                     onClick={() => startEditPost(item)}
-                                    className="p-1.5 bg-blue-50 hover:bg-blue-100 text-[#0054A6] rounded-lg transition-colors"
+                                    className="p-2 bg-blue-50 hover:bg-blue-100 text-[#0054A6] rounded-xl transition-all shadow-sm active:scale-90"
                                     title="Chỉnh sửa bài viết"
                                   >
                                     <FiEdit className="w-4 h-4" />
                                   </button>
                                   <button
                                     onClick={() => handleDeletePost(itemId)}
-                                    className="p-1.5 bg-red-50 hover:bg-red-100 text-red-500 rounded-lg transition-colors"
+                                    className="p-2 bg-red-50 hover:bg-red-100 text-red-500 rounded-xl transition-all shadow-sm active:scale-90"
                                     title="Xóa bài viết"
                                   >
                                     <FiTrash2 className="w-4 h-4" />
@@ -691,25 +695,25 @@ export default function AdminDashboard() {
             {/* TAB 5: THÙNG RÁC BÀI VIẾT ĐÃ XÓA TẠM THỜI */}
             {activeTab === 'trash' && (
               <div>
-                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center space-x-2 border-b border-gray-100 pb-4">
-                  <FiTrash2 className="text-red-500" />
+                <h3 className="text-lg font-black text-slate-800 mb-6 flex items-center space-x-2 pb-4 border-b border-slate-100">
+                  <FiTrash2 className="text-red-500 w-5 h-5" />
                   <span>Thùng rác bài viết đã xóa tạm thời</span>
                 </h3>
 
                 {deletedPosts.length === 0 ? (
-                  <div className="py-12 text-center text-gray-400 text-xs">Thùng rác hiện đang trống.</div>
+                  <div className="py-12 text-center text-slate-400 text-xs">Thùng rác hiện đang trống.</div>
                 ) : (
                   <div className="overflow-x-auto animate-fadeIn">
-                    <table className="w-full text-left text-xs text-gray-600 min-w-[800px]">
-                      <thead className="text-[10px] uppercase bg-gray-50 text-gray-500 border-b border-gray-200">
+                    <table className="w-full text-left text-xs text-slate-650 min-w-[800px] border-collapse">
+                      <thead className="text-[10px] uppercase bg-slate-50/80 text-slate-400 border-b border-slate-100">
                         <tr>
-                          <th className="px-4 py-3.5">Tiêu đề bài viết</th>
-                          <th className="px-4 py-3.5">Người đăng / Ngày đăng</th>
-                          <th className="px-4 py-3.5">Nội dung tóm tắt</th>
-                          <th className="px-4 py-3.5 text-center">Thao tác</th>
+                          <th className="px-5 py-4 font-bold tracking-wider rounded-l-2xl">Tiêu đề bài viết</th>
+                          <th className="px-5 py-4 font-bold tracking-wider">Người đăng / Ngày đăng</th>
+                          <th className="px-5 py-4 font-bold tracking-wider">Nội dung tóm tắt</th>
+                          <th className="px-5 py-4 font-bold tracking-wider text-center rounded-r-2xl">Thao tác</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-gray-155">
+                      <tbody className="divide-y divide-slate-100">
                         {deletedPosts.map((item) => {
                           const itemId = item._id || item.id;
                           const formatDate = (dateStr) => {
@@ -724,43 +728,43 @@ export default function AdminDashboard() {
                           };
 
                           return (
-                            <tr key={itemId} className="hover:bg-gray-50/50">
-                              <td className="px-4 py-4">
+                            <tr key={itemId} className="hover:bg-slate-50/60 transition-colors duration-200">
+                              <td className="px-5 py-4">
                                 <div className="flex items-center space-x-3 max-w-[280px]">
                                   {item.image && (
                                     <img
                                       src={item.image}
                                       alt="Cover"
-                                      className="w-10 h-10 object-cover rounded-lg shrink-0 border border-gray-100"
+                                      className="w-12 h-12 object-cover rounded-xl shrink-0 border border-slate-100 shadow-sm"
                                     />
                                   )}
-                                  <p className="font-bold text-gray-800 line-clamp-2" title={item.title}>
+                                  <p className="font-bold text-slate-800 text-sm line-clamp-2" title={item.title}>
                                     {item.title}
                                   </p>
                                 </div>
                               </td>
-                              <td className="px-4 py-4">
-                                <p className="font-bold text-gray-700">{item.author}</p>
-                                <p className="text-gray-400 text-[10px] mt-0.5">{formatDate(item.createdAt || item.time)}</p>
+                              <td className="px-5 py-4">
+                                <p className="font-bold text-slate-700">{item.author}</p>
+                                <p className="text-slate-400 text-[10px] mt-1">{formatDate(item.createdAt || item.time)}</p>
                               </td>
-                              <td className="px-4 py-4 max-w-[280px]">
-                                <p className="text-gray-500 line-clamp-2 font-medium leading-relaxed" title={item.content}>
+                              <td className="px-5 py-4 max-w-[280px]">
+                                <p className="text-slate-500 line-clamp-2 leading-relaxed text-xs font-medium" title={item.content}>
                                   {item.content}
                                 </p>
                               </td>
 
-                              <td className="px-4 py-4 text-center">
+                              <td className="px-5 py-4 text-center">
                                 <div className="flex items-center justify-center space-x-2">
                                   <button
                                     onClick={() => handleRestorePost(itemId)}
-                                    className="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 rounded-lg transition-colors font-bold text-[10px]"
+                                    className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 rounded-lg transition-all font-bold text-[10px] shadow-sm active:scale-95"
                                     title="Khôi phục bài viết"
                                   >
                                     Khôi phục
                                   </button>
                                   <button
                                     onClick={() => handleForceDeletePost(itemId)}
-                                    className="px-2.5 py-1.5 bg-red-50 hover:bg-red-100 text-red-500 rounded-lg transition-colors font-bold text-[10px]"
+                                    className="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-500 rounded-lg transition-all font-bold text-[10px] shadow-sm active:scale-95"
                                     title="Xóa vĩnh viễn bài viết"
                                   >
                                     Xóa vĩnh viễn
