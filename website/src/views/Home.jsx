@@ -114,7 +114,7 @@ export default function Home() {
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-black mb-4 text-gray-800">
               Chúng Tôi Làm Gì Tại <span className="text-[#0054A6]">Digi Heart?</span>
             </h2>
-            <p className="text-gray-500 font-medium text-sm sm:text-base">
+            <p className="text-gray-500 font-medium text-sm sm:text-base md:whitespace-nowrap">
               Với phương châm &ldquo;Đoàn Thanh niên xung kích chuyển đổi số&rdquo;, CLB tập trung vào 3 trụ cột hoạt động cốt lõi sau.
             </p>
           </div>

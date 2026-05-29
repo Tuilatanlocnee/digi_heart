@@ -106,11 +106,11 @@ export default function Navbar() {
   return (
     <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-200/80 text-gray-800 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-14">
           
           {/* Khu vực Logo thương hiệu MobiFone */}
           <Link to="/" className="flex items-center space-x-2 sm:space-x-3 group">
-            <img src="/mobifone.jpg?v=2" alt="MobiFone" className="h-14 sm:h-16 object-contain group-hover:scale-105 transition-transform duration-300" />
+            <img src="/mobifone.jpg?v=2" alt="MobiFone" className="h-9 sm:h-11 object-contain group-hover:scale-105 transition-transform duration-300" />
             <div className="flex flex-col border-l border-gray-200 pl-2 sm:pl-3">
               <span className="font-bold text-xs sm:text-sm tracking-wider text-gray-800 whitespace-nowrap">
                 DIGI HEART
