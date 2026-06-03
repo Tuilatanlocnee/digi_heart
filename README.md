@@ -76,7 +76,7 @@ Mở Terminal thứ nhất và thực hiện các lệnh sau:
    *Kết quả mong đợi*: Terminal hiển thị quá trình kết nối thành công và tạo tài khoản Admin mặc định.
 4. **Khởi chạy Server ở chế độ phát triển**:
    ```bash
-   npm run dev
+    npm run dev
    ```
    *Kết quả mong đợi*: Màn hình terminal hiển thị thông báo Server đang chạy thành công trên cổng 5000:
    ```text
