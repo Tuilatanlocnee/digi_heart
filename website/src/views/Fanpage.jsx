@@ -14,6 +14,7 @@ import {
   FiChevronDown,
   FiChevronRight
 } from 'react-icons/fi';
+import { useSearchParams } from 'react-router-dom';
 import { postAPI } from '../utils/api';
 
 /**
@@ -28,8 +29,10 @@ export default function Fanpage() {
   const [filter, setFilter] = useState({ type: 'all', value: null });
   const [expandedYears, setExpandedYears] = useState({});
   
-  // Bài viết đang được đọc chi tiết (null: đang xem danh sách)
-  const [activePost, setActivePost] = useState(null);
+  // Quản lý bài viết chi tiết bằng URL search params (?id=xxx) để hỗ trợ nút Back của trình duyệt và menu Navbar
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activePostId = searchParams.get('id');
+  const activePost = posts.find(p => (p._id === activePostId || p.id === activePostId)) || null;
 
   // Trạng thái đăng nhập
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -235,8 +238,8 @@ export default function Fanpage() {
     try {
       await postAPI.delete(postId);
       setPosts(posts.filter(p => p._id !== postId && p.id !== postId));
-      if (activePost && (activePost._id === postId || activePost.id === postId)) {
-        setActivePost(null);
+      if (activePostId === postId) {
+        setSearchParams({});
       }
     } catch (error) {
       alert(error.message || 'Lỗi khi xóa bài viết!');
@@ -261,15 +264,7 @@ export default function Fanpage() {
   if (activePost) {
     return (
       <div className="bg-gray-50 text-gray-800 min-h-screen py-12">
-        <div className="max-w-4xl mx-auto px-4">
-          
-          <button
-            onClick={() => setActivePost(null)}
-            className="flex items-center space-x-2 text-[#0054A6] hover:text-[#003f7f] transition-colors mb-8 group font-semibold text-sm"
-          >
-            <FiArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-            <span>Quay lại danh sách bài viết</span>
-          </button>
+        <div className="max-w-4xl mx-auto px-4 pt-6">
 
           <article className="bg-white border border-gray-200/80 rounded-3xl p-6 md:p-10 shadow-lg animate-fadeIn">
             {activePost.image && (
@@ -473,7 +468,7 @@ export default function Fanpage() {
                   return (
                     <div
                       key={postId}
-                      onClick={() => setActivePost(post)}
+                      onClick={() => setSearchParams({ id: post._id || post.id })}
                       className="bg-white border border-gray-200/80 rounded-2xl p-5 hover:border-[#0054A6]/30 hover:shadow-md transition-all duration-300 cursor-pointer group flex flex-col sm:flex-row gap-5 shadow-sm animate-fadeIn"
                     >
                       {post.image && (
