@@ -233,11 +233,11 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="bg-[#f8fafc] text-slate-800 py-6 md:py-10">
+    <div className="bg-[#f8fafc] text-slate-800 py-4 sm:py-6 md:py-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header Dashboard */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 pb-6 border-b border-slate-200/50">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 pb-4 sm:mb-8 sm:pb-6 border-b border-slate-200/50">
           <div>
             <div className="inline-flex items-center space-x-1.5 px-3 py-1 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 text-[#0054A6] rounded-full text-[10px] font-bold uppercase tracking-wider mb-2.5 shadow-sm">
               <span className="w-1.5 h-1.5 rounded-full bg-[#0054A6] animate-pulse"></span>
@@ -279,9 +279,9 @@ export default function AdminDashboard() {
         )}
 
         {/* 📊 Thẻ Thống Kê Nhanh (Stats Cards) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
           
-          <div className="bg-white border-l-4 border-l-amber-500 border border-y-slate-100 border-r-slate-100 rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group">
+          <div className="bg-white border-l-4 border-l-amber-500 border border-y-slate-100 border-r-slate-100 rounded-2xl p-4 sm:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group">
             <div>
               <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block mb-1">Ý tưởng sáng tạo</span>
               <h3 className="text-3xl font-black text-slate-800 mt-1">{stats.totalIdeas}</h3>
@@ -295,7 +295,7 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          <div className="bg-white border-l-4 border-l-emerald-500 border border-y-slate-100 border-r-slate-100 rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group">
+          <div className="bg-white border-l-4 border-l-emerald-500 border border-y-slate-100 border-r-slate-100 rounded-2xl p-4 sm:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group">
             <div>
               <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block mb-1">Ý tưởng đã áp dụng</span>
               <h3 className="text-3xl font-black text-emerald-600 mt-1">{stats.appliedIdeas}</h3>
@@ -308,7 +308,7 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          <div className="bg-white border-l-4 border-l-purple-500 border border-y-slate-100 border-r-slate-100 rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group">
+          <div className="bg-white border-l-4 border-l-purple-500 border border-y-slate-100 border-r-slate-100 rounded-2xl p-4 sm:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group">
             <div>
               <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block mb-1">Liên hệ & Góp ý</span>
               <h3 className="text-3xl font-black text-purple-650 mt-1">{stats.totalFeedbacks}</h3>
@@ -322,7 +322,7 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          <div className="bg-white border-l-4 border-l-[#0054A6] border border-y-slate-100 border-r-slate-100 rounded-2xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group">
+          <div className="bg-white border-l-4 border-l-[#0054A6] border border-y-slate-100 border-r-slate-100 rounded-2xl p-4 sm:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group">
             <div>
               <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block mb-1">Bài viết tin tức</span>
               <h3 className="text-3xl font-black text-[#0054A6] mt-1">{stats.totalNews}</h3>
@@ -338,7 +338,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* 🗂️ Menu Tab Quản Lý */}
-        <div className="flex overflow-x-auto whitespace-nowrap border-b border-slate-200 mb-8 space-x-8 scrollbar-none pl-2">
+        <div className="flex overflow-x-auto whitespace-nowrap border-b border-slate-200 mb-6 sm:mb-8 space-x-8 scrollbar-none pl-2">
           <button
             onClick={() => setActiveTab('ideas')}
             className={`shrink-0 pb-4 px-1 text-sm font-bold transition-all duration-300 flex items-center space-x-2 border-b-2 ${
@@ -395,7 +395,7 @@ export default function AdminDashboard() {
             <p className="text-gray-400 text-xs font-bold mt-4 uppercase">Đang tải dữ liệu từ máy chủ...</p>
           </div>
         ) : (
-          <div className="bg-white border border-slate-100 rounded-3xl p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.02)]">
+          <div className="bg-white border border-slate-100 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.02)]">
             
 
 
@@ -780,7 +780,7 @@ export default function AdminDashboard() {
         {/* 🔐 Modal Đăng Bài Viết Mới */}
         {showAddPost && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/55 backdrop-blur-sm p-4 animate-fadeIn">
-            <div className="bg-white border border-gray-200/80 w-full max-w-2xl rounded-3xl p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <div className="bg-white border border-gray-200/80 w-full max-w-2xl rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xl relative max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
               <h3 className="text-lg font-black text-gray-800 mb-5 flex items-center space-x-2 border-b border-gray-100 pb-3">
                 <FiFileText className="text-[#0054A6] w-5 h-5" />
                 <span>Đăng Bài Viết Tin Tức Mới</span>
@@ -879,7 +879,7 @@ export default function AdminDashboard() {
         {/* 🔐 Modal Chỉnh Sửa Bài Viết */}
         {showEditPost && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/55 backdrop-blur-sm p-4 animate-fadeIn">
-            <div className="bg-white border border-gray-200/80 w-full max-w-2xl rounded-3xl p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+            <div className="bg-white border border-gray-200/80 w-full max-w-2xl rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xl relative max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
               <h3 className="text-lg font-black text-gray-800 mb-5 flex items-center space-x-2 border-b border-gray-100 pb-3">
                 <FiEdit className="text-[#0054A6] w-5 h-5" />
                 <span>Chỉnh Sửa Bài Viết Tin Tức</span>

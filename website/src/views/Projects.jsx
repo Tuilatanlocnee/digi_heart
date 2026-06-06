@@ -31,7 +31,7 @@ export default function Projects() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Tiêu đề chính */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
+        <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12 md:mb-16">
           <h1 className="text-2xl sm:text-3xl md:text-5xl font-black mb-4 text-gray-800">
             Dự Án & <span className="text-[#0054A6]">Sáng Kiến Số</span>
           </h1>
@@ -47,7 +47,7 @@ export default function Projects() {
             <p className="text-gray-400 text-xs font-bold mt-4 uppercase">Đang tải danh sách sáng kiến...</p>
           </div>
         ) : ideas.length === 0 ? (
-          <div className="text-center py-16 bg-white border border-gray-200 rounded-3xl p-8 max-w-xl mx-auto shadow-sm space-y-5 animate-fadeIn">
+          <div className="text-center py-10 sm:py-16 bg-white border border-gray-200 rounded-2xl sm:rounded-3xl p-5 sm:p-8 max-w-xl mx-auto shadow-sm space-y-5 animate-fadeIn">
             <div className="w-16 h-16 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mx-auto text-2xl shadow-inner">
               <FiInbox className="w-8 h-8" />
             </div>
@@ -67,7 +67,7 @@ export default function Projects() {
           </div>
         ) : (
           /* Danh sách thẻ dự án */
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
             {ideas.map((idea) => (
               <div
                 key={idea._id || idea.id}

@@ -263,15 +263,15 @@ export default function Fanpage() {
   // 1. GIAO DIỆN XEM CHI TIẾT BÀI VIẾT (TRANG THÔNG TIN)
   if (activePost) {
     return (
-      <div className="bg-gray-50 text-gray-800 py-10 md:py-16">
+      <div className="bg-gray-50 text-gray-800 py-6 sm:py-10 md:py-16">
         <div className="max-w-4xl mx-auto px-4 pt-6">
 
-          <article className="bg-white border border-gray-200/80 rounded-3xl p-6 md:p-10 shadow-lg animate-fadeIn">
+          <article className="bg-white border border-gray-200/80 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-10 shadow-lg animate-fadeIn">
             {activePost.image && (
               <img
                 src={activePost.image}
                 alt={activePost.title}
-                className="w-full h-64 md:h-[400px] object-cover rounded-2xl mb-8 shadow-sm"
+                className="w-full h-48 sm:h-64 md:h-[400px] object-cover rounded-2xl mb-8 shadow-sm"
               />
             )}
 
@@ -296,11 +296,11 @@ export default function Fanpage() {
 
   // 2. GIAO DIỆN DANH SÁCH BÀI VIẾT
   return (
-    <div className="bg-gray-50 text-gray-800 py-10 md:py-16">
+    <div className="bg-gray-50 text-gray-800 py-6 sm:py-10 md:py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Banner tiêu đề chính */}
-        <div className="text-center max-w-4xl mx-auto mb-16 relative">
+        <div className="text-center max-w-4xl mx-auto mb-8 sm:mb-12 md:mb-16 relative">
           <h1 className="text-2xl sm:text-3xl md:text-5xl font-black mb-4 text-gray-800">
             Tin Tức CLB <span className="text-[#0054A6]">Digi Heart</span>
           </h1>
@@ -323,10 +323,10 @@ export default function Fanpage() {
         </div>
 
         {/* Bố cục trang gồm Sidebar lọc và Timeline chính */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
           
           {/* Cột trái (4 phần): Sidebar thông tin CLB & Lọc theo tháng */}
-          <div className="lg:col-span-4 space-y-6 lg:sticky lg:top-20">
+          <div className="hidden lg:block lg:col-span-4 space-y-6 lg:sticky lg:top-20">
             
             {/* Card Giới thiệu Slogan CLB */}
             <div className="bg-gradient-to-r from-[#002f6c] to-[#0054A6] text-white p-6 rounded-2xl md:rounded-3xl shadow-lg relative overflow-hidden group">
@@ -455,6 +455,77 @@ export default function Fanpage() {
 
           {/* Cột phải (8 phần): Danh sách các bài đăng */}
           <div className="lg:col-span-8 space-y-6">
+            {/* Mobile Filter (lg:hidden) */}
+            <div className="lg:hidden bg-white border border-gray-200/80 p-4 rounded-2xl mb-6 shadow-sm space-y-3 animate-fadeIn">
+              <div className="text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center space-x-1.5 mb-1">
+                <FiFilter className="text-[#0054A6]" />
+                <span>Lọc theo thời gian</span>
+              </div>
+              
+              {/* Horizontal scroll for Years */}
+              <div className="flex overflow-x-auto gap-2 pb-1 scrollbar-none">
+                <button
+                  onClick={() => setFilter({ type: 'all', value: null })}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold shrink-0 transition-all border text-left flex justify-between items-center ${
+                    filter.type === 'all'
+                      ? 'bg-[#0054A6] text-white border-[#0054A6] shadow-sm'
+                      : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                  }`}
+                >
+                  Tất cả ({posts.length})
+                </button>
+                {filterStructure.map((yg) => (
+                  <button
+                    key={yg.year}
+                    onClick={() => setFilter({ type: 'year', value: yg.year })}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold shrink-0 transition-all border ${
+                      (filter.type === 'year' && filter.value === yg.year) || (filter.type === 'month' && yg.months.some(m => m.monthYear === filter.value))
+                        ? 'bg-[#0054A6]/10 text-[#0054A6] border-[#0054A6]/30 font-bold'
+                        : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                    }`}
+                  >
+                    Năm {yg.year} ({yg.postCount})
+                  </button>
+                ))}
+              </div>
+
+              {/* If a year is selected or we're filtering by a month within that year, show its months */}
+              {filterStructure.map((yg) => {
+                const isYearActive = filter.type === 'year' && filter.value === yg.year;
+                const isMonthInYearActive = filter.type === 'month' && yg.months.some(m => m.monthYear === filter.value);
+                
+                if (!isYearActive && !isMonthInYearActive) return null;
+                
+                return (
+                  <div key={`months-${yg.year}`} className="flex overflow-x-auto gap-2 pt-1.5 border-t border-gray-100 scrollbar-none animate-fadeIn">
+                    <button
+                      onClick={() => setFilter({ type: 'year', value: yg.year })}
+                      className={`px-2.5 py-1 rounded-md text-[11px] font-medium shrink-0 transition-all ${
+                        isYearActive
+                          ? 'bg-[#0054A6] text-white'
+                          : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
+                      }`}
+                    >
+                      Tất cả {yg.year}
+                    </button>
+                    {yg.months.map((m) => (
+                      <button
+                        key={m.monthYear}
+                        onClick={() => setFilter({ type: 'month', value: m.monthYear })}
+                        className={`px-2.5 py-1 rounded-md text-[11px] font-medium shrink-0 transition-all ${
+                          filter.type === 'month' && filter.value === m.monthYear
+                            ? 'bg-[#0054A6] text-white'
+                            : 'bg-gray-50 text-gray-550 hover:bg-gray-100'
+                        }`}
+                      >
+                        Tháng {m.monthYear.split('/')[0]} ({m.postCount})
+                      </button>
+                    ))}
+                  </div>
+                );
+              })}
+            </div>
+
             {loading ? (
               <div className="bg-white border border-gray-200 rounded-3xl p-16 text-center shadow-sm max-w-md mx-auto">
                 <span className="inline-block w-8 h-8 border-4 border-[#0054A6] border-t-transparent rounded-full animate-spin"></span>
@@ -469,10 +540,10 @@ export default function Fanpage() {
                     <div
                       key={postId}
                       onClick={() => setSearchParams({ id: post._id || post.id })}
-                      className="bg-white border border-gray-200/80 rounded-2xl p-5 hover:border-[#0054A6]/30 hover:shadow-md transition-all duration-300 cursor-pointer group flex flex-col sm:flex-row gap-5 shadow-sm animate-fadeIn"
+                      className="bg-white border border-gray-200/80 rounded-2xl p-4 sm:p-5 hover:border-[#0054A6]/30 hover:shadow-md transition-all duration-300 cursor-pointer group flex flex-col sm:flex-row gap-4 sm:gap-5 shadow-sm animate-fadeIn"
                     >
                       {post.image && (
-                        <div className="w-full sm:w-44 h-32 rounded-xl overflow-hidden shrink-0 bg-gray-50 border border-gray-100 flex items-center justify-center">
+                        <div className="w-full sm:w-44 h-40 sm:h-32 rounded-xl overflow-hidden shrink-0 bg-gray-50 border border-gray-100 flex items-center justify-center">
                           <img 
                             src={post.image} 
                             alt={post.title} 
@@ -535,7 +606,7 @@ export default function Fanpage() {
       {/* 🔐 Modal Đăng Bài Viết Mới */}
       {showAddModal && createPortal(
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/55 backdrop-blur-sm p-4 animate-fadeIn">
-          <div className="bg-white border border-gray-200/80 w-full max-w-lg rounded-3xl p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+          <div className="bg-white border border-gray-200/80 w-full max-w-lg rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xl relative max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
             <h3 className="text-lg font-black text-gray-800 mb-5 flex items-center space-x-2 border-b border-gray-100 pb-3">
               <FiPlusCircle className="text-[#0054A6] w-5 h-5" />
               <span>Đăng Bài Viết Fanpage Mới</span>

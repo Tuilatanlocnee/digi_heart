@@ -83,7 +83,7 @@ export default function Contact() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Tiêu đề */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
+        <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12 md:mb-16">
           <h1 className="text-2xl sm:text-3xl md:text-5xl font-black mb-4 text-gray-800">
             Liên Hệ & <span className="text-[#0054A6]">Góp Ý Sáng Kiến</span>
           </h1>
@@ -92,7 +92,7 @@ export default function Contact() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-12 items-start">
           
           {/* Cột trái (5 phần): Thông tin liên hệ trực tiếp */}
           <div className="lg:col-span-5 space-y-6">
@@ -138,9 +138,9 @@ export default function Contact() {
           </div>
 
           {/* Cột phải (7 phần): Form gửi sáng kiến hoặc liên hệ góp ý */}
-          <div className="lg:col-span-7 bg-white border border-gray-200/80 rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-lg">
+          <div className="lg:col-span-7 bg-white border border-gray-200/80 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 shadow-lg">
             {isAdmin ? (
-              <div className="min-h-[350px] flex flex-col justify-center items-center text-center p-6 bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">
+              <div className="min-h-[350px] flex flex-col justify-center items-center text-center p-4 sm:p-6 bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">
                 <div className="p-4 bg-amber-50 text-amber-500 rounded-full mb-4 shadow-sm">
                   <FiShield className="w-10 h-10" />
                 </div>

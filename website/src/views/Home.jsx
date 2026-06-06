@@ -47,10 +47,10 @@ export default function Home() {
           </div>
 
           <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold leading-tight tracking-tight mb-3 md:mb-4">
-            <span className="bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent inline-block py-2 px-1 leading-normal">
+            <span className="bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent inline py-2 px-1 leading-normal">
               {"DIGI HEART - "}
             </span>
-            <span className="bg-gradient-to-r from-[#ffd0d4] via-[#ff6b7b] to-[#e30613] bg-clip-text text-transparent inline-block py-2 px-1 leading-normal font-extrabold drop-shadow-[0_2px_8px_rgba(227,6,19,0.2)]">
+            <span className="bg-gradient-to-r from-[#ffd0d4] via-[#ff6b7b] to-[#e30613] bg-clip-text text-transparent inline py-2 px-1 leading-normal font-extrabold drop-shadow-[0_2px_8px_rgba(227,6,19,0.2)]">
               {"TRÁI TIM SỐ"}
             </span>
           </h1>

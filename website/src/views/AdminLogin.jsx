@@ -52,13 +52,13 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="bg-gray-50 text-gray-800 min-h-[calc(100vh-16rem)] flex items-center justify-center py-16 px-4">
-      <div className="max-w-md w-full bg-white border border-gray-200/80 rounded-3xl p-6 md:p-8 shadow-xl">
+    <div className="bg-gray-50 text-gray-800 min-h-[calc(100vh-16rem)] flex items-center justify-center py-8 sm:py-12 md:py-16 px-4">
+      <div className="max-w-md w-full bg-white border border-gray-200/80 rounded-2xl sm:rounded-3xl p-5 sm:p-6 md:p-8 shadow-xl">
         
         {/* Header Form */}
         <div className="text-center mb-6">
           <div className="flex justify-center mb-4">
-            <img src="/mobifone.jpg?v=2" alt="MobiFone" className="h-28 object-contain" />
+            <img src="/mobifone.jpg?v=2" alt="MobiFone" className="h-20 sm:h-28 object-contain" />
           </div>
           <h2 className="text-2xl font-black text-gray-800">
             Đăng Nhập Quản Lý

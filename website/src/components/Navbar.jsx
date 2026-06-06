@@ -285,7 +285,7 @@ export default function Navbar() {
       {/* 🔐 Modal Đổi mật khẩu */}
       {showChangePassword && createPortal(
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/55 backdrop-blur-sm p-4 animate-fadeIn">
-          <div className="bg-white border border-gray-200/80 w-full max-w-md rounded-3xl p-6 shadow-2xl relative">
+          <div className="bg-white border border-gray-200/80 w-full max-w-md rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-2xl relative">
             <h3 className="text-lg font-black text-gray-800 mb-5 flex items-center space-x-2">
               <FiKey className="text-[#0054A6] w-5 h-5" />
               <span>Thay Đổi Mật Khẩu</span>
