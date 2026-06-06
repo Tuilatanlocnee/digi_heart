@@ -164,7 +164,7 @@ export default function News() {
   // GIAO DIỆN XEM CHI TIẾT BÀI VIẾT
   if (activePost) {
     return (
-      <div className="bg-gray-50 text-gray-800 min-h-screen py-12">
+      <div className="bg-gray-50 text-gray-800 py-10 md:py-16">
         <div className="max-w-4xl mx-auto px-4">
 
           <button
@@ -213,7 +213,7 @@ export default function News() {
 
   // GIAO DIỆN DANH SÁCH BÀI VIẾT
   return (
-    <div className="bg-gray-50 text-gray-800 min-h-screen py-16">
+    <div className="bg-gray-50 text-gray-800 py-10 md:py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Tiêu đề trang */}

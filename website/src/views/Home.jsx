@@ -26,7 +26,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="bg-white text-gray-800 min-h-screen">
+    <div className="bg-white text-gray-800">
 
       {/* 🚀 Hero Section (Banner lớn phong cách mobifone.vn) */}
       <section className="relative overflow-hidden py-8 sm:py-12 md:py-16 bg-gradient-to-r from-[#002f6c] via-[#0054A6] to-[#002f6c] text-white">
@@ -107,7 +107,7 @@ export default function Home() {
       </section>
 
       {/* 🎯 Section: Mục tiêu và Sứ mệnh (Nền trắng tinh) */}
-      <section className="py-12 sm:py-20 md:py-24 bg-white">
+      <section className="py-10 sm:py-16 md:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
           <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-16">

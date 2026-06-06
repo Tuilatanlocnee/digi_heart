@@ -233,7 +233,7 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="bg-[#f8fafc] text-slate-800 min-h-screen py-10">
+    <div className="bg-[#f8fafc] text-slate-800 py-6 md:py-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header Dashboard */}

@@ -263,7 +263,7 @@ export default function Fanpage() {
   // 1. GIAO DIỆN XEM CHI TIẾT BÀI VIẾT (TRANG THÔNG TIN)
   if (activePost) {
     return (
-      <div className="bg-gray-50 text-gray-800 min-h-screen py-12">
+      <div className="bg-gray-50 text-gray-800 py-10 md:py-16">
         <div className="max-w-4xl mx-auto px-4 pt-6">
 
           <article className="bg-white border border-gray-200/80 rounded-3xl p-6 md:p-10 shadow-lg animate-fadeIn">
@@ -296,7 +296,7 @@ export default function Fanpage() {
 
   // 2. GIAO DIỆN DANH SÁCH BÀI VIẾT
   return (
-    <div className="bg-gray-50 text-gray-800 min-h-screen py-16">
+    <div className="bg-gray-50 text-gray-800 py-10 md:py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Banner tiêu đề chính */}
