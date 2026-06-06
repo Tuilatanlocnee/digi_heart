@@ -41,12 +41,12 @@ export default function Home() {
             MobiFone Cần Thơ • Kết nối giá trị - Khơi dậy tiềm năng
           </span>
 
+          <div className="flex items-center justify-center gap-2 sm:gap-3 text-base sm:text-xl md:text-2xl font-bold opacity-90 mb-2">
+            <img src="/doanthanhnien.jpg?v=2" alt="Logo Đoàn" className="w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 rounded-full object-cover border-2 border-white/90 shadow-md shrink-0" />
+            <span>Đoàn Thanh Niên</span>
+          </div>
+
           <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold leading-tight tracking-tight mb-3 md:mb-4">
-            <span className="inline-flex items-center gap-2 sm:gap-3 justify-center align-middle text-lg sm:text-2xl md:text-3xl font-bold opacity-90 mb-1">
-              <img src="/doanthanhnien.jpg?v=2" alt="Logo Đoàn" className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full object-cover border-2 border-white/90 shadow-md shrink-0" />
-              <span>Đoàn Thanh Niên</span>
-            </span>
-            <br className="hidden sm:inline" />
             <span className="bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent inline-block py-2 px-1 leading-normal">
               {"DIGI HEART - "}
             </span>
