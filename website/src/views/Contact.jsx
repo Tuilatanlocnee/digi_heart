@@ -84,10 +84,10 @@ export default function Contact() {
         
         {/* Tiêu đề */}
         <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12 md:mb-16">
-          <h1 className="text-2xl sm:text-3xl md:text-5xl font-black mb-4 text-gray-800">
+          <h1 className="text-xl sm:text-3xl md:text-4xl font-black mb-4 text-gray-800">
             Liên Hệ & <span className="text-[#0054A6]">Góp Ý Sáng Kiến</span>
           </h1>
-          <p className="text-gray-500 font-medium">
+          <p className="text-xs sm:text-sm md:text-base text-gray-500 font-medium">
             Bạn có ý tưởng cải tiến công việc hay sáng kiến số hóa nào cho MobiFone Cần Thơ? Hãy gửi ngay cho CLB Digi Heart!
           </p>
         </div>
@@ -96,14 +96,14 @@ export default function Contact() {
           
           {/* Cột trái (5 phần): Thông tin liên hệ trực tiếp */}
           <div className="lg:col-span-5 space-y-6">
-            <h2 className="text-2xl font-bold mb-4 text-gray-800">MobiFone Cần Thơ</h2>
+            <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-4 text-gray-800">MobiFone Cần Thơ</h2>
             <div className="bg-white border border-gray-200/80 p-6 rounded-2xl space-y-5 shadow-sm">
               
               <div className="flex items-start space-x-3.5">
                 <FiMapPin className="text-[#0054A6] w-5 h-5 mt-1 flex-shrink-0" />
                 <div>
-                  <h4 className="font-bold text-sm text-gray-800">Địa chỉ văn phòng</h4>
-                  <p className="text-gray-500 text-xs mt-1 leading-relaxed">
+                  <h4 className="font-bold text-xs sm:text-sm text-gray-800">Địa chỉ văn phòng</h4>
+                  <p className="text-gray-500 text-[11px] sm:text-xs mt-1 leading-relaxed">
                     Đoàn cơ sở Công ty Dịch vụ MobiFone Khu vực 9 <br />
                     Số 06 Hòa Bình, Phường An Hội, Quận Ninh Kiều, Thành phố Cần Thơ.
                   </p>
@@ -113,16 +113,16 @@ export default function Contact() {
               <div className="flex items-center space-x-3.5 border-t border-gray-100 pt-4">
                 <FiPhone className="text-[#E30613] w-5 h-5 flex-shrink-0" />
                 <div>
-                  <h4 className="font-bold text-sm text-gray-800">Tổng đài hỗ trợ</h4>
-                  <p className="text-gray-500 text-xs mt-0.5">1800 1090 (Hỗ trợ 24/7)</p>
+                  <h4 className="font-bold text-xs sm:text-sm text-gray-800">Tổng đài hỗ trợ</h4>
+                  <p className="text-gray-500 text-[11px] sm:text-xs mt-0.5">1800 1090 (Hỗ trợ 24/7)</p>
                 </div>
               </div>
 
               <div className="flex items-center space-x-3.5 border-t border-gray-100 pt-4">
                 <FiMail className="text-[#0054A6] w-5 h-5 flex-shrink-0" />
                 <div>
-                  <h4 className="font-bold text-sm text-gray-800">Hộp thư điện tử</h4>
-                  <p className="text-gray-500 text-xs mt-0.5">doanthanhnien.cantho@mobifone.vn</p>
+                  <h4 className="font-bold text-xs sm:text-sm text-gray-800">Hộp thư điện tử</h4>
+                  <p className="text-gray-500 text-[11px] sm:text-xs mt-0.5">doanthanhnien.cantho@mobifone.vn</p>
                 </div>
               </div>
 
@@ -207,32 +207,32 @@ export default function Contact() {
 
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div>
-                    <label className="block text-xs font-bold text-gray-500 mb-2 uppercase">Họ và tên người đóng góp *</label>
+                    <label className="block text-[11px] sm:text-xs font-bold text-gray-500 mb-2 uppercase">Họ và tên người đóng góp *</label>
                     <input
                       type="text"
                       name="fullName"
                       value={formData.fullName}
                       onChange={handleChange}
-                      className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#0054A6] focus:ring-1 focus:ring-[#0054A6] text-gray-800 placeholder-gray-450 shadow-inner"
+                      className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#0054A6] focus:ring-1 focus:ring-[#0054A6] text-gray-800 placeholder-gray-455 shadow-inner"
                       placeholder="Nhập họ và tên..."
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-gray-500 mb-2 uppercase">Email nhận phản hồi (tùy chọn)</label>
+                    <label className="block text-[11px] sm:text-xs font-bold text-gray-500 mb-2 uppercase">Email nhận phản hồi (tùy chọn)</label>
                     <input
                       type="email"
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
-                      className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#0054A6] focus:ring-1 focus:ring-[#0054A6] text-gray-800 placeholder-gray-450 shadow-inner"
+                      className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#0054A6] focus:ring-1 focus:ring-[#0054A6] text-gray-800 placeholder-gray-455 shadow-inner"
                       placeholder="username@mobifone.vn"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-gray-500 mb-2 uppercase">
+                    <label className="block text-[11px] sm:text-xs font-bold text-gray-500 mb-2 uppercase">
                       {formType === 'sangkien' ? 'Tên ý tưởng / Sáng kiến số hóa *' : 'Tiêu đề liên hệ / góp ý *'}
                     </label>
                     <input
@@ -240,14 +240,14 @@ export default function Contact() {
                       name="title"
                       value={formData.title}
                       onChange={handleChange}
-                      className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#0054A6] focus:ring-1 focus:ring-[#0054A6] text-gray-800 placeholder-gray-450 shadow-inner"
+                      className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#0054A6] focus:ring-1 focus:ring-[#0054A6] text-gray-800 placeholder-gray-455 shadow-inner"
                       placeholder={formType === 'sangkien' ? "Ví dụ: Tích hợp mã QR tra cứu cẩm nang tại sảnh tiếp khách..." : "Ví dụ: Góp ý hoạt động CLB, Đề xuất liên hệ..."}
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-gray-500 mb-2 uppercase">
+                    <label className="block text-[11px] sm:text-xs font-bold text-gray-500 mb-2 uppercase">
                       {formType === 'sangkien' ? 'Mô tả chi tiết giải pháp & Hiệu quả mong đợi *' : 'Nội dung liên hệ & Đóng góp ý kiến *'}
                     </label>
                     <textarea

@@ -37,16 +37,16 @@ export default function Home() {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           {/* Nhãn nhỏ mang Slogan MobiFone */}
-          <span className="inline-block px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-white/10 border border-white/20 text-[10px] sm:text-xs font-semibold text-blue-200 mb-3 md:mb-4 uppercase tracking-wider max-w-full truncate sm:overflow-visible">
+          <span className="inline-block px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-white/10 border border-white/20 text-[9px] sm:text-xs font-semibold text-blue-200 mb-3 md:mb-4 uppercase tracking-wider max-w-full truncate sm:overflow-visible">
             MobiFone Cần Thơ • Kết nối giá trị - Khơi dậy tiềm năng
           </span>
 
-          <div className="flex items-center justify-center gap-2 sm:gap-3 text-base sm:text-xl md:text-2xl font-bold opacity-90 mb-2">
-            <img src="/doanthanhnien.jpg?v=2" alt="Logo Đoàn" className="w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 rounded-full object-cover border-2 border-white/90 shadow-md shrink-0" />
+          <div className="flex items-center justify-center gap-2 sm:gap-3 text-xs sm:text-base md:text-lg font-bold opacity-90 mb-2">
+            <img src="/doanthanhnien.jpg?v=2" alt="Logo Đoàn" className="w-5 h-5 sm:w-7 sm:h-7 md:w-8 md:h-8 rounded-full object-cover border-2 border-white/90 shadow-md shrink-0" />
             <span>Đoàn Thanh Niên</span>
           </div>
 
-          <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold leading-tight tracking-tight mb-3 md:mb-4">
+          <h1 className="text-xl sm:text-3xl md:text-4xl font-extrabold leading-tight tracking-tight mb-3 md:mb-4">
             <span className="bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent inline py-2 px-1 leading-normal">
               {"DIGI HEART - "}
             </span>
@@ -56,11 +56,11 @@ export default function Home() {
           </h1>
 
           {/* Slogan của CLB */}
-          <div className="text-base sm:text-lg md:text-xl font-bold text-amber-300 mb-3 tracking-wide">
+          <div className="text-sm sm:text-base md:text-lg font-bold text-amber-300 mb-3 tracking-wide">
             Kết nối tri thức số – Dẫn lối tương lai
           </div>
 
-          <p className="text-sm sm:text-base md:text-lg text-blue-100 max-w-3xl mx-auto mb-6 md:mb-8 leading-relaxed font-light px-2 sm:px-0">
+          <p className="text-xs sm:text-sm md:text-base text-blue-100 max-w-3xl mx-auto mb-6 md:mb-8 leading-relaxed font-light px-2 sm:px-0">
             Nơi hội tụ thế hệ trẻ MobiFone Cần Thơ. Mỗi thành viên mang trong mình trái tim nhiệt huyết, tiên phong chuyển đổi số và lan tỏa kiến thức số đến cộng đồng.
           </p>
 
@@ -82,24 +82,24 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 text-center">
 
-            <div className="p-4 sm:p-5 bg-white rounded-2xl border border-gray-200/60 shadow-sm">
-              <span className="block text-2xl sm:text-3xl md:text-4xl font-black text-[#0054A6] mb-1">50+</span>
-              <span className="text-[10px] sm:text-[11px] text-gray-500 uppercase tracking-wider font-bold block min-h-[32px] flex items-center justify-center">Thành viên nòng cốt</span>
+            <div className="p-3 sm:p-5 bg-white rounded-2xl border border-gray-200/60 shadow-sm">
+              <span className="block text-xl sm:text-2xl md:text-3xl font-black text-[#0054A6] mb-0.5">50+</span>
+              <span className="text-[9px] sm:text-[10px] text-gray-500 uppercase tracking-wider font-bold block min-h-[32px] flex items-center justify-center leading-tight">Thành viên nòng cốt</span>
             </div>
 
-            <div className="p-4 sm:p-5 bg-white rounded-2xl border border-gray-200/60 shadow-sm">
-              <span className="block text-2xl sm:text-3xl md:text-4xl font-black text-[#E30613] mb-1">15+</span>
-              <span className="text-[10px] sm:text-[11px] text-gray-500 uppercase tracking-wider font-bold block min-h-[32px] flex items-center justify-center">Dự án & Sáng kiến</span>
+            <div className="p-3 sm:p-5 bg-white rounded-2xl border border-gray-200/60 shadow-sm">
+              <span className="block text-xl sm:text-2xl md:text-3xl font-black text-[#E30613] mb-0.5">15+</span>
+              <span className="text-[9px] sm:text-[10px] text-gray-500 uppercase tracking-wider font-bold block min-h-[32px] flex items-center justify-center leading-tight">Dự án & Sáng kiến</span>
             </div>
 
-            <div className="p-4 sm:p-5 bg-white rounded-2xl border border-gray-200/60 shadow-sm">
-              <span className="block text-2xl sm:text-3xl md:text-4xl font-black text-[#0054A6] mb-1">2000+</span>
-              <span className="text-[10px] sm:text-[11px] text-gray-500 uppercase tracking-wider font-bold block min-h-[32px] flex items-center justify-center">Lượt hỗ trợ người dân</span>
+            <div className="p-3 sm:p-5 bg-white rounded-2xl border border-gray-200/60 shadow-sm">
+              <span className="block text-xl sm:text-2xl md:text-3xl font-black text-[#0054A6] mb-0.5">2000+</span>
+              <span className="text-[9px] sm:text-[10px] text-gray-500 uppercase tracking-wider font-bold block min-h-[32px] flex items-center justify-center leading-tight">Lượt hỗ trợ người dân</span>
             </div>
 
-            <div className="p-4 sm:p-5 bg-white rounded-2xl border border-gray-200/60 shadow-sm">
-              <span className="block text-2xl sm:text-3xl md:text-4xl font-black text-emerald-500 mb-1">100%</span>
-              <span className="text-[10px] sm:text-[11px] text-gray-500 uppercase tracking-wider font-bold block min-h-[32px] flex items-center justify-center">Chỉ tiêu số hóa đạt</span>
+            <div className="p-3 sm:p-5 bg-white rounded-2xl border border-gray-200/60 shadow-sm">
+              <span className="block text-xl sm:text-2xl md:text-3xl font-black text-emerald-500 mb-0.5">100%</span>
+              <span className="text-[9px] sm:text-[10px] text-gray-500 uppercase tracking-wider font-bold block min-h-[32px] flex items-center justify-center leading-tight">Chỉ tiêu số hóa đạt</span>
             </div>
 
           </div>
@@ -111,10 +111,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
           <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-16">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black mb-4 text-gray-800">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-black mb-3 text-gray-800">
               Chúng Tôi Làm Gì Tại <span className="text-[#0054A6]">Digi Heart?</span>
             </h2>
-            <p className="text-gray-500 font-medium text-sm sm:text-base md:whitespace-nowrap">
+            <p className="text-gray-500 font-medium text-xs sm:text-sm md:whitespace-nowrap">
               Với phương châm &ldquo;Đoàn Thanh niên xung kích chuyển đổi số&rdquo;, CLB tập trung vào 3 trụ cột hoạt động cốt lõi sau.
             </p>
           </div>
@@ -129,8 +129,8 @@ export default function Home() {
                   {obj.icon}
                 </div>
                 <div className="flex-grow">
-                  <h3 className="text-sm md:text-xl font-bold mb-1 md:mb-3 text-gray-800">{obj.title}</h3>
-                  <p className="text-xs md:text-sm text-gray-500 leading-relaxed">{obj.description}</p>
+                  <h3 className="text-xs sm:text-sm md:text-base font-bold mb-1 md:mb-2 text-gray-800">{obj.title}</h3>
+                  <p className="text-[11px] sm:text-xs md:text-sm text-gray-500 leading-relaxed">{obj.description}</p>
                 </div>
               </div>
             ))}

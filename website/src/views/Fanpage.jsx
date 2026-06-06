@@ -280,11 +280,11 @@ export default function Fanpage() {
               <span>{formatDate(activePost.createdAt || activePost.time)}</span>
             </div>
 
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-black mb-6 leading-snug text-gray-800">
+            <h1 className="text-lg sm:text-2xl md:text-3xl font-black mb-6 leading-snug text-gray-800">
               {activePost.title}
             </h1>
 
-            <div className="text-gray-655 leading-relaxed text-sm md:text-base space-y-6 whitespace-pre-line border-t border-gray-100 pt-6">
+            <div className="text-gray-655 leading-relaxed text-xs sm:text-sm md:text-base space-y-6 whitespace-pre-line border-t border-gray-100 pt-6">
               {activePost.content}
             </div>
           </article>
@@ -301,10 +301,10 @@ export default function Fanpage() {
         
         {/* Banner tiêu đề chính */}
         <div className="text-center max-w-4xl mx-auto mb-8 sm:mb-12 md:mb-16 relative">
-          <h1 className="text-2xl sm:text-3xl md:text-5xl font-black mb-4 text-gray-800">
+          <h1 className="text-xl sm:text-3xl md:text-4xl font-black mb-4 text-gray-800">
             Tin Tức CLB <span className="text-[#0054A6]">Digi Heart</span>
           </h1>
-          <p className="text-gray-500 font-medium md:whitespace-nowrap">
+          <p className="text-xs sm:text-sm md:text-base text-gray-500 font-medium md:whitespace-nowrap">
             Nơi kết nối và cập nhật tức thì các hoạt động, hình ảnh sôi nổi của Câu lạc bộ Chuyển đổi số Digi Heart.
           </p>
 
@@ -558,10 +558,10 @@ export default function Fanpage() {
                             <FiCalendar className="mr-1" />
                             {formatDate(post.createdAt || post.time)}
                           </span>
-                          <h3 className="text-base sm:text-lg font-bold text-gray-800 group-hover:text-[#0054A6] transition-colors leading-snug mb-2 line-clamp-2">
+                          <h3 className="text-sm sm:text-base md:text-lg font-bold text-gray-800 group-hover:text-[#0054A6] transition-colors leading-snug mb-2 line-clamp-2">
                             {post.title}
                           </h3>
-                          <p className="text-gray-500 text-xs sm:text-sm font-light leading-relaxed line-clamp-2">
+                          <p className="text-gray-500 text-[11px] sm:text-xs md:text-sm font-light leading-relaxed line-clamp-2">
                             {post.content}
                           </p>
                         </div>

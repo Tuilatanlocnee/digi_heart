@@ -60,7 +60,7 @@ export default function AdminLogin() {
           <div className="flex justify-center mb-4">
             <img src="/mobifone.jpg?v=2" alt="MobiFone" className="h-20 sm:h-28 object-contain" />
           </div>
-          <h2 className="text-2xl font-black text-gray-800">
+          <h2 className="text-xl sm:text-2xl font-black text-gray-800">
             Đăng Nhập Quản Lý
           </h2>
           <p className="text-gray-400 text-xs mt-1.5 font-semibold uppercase tracking-wider">
@@ -79,7 +79,7 @@ export default function AdminLogin() {
         {/* Biểu mẫu đăng nhập */}
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-xs font-bold text-gray-500 mb-2 uppercase">
+            <label className="block text-[11px] sm:text-xs font-bold text-gray-500 mb-2 uppercase">
               Tên tài khoản
             </label>
             <div className="relative">
@@ -99,7 +99,7 @@ export default function AdminLogin() {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-500 mb-2 uppercase">
+            <label className="block text-[11px] sm:text-xs font-bold text-gray-500 mb-2 uppercase">
               Mật khẩu
             </label>
             <div className="relative">

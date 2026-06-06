@@ -219,7 +219,7 @@ export default function Navbar() {
                 to={link.path}
                 onClick={() => setIsOpen(false)}
                 className={({ isActive }) =>
-                  `block px-3 py-2.5 rounded-xl text-base font-semibold transition-all ${
+                  `block px-3 py-2 rounded-xl text-sm font-semibold transition-all ${
                     isActive
                       ? 'bg-blue-50 text-[#0054A6] border-l-4 border-[#0054A6] pl-4 shadow-inner'
                       : 'text-gray-600 hover:bg-gray-50 hover:text-[#0054A6]'
@@ -238,7 +238,7 @@ export default function Navbar() {
                     <NavLink
                       to="/admin"
                       onClick={() => setIsOpen(false)}
-                      className="block px-3 py-2.5 rounded-xl text-base font-semibold text-emerald-600 hover:bg-emerald-50 flex items-center space-x-2 transition-all"
+                      className="block px-3 py-2 rounded-xl text-sm font-semibold text-emerald-600 hover:bg-emerald-50 flex items-center space-x-2 transition-all"
                     >
                       <FiLock className="w-4 h-4" />
                       <span>Trang Quản lý</span>
@@ -250,7 +250,7 @@ export default function Navbar() {
                       setIsOpen(false);
                       setShowChangePassword(true);
                     }}
-                    className="w-full text-left block px-3 py-2.5 rounded-xl text-base font-semibold text-gray-600 hover:bg-gray-50 flex items-center space-x-2 transition-all"
+                    className="w-full text-left block px-3 py-2 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 flex items-center space-x-2 transition-all"
                   >
                     <FiKey className="w-4 h-4" />
                     <span>Đổi mật khẩu</span>
@@ -261,7 +261,7 @@ export default function Navbar() {
                       setIsOpen(false);
                       handleLogout();
                     }}
-                    className="w-full text-left block px-3 py-2.5 rounded-xl text-base font-semibold text-red-500 hover:bg-red-50 flex items-center space-x-2 transition-all"
+                    className="w-full text-left block px-3 py-2 rounded-xl text-sm font-semibold text-red-500 hover:bg-red-50 flex items-center space-x-2 transition-all"
                   >
                     <FiLogOut className="w-4 h-4" />
                     <span>Đăng xuất</span>
@@ -271,7 +271,7 @@ export default function Navbar() {
                 <NavLink
                   to="/admin/login"
                   onClick={() => setIsOpen(false)}
-                  className="block px-3 py-2.5 rounded-xl text-base font-semibold text-gray-500 hover:text-[#0054A6] hover:bg-gray-50 flex items-center space-x-2 transition-all"
+                  className="block px-3 py-2 rounded-xl text-sm font-semibold text-gray-500 hover:text-[#0054A6] hover:bg-gray-50 flex items-center space-x-2 transition-all"
                 >
                   <FiLock className="w-4 h-4" />
                   <span>Đăng nhập hệ thống</span>

@@ -243,7 +243,7 @@ export default function AdminDashboard() {
               <span className="w-1.5 h-1.5 rounded-full bg-[#0054A6] animate-pulse"></span>
               <span>Doanh Nghiệp • Digi Heart Portal</span>
             </div>
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-800 flex items-center space-x-3 tracking-tight">
+            <h1 className="text-lg sm:text-2xl md:text-3xl font-black text-slate-800 flex items-center space-x-3 tracking-tight">
               <div className="p-2 bg-[#0054A6]/5 rounded-xl border border-[#0054A6]/10">
                 <FiShield className="text-[#0054A6] w-6 h-6 md:w-7 md:h-7 shrink-0" />
               </div>
@@ -266,82 +266,69 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Thông báo sự kiện */}
-        {message.text && (
-          <div className={`mb-6 p-4 rounded-xl text-xs font-bold flex items-center space-x-2 animate-fadeIn ${
-            message.type === 'danger' ? 'bg-red-50 border border-red-200 text-red-700' :
-            message.type === 'warning' ? 'bg-amber-50 border border-amber-200 text-amber-700' :
-            'bg-emerald-50 border border-emerald-200 text-emerald-700'
-          }`}>
-            <FiCheck className="w-4 h-4 flex-shrink-0" />
-            <span>{message.text}</span>
-          </div>
-        )}
-
-        {/* 📊 Thẻ Thống Kê Nhanh (Stats Cards) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+         {/* 📊 Thẻ Thống Kê Nhanh (Stats Cards) */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
           
-          <div className="bg-white border-l-4 border-l-amber-500 border border-y-slate-100 border-r-slate-100 rounded-2xl p-4 sm:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group">
-            <div>
-              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block mb-1">Ý tưởng sáng tạo</span>
-              <h3 className="text-3xl font-black text-slate-800 mt-1">{stats.totalIdeas}</h3>
-              <div className="text-[10px] text-slate-450 mt-2 flex items-center space-x-1">
-                <span>Chờ duyệt:</span>
-                <span className="font-extrabold text-amber-650 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-100/30">{stats.pendingIdeas}</span>
+          <div className="bg-white border-l-4 border-l-amber-500 border border-y-slate-100 border-r-slate-100 rounded-2xl p-3 sm:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group">
+            <div className="min-w-0 flex-1">
+              <span className="text-[9px] sm:text-[10px] uppercase font-bold text-slate-400 tracking-wider block mb-1 truncate">Ý tưởng sáng tạo</span>
+              <h3 className="text-xl sm:text-3xl font-black text-slate-800 mt-1">{stats.totalIdeas}</h3>
+              <div className="text-[9px] sm:text-[10px] text-slate-450 mt-1.5 flex items-center space-x-1">
+                <span className="shrink-0">Chờ duyệt:</span>
+                <span className="font-extrabold text-amber-655 bg-amber-50 px-1.5 py-0.5 rounded-md border border-amber-100/30 text-[9px]">{stats.pendingIdeas}</span>
               </div>
             </div>
-            <div className="p-4 bg-gradient-to-br from-amber-50 to-amber-100/30 text-amber-500 rounded-xl shadow-inner group-hover:scale-105 transition-transform duration-300">
-              <FiZap className="w-5 h-5" />
+            <div className="p-2 sm:p-4 bg-gradient-to-br from-amber-50 to-amber-100/30 text-amber-500 rounded-xl shadow-inner group-hover:scale-105 transition-transform duration-300 hidden xs:flex shrink-0 ml-1">
+              <FiZap className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
             </div>
           </div>
 
-          <div className="bg-white border-l-4 border-l-emerald-500 border border-y-slate-100 border-r-slate-100 rounded-2xl p-4 sm:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group">
-            <div>
-              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block mb-1">Ý tưởng đã áp dụng</span>
-              <h3 className="text-3xl font-black text-emerald-600 mt-1">{stats.appliedIdeas}</h3>
-              <div className="text-[10px] text-slate-450 mt-2">
-                <span className="bg-emerald-50/50 text-emerald-650 px-2 py-0.5 rounded-md border border-emerald-100/30 font-bold">Đã đưa vào thực tế</span>
+          <div className="bg-white border-l-4 border-l-emerald-500 border border-y-slate-100 border-r-slate-100 rounded-2xl p-3 sm:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group">
+            <div className="min-w-0 flex-1">
+              <span className="text-[9px] sm:text-[10px] uppercase font-bold text-slate-400 tracking-wider block mb-1 truncate">Đã áp dụng</span>
+              <h3 className="text-xl sm:text-3xl font-black text-emerald-650 mt-1">{stats.appliedIdeas}</h3>
+              <div className="text-[9px] sm:text-[10px] text-slate-450 mt-1.5">
+                <span className="bg-emerald-50/50 text-emerald-650 px-1.5 py-0.5 rounded-md border border-emerald-100/30 font-bold block text-center sm:inline-block text-[8px] sm:text-[9px]">Đã vào thực tế</span>
               </div>
             </div>
-            <div className="p-4 bg-gradient-to-br from-emerald-50 to-emerald-100/30 text-emerald-500 rounded-xl shadow-inner group-hover:scale-105 transition-transform duration-300">
-              <FiCheck className="w-5 h-5" />
+            <div className="p-2 sm:p-4 bg-gradient-to-br from-emerald-50 to-emerald-100/30 text-emerald-500 rounded-xl shadow-inner group-hover:scale-105 transition-transform duration-300 hidden xs:flex shrink-0 ml-1">
+              <FiCheck className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
             </div>
           </div>
 
-          <div className="bg-white border-l-4 border-l-purple-500 border border-y-slate-100 border-r-slate-100 rounded-2xl p-4 sm:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group">
-            <div>
-              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block mb-1">Liên hệ & Góp ý</span>
-              <h3 className="text-3xl font-black text-purple-650 mt-1">{stats.totalFeedbacks}</h3>
-              <div className="text-[10px] text-slate-450 mt-2 flex items-center space-x-1">
-                <span>Chưa xử lý:</span>
-                <span className="font-extrabold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-md border border-purple-100/30">{stats.pendingFeedbacks}</span>
+          <div className="bg-white border-l-4 border-l-purple-500 border border-y-slate-100 border-r-slate-100 rounded-2xl p-3 sm:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group">
+            <div className="min-w-0 flex-1">
+              <span className="text-[9px] sm:text-[10px] uppercase font-bold text-slate-400 tracking-wider block mb-1 truncate">Liên hệ & Góp ý</span>
+              <h3 className="text-xl sm:text-3xl font-black text-purple-650 mt-1">{stats.totalFeedbacks}</h3>
+              <div className="text-[9px] sm:text-[10px] text-slate-455 mt-1.5 flex items-center space-x-1">
+                <span className="shrink-0">Chưa xử lý:</span>
+                <span className="font-extrabold text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded-md border border-purple-100/30 text-[9px]">{stats.pendingFeedbacks}</span>
               </div>
             </div>
-            <div className="p-4 bg-gradient-to-br from-purple-50 to-purple-100/30 text-purple-500 rounded-xl shadow-inner group-hover:scale-105 transition-transform duration-300">
-              <FiMail className="w-5 h-5" />
+            <div className="p-2 sm:p-4 bg-gradient-to-br from-purple-50 to-purple-100/30 text-purple-500 rounded-xl shadow-inner group-hover:scale-105 transition-transform duration-300 hidden xs:flex shrink-0 ml-1">
+              <FiMail className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
             </div>
           </div>
 
-          <div className="bg-white border-l-4 border-l-[#0054A6] border border-y-slate-100 border-r-slate-100 rounded-2xl p-4 sm:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group">
-            <div>
-              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block mb-1">Bài viết tin tức</span>
-              <h3 className="text-3xl font-black text-[#0054A6] mt-1">{stats.totalNews}</h3>
-              <div className="text-[10px] text-slate-455 mt-2">
-                <span className="bg-blue-50/50 text-[#0054A6] px-2 py-0.5 rounded-md border border-blue-100/30 font-bold">Đã đăng lên tin tức</span>
+          <div className="bg-white border-l-4 border-l-[#0054A6] border border-y-slate-100 border-r-slate-100 rounded-2xl p-3 sm:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group">
+            <div className="min-w-0 flex-1">
+              <span className="text-[9px] sm:text-[10px] uppercase font-bold text-slate-400 tracking-wider block mb-1 truncate">Bài viết tin tức</span>
+              <h3 className="text-xl sm:text-3xl font-black text-[#0054A6] mt-1">{stats.totalNews}</h3>
+              <div className="text-[9px] sm:text-[10px] text-slate-455 mt-1.5">
+                <span className="bg-blue-50/50 text-[#0054A6] px-1.5 py-0.5 rounded-md border border-blue-100/30 font-bold block text-center sm:inline-block text-[8px] sm:text-[9px]">Đã đăng tin</span>
               </div>
             </div>
-            <div className="p-4 bg-gradient-to-br from-blue-50 to-blue-100/30 text-[#0054A6] rounded-xl shadow-inner group-hover:scale-105 transition-transform duration-300">
-              <FiFileText className="w-5 h-5" />
+             <div className="p-2 sm:p-4 bg-gradient-to-br from-blue-50 to-blue-100/30 text-[#0054A6] rounded-xl shadow-inner group-hover:scale-105 transition-transform duration-300 hidden xs:flex shrink-0 ml-1">
+              <FiFileText className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
             </div>
           </div>
-
         </div>
 
         {/* 🗂️ Menu Tab Quản Lý */}
         <div className="flex overflow-x-auto whitespace-nowrap border-b border-slate-200 mb-6 sm:mb-8 space-x-8 scrollbar-none pl-2">
           <button
             onClick={() => setActiveTab('ideas')}
-            className={`shrink-0 pb-4 px-1 text-sm font-bold transition-all duration-300 flex items-center space-x-2 border-b-2 ${
+            className={`shrink-0 pb-4 px-1 text-xs sm:text-sm font-bold transition-all duration-300 flex items-center space-x-2 border-b-2 ${
               activeTab === 'ideas' 
                 ? 'border-[#0054A6] text-[#0054A6]' 
                 : 'border-transparent text-slate-400 hover:text-slate-700'
@@ -353,7 +340,7 @@ export default function AdminDashboard() {
           
           <button
             onClick={() => setActiveTab('feedbacks')}
-            className={`shrink-0 pb-4 px-1 text-sm font-bold transition-all duration-300 flex items-center space-x-2 border-b-2 ${
+            className={`shrink-0 pb-4 px-1 text-xs sm:text-sm font-bold transition-all duration-300 flex items-center space-x-2 border-b-2 ${
               activeTab === 'feedbacks' 
                 ? 'border-purple-500 text-purple-600' 
                 : 'border-transparent text-slate-400 hover:text-slate-700'
@@ -365,7 +352,7 @@ export default function AdminDashboard() {
 
           <button
             onClick={() => setActiveTab('news')}
-            className={`shrink-0 pb-4 px-1 text-sm font-bold transition-all duration-300 flex items-center space-x-2 border-b-2 ${
+            className={`shrink-0 pb-4 px-1 text-xs sm:text-sm font-bold transition-all duration-300 flex items-center space-x-2 border-b-2 ${
               activeTab === 'news' 
                 ? 'border-[#0054A6] text-[#0054A6]' 
                 : 'border-transparent text-slate-400 hover:text-slate-700'
@@ -377,7 +364,7 @@ export default function AdminDashboard() {
           
           <button
             onClick={() => setActiveTab('trash')}
-            className={`shrink-0 pb-4 px-1 text-sm font-bold transition-all duration-300 flex items-center space-x-2 border-b-2 ${
+            className={`shrink-0 pb-4 px-1 text-xs sm:text-sm font-bold transition-all duration-300 flex items-center space-x-2 border-b-2 ${
               activeTab === 'trash' 
                 ? 'border-red-500 text-red-600' 
                 : 'border-transparent text-slate-400 hover:text-slate-700'

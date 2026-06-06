@@ -32,10 +32,10 @@ export default function Projects() {
 
         {/* Tiêu đề chính */}
         <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12 md:mb-16">
-          <h1 className="text-2xl sm:text-3xl md:text-5xl font-black mb-4 text-gray-800">
+          <h1 className="text-xl sm:text-3xl md:text-4xl font-black mb-4 text-gray-800">
             Dự Án & <span className="text-[#0054A6]">Sáng Kiến Số</span>
           </h1>
-          <p className="text-gray-500 font-medium">
+          <p className="text-xs sm:text-sm md:text-base text-gray-500 font-medium">
             Tổng hợp các giải pháp công nghệ, phần mềm tiện ích và các chiến dịch số hóa cộng đồng do lực lượng thanh niên MobiFone Cần Thơ làm nòng cốt.
           </p>
         </div>
@@ -89,10 +89,10 @@ export default function Projects() {
                 </div>
 
                 {/* Tên và Mô tả */}
-                <h3 className="text-xl md:text-2xl font-bold mb-4 text-gray-800 group-hover:text-[#0054A6] transition-colors leading-tight">
+                <h3 className="text-base sm:text-lg md:text-xl font-bold mb-3 text-gray-800 group-hover:text-[#0054A6] transition-colors leading-tight">
                   {idea.title}
                 </h3>
-                <p className="text-gray-500 text-sm leading-relaxed mb-6 whitespace-pre-line">
+                <p className="text-gray-500 text-xs sm:text-sm leading-relaxed mb-6 whitespace-pre-line">
                   {idea.description}
                 </p>
 
