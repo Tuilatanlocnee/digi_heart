@@ -7,28 +7,28 @@ import { FiMail, FiPhone, FiMapPin, FiActivity } from 'react-icons/fi';
  */
 export default function Footer() {
   return (
-    <footer className="bg-white text-gray-655 border-t border-gray-250 py-6 md:py-12 mt-auto">
+    <footer className="bg-white text-gray-655 border-t border-gray-250 py-4 md:py-6 mt-auto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* 💻 GIAO DIỆN DESKTOP (Màn hình máy tính & máy tính bảng lớn) */}
         <div className="hidden md:grid grid-cols-12 gap-8">
           
           {/* Cột 1: Giới thiệu chung */}
-          <div className="col-span-5 space-y-4 flex flex-col items-start text-left">
+          <div className="col-span-5 space-y-2 flex flex-col items-start text-left">
             <div className="flex items-center space-x-2">
-              <FiActivity className="w-6 h-6 text-[#0054A6]" />
-              <span className="text-gray-800 font-extrabold tracking-wider text-base">DIGI HEART</span>
+              <FiActivity className="w-5 h-5 text-[#0054A6]" />
+              <span className="text-gray-800 font-extrabold tracking-wider text-sm">DIGI HEART</span>
             </div>
-            <p className="text-sm leading-relaxed text-gray-500 max-w-md">
+            <p className="text-xs leading-relaxed text-gray-500 max-w-sm">
               Câu lạc bộ Chuyển đổi số Đoàn Thanh niên MobiFone Cần Thơ.
-              Chúng tôi kết nối những trái tim trẻ nhiệt huyết, ứng dụng công nghệ để nâng cao hiệu quả công việc và phục vụ cộng đồng.
+              Kết nối sức trẻ, ứng dụng công nghệ vì sự phát triển cộng đồng.
             </p>
           </div>
 
           {/* Cột 2: Các liên kết nhanh */}
           <div className="col-span-3 flex flex-col items-start text-left">
-            <h3 className="text-gray-800 font-bold text-sm mb-4 uppercase tracking-wider">Liên kết</h3>
-            <ul className="space-y-2 text-sm">
+            <h3 className="text-gray-800 font-bold text-xs mb-2 uppercase tracking-wider">Liên kết</h3>
+            <ul className="space-y-1 text-xs">
               <li>
                 <Link to="/" className="hover:text-[#0054A6] transition-colors duration-200">Trang chủ</Link>
               </li>
@@ -45,9 +45,9 @@ export default function Footer() {
           </div>
 
           {/* Cột 3: Thông tin liên hệ */}
-          <div className="col-span-4 space-y-3 flex flex-col items-start text-left">
-            <h3 className="text-gray-800 font-bold text-sm mb-4 uppercase tracking-wider">Liên hệ</h3>
-            <ul className="space-y-2.5 text-sm text-gray-500 flex flex-col items-start w-full">
+          <div className="col-span-4 space-y-2 flex flex-col items-start text-left">
+            <h3 className="text-gray-800 font-bold text-xs mb-2 uppercase tracking-wider">Liên hệ</h3>
+            <ul className="space-y-1.5 text-xs text-gray-500 flex flex-col items-start w-full">
               <li className="flex items-start space-x-2 text-left max-w-xs">
                 <FiMapPin className="mt-0.5 text-[#0054A6] flex-shrink-0 w-3.5 h-3.5" />
                 <span>Số 06 Hòa Bình, Ninh Kiều, Cần Thơ</span>
@@ -104,8 +104,8 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* 📑 Bản quyền tác giả (Chung cho cả hai) */}
-        <div className="border-t border-gray-100 mt-4 md:mt-8 pt-4 md:pt-8 text-center text-[9px] md:text-xs text-gray-400 px-4">
+        {/* 🎯 Bản quyền tác giả (Chung cho cả hai) */}
+        <div className="border-t border-gray-100 mt-4 pt-4 text-center text-[9px] md:text-xs text-gray-400 px-4">
           <p>
             &copy; {new Date().getFullYear()} Digi Heart - Trái Tim Số.
           </p>
