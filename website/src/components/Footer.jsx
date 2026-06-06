@@ -23,9 +23,9 @@ export default function Footer() {
           </div>
 
           {/* Cột 2: Các liên kết nhanh tiện ích */}
-          <div className="col-span-6 md:col-span-3 flex flex-col items-start text-left pt-2 md:pt-0">
+          <div className="col-span-12 sm:col-span-6 md:col-span-3 flex flex-col items-center sm:items-start text-center sm:text-left pt-4 sm:pt-0">
             <h3 className="text-gray-800 font-bold text-xs md:text-sm mb-2 md:mb-4 uppercase tracking-wider">Liên kết</h3>
-            <ul className="space-y-1.5 md:space-y-2 text-xs md:text-sm">
+            <ul className="space-y-1.5 md:space-y-2 text-xs md:text-sm flex flex-col items-center sm:items-start">
               <li>
                 <Link to="/" className="hover:text-[#0054A6] transition-colors duration-200">Trang chủ</Link>
               </li>
@@ -42,18 +42,18 @@ export default function Footer() {
           </div>
 
           {/* Cột 3: Thông tin liên hệ tại MobiFone Cần Thơ */}
-          <div className="col-span-6 md:col-span-4 space-y-2 md:space-y-3 flex flex-col items-start text-left pt-2 md:pt-0">
+          <div className="col-span-12 sm:col-span-6 md:col-span-4 space-y-2 md:space-y-3 flex flex-col items-center sm:items-start text-center sm:text-left pt-4 sm:pt-0">
             <h3 className="text-gray-800 font-bold text-xs md:text-sm mb-2 md:mb-4 uppercase tracking-wider">Liên hệ</h3>
-            <ul className="space-y-1.5 md:space-y-2.5 text-xs md:text-sm text-gray-500 flex flex-col items-start w-full">
-              <li className="flex items-start space-x-2 text-left max-w-md">
+            <ul className="space-y-1.5 md:space-y-2.5 text-xs md:text-sm text-gray-500 flex flex-col items-center sm:items-start w-full">
+              <li className="flex items-start space-x-2 text-center sm:text-left justify-center sm:justify-start max-w-xs">
                 <FiMapPin className="mt-0.5 text-[#0054A6] flex-shrink-0 w-3.5 h-3.5" />
                 <span>Số 06 Hòa Bình, Ninh Kiều, Cần Thơ</span>
               </li>
-              <li className="flex items-center space-x-2 text-left w-full justify-start">
+              <li className="flex items-center space-x-2 justify-center sm:justify-start w-full">
                 <FiPhone className="text-[#0054A6] flex-shrink-0 w-3.5 h-3.5" />
                 <span>1800 1090</span>
               </li>
-              <li className="flex items-center space-x-2 text-left w-full justify-start">
+              <li className="flex items-center space-x-2 justify-center sm:justify-start w-full">
                 <FiMail className="text-[#0054A6] flex-shrink-0 w-3.5 h-3.5" />
                 <span className="break-all">doanthanhnien.cantho@mobifone.vn</span>
               </li>
