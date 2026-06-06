@@ -39,6 +39,9 @@ export default function Footer() {
                 <Link to="/projects" className="hover:text-[#0054A6] transition-colors duration-200">Dự án số</Link>
               </li>
               <li>
+                <Link to="/join" className="hover:text-[#0054A6] transition-colors duration-200">Gia nhập</Link>
+              </li>
+              <li>
                 <Link to="/contact" className="hover:text-[#0054A6] transition-colors duration-200">Liên hệ</Link>
               </li>
             </ul>
@@ -80,6 +83,8 @@ export default function Footer() {
             <Link to="/news" className="hover:text-[#0054A6] transition-colors">Tin tức</Link>
             <span className="text-gray-300">•</span>
             <Link to="/projects" className="hover:text-[#0054A6] transition-colors">Dự án số</Link>
+            <span className="text-gray-300">•</span>
+            <Link to="/join" className="hover:text-[#0054A6] transition-colors">Gia nhập</Link>
             <span className="text-gray-300">•</span>
             <Link to="/contact" className="hover:text-[#0054A6] transition-colors">Liên hệ</Link>
           </div>

@@ -2,9 +2,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   FiZap, FiCheck, FiTrash2, 
-  FiRefreshCw, FiShield, FiFileText, FiEdit, FiMail
+  FiRefreshCw, FiShield, FiFileText, FiEdit, FiMail, FiUsers
 } from 'react-icons/fi';
-import { ideaAPI, postAPI } from '../utils/api';
+import { ideaAPI, postAPI, candidateAPI } from '../utils/api';
 
 /**
  * View AdminDashboard - Trang quản trị trung tâm dành cho Ban chủ nhiệm CLB Digi Heart.
@@ -13,13 +13,18 @@ import { ideaAPI, postAPI } from '../utils/api';
 export default function AdminDashboard() {
   const navigate = useNavigate();
   
-  // Trạng thái các tab quản lý: 'ideas' | 'news'
+  // Trạng thái các tab quản lý: 'ideas' | 'feedbacks' | 'news' | 'trash' | 'candidates'
   const [activeTab, setActiveTab] = useState('ideas');
 
   // Dữ liệu lấy từ API
   const [ideas, setIdeas] = useState([]);
   const [posts, setPosts] = useState([]);
   const [deletedPosts, setDeletedPosts] = useState([]);
+  const [candidates, setCandidates] = useState([]);
+  
+  // Trạng thái tài khoản thành viên mới được phê duyệt
+  const [createdAccount, setCreatedAccount] = useState(null);
+  const [showAccountModal, setShowAccountModal] = useState(false);
   
   // Trạng thái đăng bài viết tin tức mới
   const [showAddPost, setShowAddPost] = useState(false);
@@ -48,14 +53,16 @@ export default function AdminDashboard() {
     await Promise.resolve();
     setLoading(true);
     try {
-      const [ideasData, postsData, deletedPostsData] = await Promise.all([
+      const [ideasData, postsData, deletedPostsData, candidatesData] = await Promise.all([
         ideaAPI.getAll(),
         postAPI.getAll(),
-        postAPI.getDeleted()
+        postAPI.getDeleted(),
+        candidateAPI.getAll()
       ]);
       setIdeas(ideasData);
       setPosts(postsData);
       setDeletedPosts(deletedPostsData);
+      setCandidates(candidatesData);
     } catch (error) {
       console.error('Lỗi tải dữ liệu admin:', error);
       if (error.response?.status === 401 || error.response?.status === 403) {
@@ -109,6 +116,57 @@ export default function AdminDashboard() {
     } catch (error) {
       console.error('Lỗi xóa ý tưởng:', error);
       showNotify('Lỗi xóa ý tưởng!', 'danger');
+    }
+  };
+
+  // ==========================================
+  // XỬ LÝ CANDIDATES (ỨNG VIÊN ĐĂNG KÝ GIA NHẬP CLB)
+  // ==========================================
+  const handleApproveCandidate = async (id) => {
+    try {
+      const response = await candidateAPI.updateStatus(id, 'Đã duyệt');
+      showNotify('Phê duyệt hồ sơ ứng viên thành công!');
+      
+      setCandidates(candidates.map(cand => 
+        (cand._id === id || cand.id === id) ? { ...cand, status: 'Đã duyệt' } : cand
+      ));
+
+      if (response.tempPassword) {
+        setCreatedAccount({
+          phone: response.candidate.phone,
+          fullName: response.candidate.fullName,
+          tempPassword: response.tempPassword
+        });
+        setShowAccountModal(true);
+      }
+    } catch (error) {
+      console.error('Lỗi phê duyệt hồ sơ ứng viên:', error);
+      showNotify(error.response?.data?.message || 'Lỗi phê duyệt ứng viên!', 'danger');
+    }
+  };
+
+  const handleRejectCandidate = async (id) => {
+    try {
+      await candidateAPI.updateStatus(id, 'Từ chối');
+      showNotify('Đã từ chối hồ sơ ứng tuyển thành công!');
+      setCandidates(candidates.map(cand => 
+        (cand._id === id || cand.id === id) ? { ...cand, status: 'Từ chối' } : cand
+      ));
+    } catch (error) {
+      console.error('Lỗi từ chối ứng viên:', error);
+      showNotify('Lỗi cập nhật trạng thái ứng viên!', 'danger');
+    }
+  };
+
+  const handleDeleteCandidate = async (id) => {
+    if (!window.confirm('Bạn có chắc chắn muốn xóa hồ sơ ứng viên này khỏi cơ sở dữ liệu?')) return;
+    try {
+      await candidateAPI.delete(id);
+      showNotify('Đã xóa hồ sơ ứng viên thành công!');
+      setCandidates(candidates.filter(cand => cand._id !== id && cand.id !== id));
+    } catch (error) {
+      console.error('Lỗi xóa hồ sơ ứng viên:', error);
+      showNotify('Lỗi xóa hồ sơ ứng viên!', 'danger');
     }
   };
 
@@ -229,6 +287,8 @@ export default function AdminDashboard() {
     appliedIdeas: ideas.filter(i => i.type !== 'Góp ý' && i.status === 'Đã áp dụng').length,
     totalFeedbacks: ideas.filter(i => i.type === 'Góp ý').length,
     pendingFeedbacks: ideas.filter(i => i.type === 'Góp ý' && i.status === 'Chờ duyệt').length,
+    totalCandidates: candidates.length,
+    pendingCandidates: candidates.filter(c => c.status === 'Chờ duyệt').length,
     totalNews: posts.length
   };
 
@@ -267,7 +327,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* 📊 Thẻ Thống Kê Nhanh (Stats Cards) */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-5 mb-6 sm:mb-8">
           
           <div className="bg-white border border-slate-200/80 rounded-2xl p-3 sm:p-5 shadow-sm hover:shadow-md hover:border-[#0054A6]/20 transition-all duration-300 flex items-center justify-between group">
             <div className="min-w-0 flex-1">
@@ -278,7 +338,7 @@ export default function AdminDashboard() {
                 <span className={`font-bold px-1.5 py-0.5 rounded-md text-[9px] ${stats.pendingIdeas > 0 ? 'bg-amber-50 text-amber-600 border border-amber-100/50' : 'bg-slate-50 text-slate-500 border border-slate-100'}`}>{stats.pendingIdeas}</span>
               </div>
             </div>
-            <div className="p-2.5 bg-slate-50 text-slate-400 group-hover:bg-blue-50 group-hover:text-[#0054A6] rounded-xl transition-all duration-300 hidden xs:flex shrink-0 ml-1">
+            <div className="p-2 bg-slate-50 text-slate-400 group-hover:bg-blue-50 group-hover:text-[#0054A6] rounded-xl transition-all duration-300 hidden xs:flex shrink-0 ml-1">
               <FiZap className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
             </div>
           </div>
@@ -291,8 +351,22 @@ export default function AdminDashboard() {
                 <span className="bg-blue-50/50 text-[#0054A6] px-1.5 py-0.5 rounded-md border border-blue-100/30 font-bold block text-center sm:inline-block text-[8px] sm:text-[9px]">Sáng kiến thực tế</span>
               </div>
             </div>
-            <div className="p-2.5 bg-slate-50 text-slate-400 group-hover:bg-blue-50 group-hover:text-[#0054A6] rounded-xl transition-all duration-300 hidden xs:flex shrink-0 ml-1">
+            <div className="p-2 bg-slate-50 text-slate-400 group-hover:bg-blue-50 group-hover:text-[#0054A6] rounded-xl transition-all duration-300 hidden xs:flex shrink-0 ml-1">
               <FiCheck className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+            </div>
+          </div>
+
+          <div className="bg-white border border-slate-200/80 rounded-2xl p-3 sm:p-5 shadow-sm hover:shadow-md hover:border-[#0054A6]/20 transition-all duration-300 flex items-center justify-between group">
+            <div className="min-w-0 flex-1">
+              <span className="text-[9px] sm:text-[10px] uppercase font-bold text-slate-450 tracking-wider block mb-1 truncate">Ứng tuyển CLB</span>
+              <h3 className="text-xl sm:text-2xl font-black text-slate-800 mt-1">{stats.totalCandidates}</h3>
+              <div className="text-[9px] sm:text-[10px] text-slate-500 mt-1.5 flex items-center space-x-1">
+                <span className="shrink-0">Chờ duyệt:</span>
+                <span className={`font-bold px-1.5 py-0.5 rounded-md text-[9px] ${stats.pendingCandidates > 0 ? 'bg-amber-50 text-amber-600 border border-amber-100/50' : 'bg-slate-50 text-slate-500 border border-slate-100'}`}>{stats.pendingCandidates}</span>
+              </div>
+            </div>
+            <div className="p-2 bg-slate-50 text-slate-400 group-hover:bg-blue-50 group-hover:text-[#0054A6] rounded-xl transition-all duration-300 hidden xs:flex shrink-0 ml-1">
+              <FiUsers className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
             </div>
           </div>
 
@@ -302,10 +376,10 @@ export default function AdminDashboard() {
               <h3 className="text-xl sm:text-2xl font-black text-slate-800 mt-1">{stats.totalFeedbacks}</h3>
               <div className="text-[9px] sm:text-[10px] text-slate-500 mt-1.5 flex items-center space-x-1">
                 <span className="shrink-0">Chưa xử lý:</span>
-                <span className={`font-bold px-1.5 py-0.5 rounded-md text-[9px] ${stats.pendingFeedbacks > 0 ? 'bg-purple-50 text-purple-600 border border-purple-100/50' : 'bg-slate-50 text-slate-500 border border-slate-100'}`}>{stats.pendingFeedbacks}</span>
+                <span className={`font-bold px-1.5 py-0.5 rounded-md text-[9px] ${stats.pendingFeedbacks > 0 ? 'bg-[#0054A6]/10 text-[#0054A6] border border-[#0054A6]/20' : 'bg-slate-50 text-slate-500 border border-slate-100'}`}>{stats.pendingFeedbacks}</span>
               </div>
             </div>
-            <div className="p-2.5 bg-slate-50 text-slate-400 group-hover:bg-blue-50 group-hover:text-[#0054A6] rounded-xl transition-all duration-300 hidden xs:flex shrink-0 ml-1">
+            <div className="p-2 bg-slate-50 text-slate-400 group-hover:bg-blue-50 group-hover:text-[#0054A6] rounded-xl transition-all duration-300 hidden xs:flex shrink-0 ml-1">
               <FiMail className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
             </div>
           </div>
@@ -318,10 +392,11 @@ export default function AdminDashboard() {
                 <span className="bg-blue-50/50 text-[#0054A6] px-1.5 py-0.5 rounded-md border border-blue-100/30 font-bold block text-center sm:inline-block text-[8px] sm:text-[9px]">Đã đăng tin</span>
               </div>
             </div>
-            <div className="p-2.5 bg-slate-50 text-slate-400 group-hover:bg-blue-50 group-hover:text-[#0054A6] rounded-xl transition-all duration-300 hidden xs:flex shrink-0 ml-1">
+            <div className="p-2 bg-slate-50 text-slate-400 group-hover:bg-blue-50 group-hover:text-[#0054A6] rounded-xl transition-all duration-300 hidden xs:flex shrink-0 ml-1">
               <FiFileText className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
             </div>
           </div>
+
         </div>
 
         {/* 🗂️ Menu Tab Quản Lý */}
@@ -335,9 +410,21 @@ export default function AdminDashboard() {
             }`}
           >
             <FiZap className="w-4 h-4" />
-            <span>Sáng Kiến Số Hóa ({stats.totalIdeas})</span>
+            <span>Sáng Kiến Số ({stats.totalIdeas})</span>
           </button>
           
+          <button
+            onClick={() => setActiveTab('candidates')}
+            className={`shrink-0 pb-4 px-1 text-xs sm:text-sm font-bold transition-all duration-300 flex items-center space-x-2 border-b-2 ${
+              activeTab === 'candidates' 
+                ? 'border-[#0054A6] text-[#0054A6]' 
+                : 'border-transparent text-slate-400 hover:text-slate-700'
+            }`}
+          >
+            <FiUsers className="w-4 h-4" />
+            <span>Hồ Sơ Ứng Tuyển ({stats.pendingCandidates})</span>
+          </button>
+
           <button
             onClick={() => setActiveTab('feedbacks')}
             className={`shrink-0 pb-4 px-1 text-xs sm:text-sm font-bold transition-all duration-300 flex items-center space-x-2 border-b-2 ${
@@ -468,6 +555,112 @@ export default function AdminDashboard() {
                                   onClick={() => handleDeleteIdea(ideaId)}
                                   className="p-2 bg-slate-50 hover:bg-red-50 hover:text-red-600 text-slate-400 rounded-xl transition-all shadow-sm active:scale-90"
                                   title="Xóa ý tưởng"
+                                >
+                                  <FiTrash2 className="w-4 h-4" />
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* TAB: QUẢN LÝ HỒ SƠ ỨNG TUYỂN */}
+            {activeTab === 'candidates' && (
+              <div>
+                <h3 className="text-lg font-black text-slate-800 mb-6 flex items-center space-x-2 pb-4 border-b border-slate-100">
+                  <FiUsers className="text-[#0054A6] w-5 h-5" />
+                  <span>Danh sách hồ sơ đăng ký gia nhập CLB Digi Heart</span>
+                </h3>
+
+                {candidates.length === 0 ? (
+                  <div className="py-12 text-center text-gray-400 text-xs">Hiện tại chưa có hồ sơ đăng ký gia nhập nào.</div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs text-slate-650 min-w-[950px] border-collapse">
+                      <thead className="text-[10px] uppercase bg-slate-50/80 text-slate-400 border-b border-slate-100">
+                        <tr>
+                          <th className="px-4 py-4 font-bold tracking-wider rounded-l-2xl">Ứng viên / Ngày gửi</th>
+                          <th className="px-4 py-4 font-bold tracking-wider">Thông tin liên hệ</th>
+                          <th className="px-4 py-4 font-bold tracking-wider">Phòng ban / Ban ứng tuyển</th>
+                          <th className="px-4 py-4 font-bold tracking-wider">Kỹ năng nổi bật</th>
+                          <th className="px-4 py-4 font-bold tracking-wider">Lý do gia nhập</th>
+                          <th className="px-4 py-4 font-bold tracking-wider text-center">Trạng thái</th>
+                          <th className="px-4 py-4 font-bold tracking-wider text-center">Duyệt hồ sơ</th>
+                          <th className="px-4 py-4 font-bold tracking-wider text-center rounded-r-2xl">Xóa</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {candidates.map((cand) => {
+                          const candId = cand._id || cand.id;
+                          return (
+                            <tr key={candId} className="hover:bg-slate-50/60 transition-colors duration-200">
+                              <td className="px-4 py-4">
+                                <p className="font-bold text-slate-800 text-sm">{cand.fullName}</p>
+                                <p className="text-slate-400 text-[9px] mt-1">Gửi ngày: {cand.date || new Date(cand.createdAt).toISOString().split('T')[0]}</p>
+                              </td>
+                              <td className="px-4 py-4">
+                                <p className="text-slate-700 font-semibold">{cand.phone}</p>
+                                <p className="text-slate-450 text-[10px] mt-0.5">{cand.email}</p>
+                              </td>
+                              <td className="px-4 py-4">
+                                <p className="text-slate-700 font-bold">{cand.department}</p>
+                                <p className="text-[#0054A6] text-[10px] font-semibold mt-0.5">{cand.targetBan}</p>
+                              </td>
+                              <td className="px-4 py-4 max-w-[150px]">
+                                <p className="text-slate-600 line-clamp-2 leading-relaxed text-xs" title={cand.skills}>
+                                  {cand.skills || 'Không ghi nhận'}
+                                </p>
+                              </td>
+                              <td className="px-4 py-4 max-w-[200px]">
+                                <p className="text-slate-600 line-clamp-3 leading-relaxed text-xs" title={cand.reason}>
+                                  {cand.reason}
+                                </p>
+                              </td>
+                              <td className="px-4 py-4 text-center">
+                                <span className={`px-2.5 py-1.5 rounded-full font-bold text-[10px] inline-block ${
+                                  cand.status === 'Đã duyệt' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100/50' :
+                                  cand.status === 'Từ chối' ? 'bg-red-50 text-red-600 border border-red-100/50' :
+                                  'bg-amber-50 text-amber-600 border border-amber-100/50'
+                                }`}>
+                                  {cand.status}
+                                </span>
+                              </td>
+                              <td className="px-4 py-4 text-center">
+                                <div className="flex flex-col space-y-1.5 items-center justify-center">
+                                  {cand.status === 'Chờ duyệt' && (
+                                    <>
+                                      <button
+                                        onClick={() => handleApproveCandidate(candId)}
+                                        className="px-2 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 rounded-lg text-[10px] font-bold transition-all w-20 shadow-sm active:scale-95"
+                                      >
+                                        Duyệt
+                                      </button>
+                                      <button
+                                        onClick={() => handleRejectCandidate(candId)}
+                                        className="px-2 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-[10px] font-bold transition-all w-20 shadow-sm active:scale-95"
+                                      >
+                                        Từ chối
+                                      </button>
+                                    </>
+                                  )}
+                                  {cand.status === 'Đã duyệt' && (
+                                    <span className="text-emerald-650 text-[9px] font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">Đã kích hoạt</span>
+                                  )}
+                                  {cand.status === 'Từ chối' && (
+                                    <span className="text-red-500 text-[9px] font-bold bg-red-50 px-2 py-0.5 rounded border border-red-100">Từ chối</span>
+                                  )}
+                                </div>
+                              </td>
+                              <td className="px-4 py-4 text-center">
+                                <button
+                                  onClick={() => handleDeleteCandidate(candId)}
+                                  className="p-2 bg-slate-50 hover:bg-red-50 hover:text-red-600 text-slate-400 rounded-xl transition-all shadow-sm active:scale-90"
+                                  title="Xóa hồ sơ"
                                 >
                                   <FiTrash2 className="w-4 h-4" />
                                 </button>
@@ -963,8 +1156,53 @@ export default function AdminDashboard() {
           </div>
         )}
 
+        {/* 🔐 Modal hiển thị tài khoản vừa tạo */}
+        {showAccountModal && createdAccount && (
+          <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fadeIn">
+            <div className="bg-white border border-gray-250 w-full max-w-md rounded-2xl p-6 shadow-2xl relative">
+              <div className="text-center mb-4">
+                <div className="w-12 h-12 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto text-xl mb-3 border border-emerald-100 shadow-inner">
+                  <FiCheck className="w-6 h-6" />
+                </div>
+                <h3 className="text-base sm:text-lg font-black text-gray-800">Duyệt & Tạo Tài Khoản Thành Công</h3>
+                <p className="text-gray-400 text-[10px] mt-1 uppercase font-bold tracking-wider">Hệ thống Digi Heart</p>
+              </div>
+              
+              <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-3 mb-6 text-xs text-left">
+                <div>
+                  <span className="text-gray-450 block font-bold uppercase text-[9px]">Họ tên thành viên:</span>
+                  <span className="font-extrabold text-slate-800 text-sm">{createdAccount.fullName}</span>
+                </div>
+                <div className="border-t border-gray-200/50 pt-2">
+                  <span className="text-gray-455 block font-bold uppercase text-[9px]">Tên đăng nhập (SĐT):</span>
+                  <span className="font-mono font-extrabold text-[#0054A6] text-sm select-all">{createdAccount.phone}</span>
+                </div>
+                <div className="border-t border-gray-200/50 pt-2">
+                  <span className="text-gray-455 block font-bold uppercase text-[9px]">Mật khẩu tạm thời:</span>
+                  <span className="font-mono font-extrabold text-emerald-600 text-sm select-all">{createdAccount.tempPassword}</span>
+                </div>
+              </div>
+
+              <p className="text-[10px] text-amber-600 font-semibold mb-6 bg-amber-55/70 border border-amber-100 p-2.5 rounded-lg leading-relaxed">
+                ⚠️ Lưu ý: Mật khẩu tạm thời chỉ hiển thị một lần duy nhất này. Vui lòng sao chép lại thông tin trên và gửi cho thành viên để họ đăng nhập và đổi mật khẩu mới!
+              </p>
+
+              <div className="flex items-center justify-end">
+                <button
+                  onClick={() => {
+                    setShowAccountModal(false);
+                    setCreatedAccount(null);
+                  }}
+                  className="px-5 py-2 bg-[#0054A6] hover:bg-[#003d80] text-white text-xs font-bold rounded-xl shadow-md transition-colors"
+                >
+                  Tôi đã sao chép
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
-
   );
 }

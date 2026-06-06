@@ -98,6 +98,7 @@ export default function Navbar() {
     { name: 'Trang chủ', path: '/' },
     { name: 'Tin tức', path: '/news' },
     { name: 'Dự án số', path: '/projects' },
+    { name: 'Gia nhập', path: '/join' },
     { name: 'Liên hệ', path: '/contact' },
   ];
 
