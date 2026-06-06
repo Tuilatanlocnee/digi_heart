@@ -9,10 +9,10 @@ export default function Footer() {
   return (
     <footer className="bg-white text-gray-655 border-t border-gray-250 py-4 md:py-6 mt-auto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* 💻 GIAO DIỆN DESKTOP (Màn hình máy tính & máy tính bảng lớn) */}
         <div className="hidden md:grid grid-cols-12 gap-8">
-          
+
           {/* Cột 1: Giới thiệu chung */}
           <div className="col-span-5 space-y-2 flex flex-col items-start text-left">
             <div className="flex items-center space-x-2">
@@ -37,9 +37,6 @@ export default function Footer() {
               </li>
               <li>
                 <Link to="/projects" className="hover:text-[#0054A6] transition-colors duration-200">Dự án số</Link>
-              </li>
-              <li>
-                <Link to="/join" className="hover:text-[#0054A6] transition-colors duration-200">Gia nhập</Link>
               </li>
               <li>
                 <Link to="/contact" className="hover:text-[#0054A6] transition-colors duration-200">Liên hệ</Link>
@@ -69,7 +66,7 @@ export default function Footer() {
 
         {/* 📱 GIAO DIỆN MOBILE & TABLET NHỎ (Tối giản, siêu gọn, hạn chế tối đa chiều cao) */}
         <div className="md:hidden flex flex-col items-center space-y-4">
-          
+
           {/* Logo ngắn gọn, không hiển thị mô tả */}
           <div className="flex items-center space-x-2">
             <FiActivity className="w-5 h-5 text-[#0054A6]" />
@@ -83,8 +80,6 @@ export default function Footer() {
             <Link to="/news" className="hover:text-[#0054A6] transition-colors">Tin tức</Link>
             <span className="text-gray-300">•</span>
             <Link to="/projects" className="hover:text-[#0054A6] transition-colors">Dự án số</Link>
-            <span className="text-gray-300">•</span>
-            <Link to="/join" className="hover:text-[#0054A6] transition-colors">Gia nhập</Link>
             <span className="text-gray-300">•</span>
             <Link to="/contact" className="hover:text-[#0054A6] transition-colors">Liên hệ</Link>
           </div>

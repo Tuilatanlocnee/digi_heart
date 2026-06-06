@@ -5,7 +5,6 @@ import Home from './views/Home';
 import Projects from './views/Projects';
 import Fanpage from './views/Fanpage';
 import Contact from './views/Contact';
-import JoinUs from './views/JoinUs';
 import AdminLogin from './views/AdminLogin';
 import AdminDashboard from './views/AdminDashboard';
 
@@ -17,7 +16,7 @@ function App() {
   return (
     <Router>
       <div className="flex flex-col min-h-screen bg-gray-50 text-gray-800 selection:bg-blue-100 selection:text-[#0054A6]">
-        
+
         {/* Thanh điều hướng cố định phía trên */}
         <Navbar />
 
@@ -28,8 +27,7 @@ function App() {
             <Route path="/news" element={<Fanpage />} />
             <Route path="/projects" element={<Projects />} />
             <Route path="/contact" element={<Contact />} />
-            <Route path="/join" element={<JoinUs />} />
-            
+
             {/* Phân hệ quản trị Admin */}
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin" element={<AdminDashboard />} />
@@ -38,7 +36,7 @@ function App() {
 
         {/* Chân trang hiển thị thông tin bản quyền và liên hệ */}
         <Footer />
-        
+
       </div>
     </Router>
   );

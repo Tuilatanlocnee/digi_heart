@@ -98,7 +98,6 @@ export default function Navbar() {
     { name: 'Trang chủ', path: '/' },
     { name: 'Tin tức', path: '/news' },
     { name: 'Dự án số', path: '/projects' },
-    { name: 'Gia nhập', path: '/join' },
     { name: 'Liên hệ', path: '/contact' },
   ];
 
@@ -108,7 +107,7 @@ export default function Navbar() {
     <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-200/80 text-gray-800 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-14">
-          
+
           {/* Khu vực Logo thương hiệu MobiFone */}
           <Link to="/" className="flex items-center space-x-2 sm:space-x-3 group">
             <img src="/mobifone.jpg?v=2" alt="MobiFone" className="h-9 sm:h-11 object-contain group-hover:scale-105 transition-transform duration-300" />
@@ -129,10 +128,9 @@ export default function Navbar() {
                 key={link.path}
                 to={link.path}
                 className={({ isActive }) =>
-                  `px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
-                    isActive
-                      ? 'bg-blue-50 text-[#0054A6] border border-blue-100/50 shadow-sm'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-[#0054A6]'
+                  `px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${isActive
+                    ? 'bg-blue-50 text-[#0054A6] border border-blue-100/50 shadow-sm'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-[#0054A6]'
                   }`
                 }
               >
@@ -147,10 +145,9 @@ export default function Navbar() {
                   <NavLink
                     to="/admin"
                     className={({ isActive }) =>
-                      `px-3 py-2 rounded-lg text-sm font-semibold flex items-center space-x-1.5 transition-all duration-200 ${
-                        isActive
-                          ? 'bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-sm'
-                          : 'text-emerald-600 hover:bg-emerald-50'
+                      `px-3 py-2 rounded-lg text-sm font-semibold flex items-center space-x-1.5 transition-all duration-200 ${isActive
+                        ? 'bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-sm'
+                        : 'text-emerald-600 hover:bg-emerald-50'
                       }`
                     }
                   >
@@ -184,8 +181,7 @@ export default function Navbar() {
               <NavLink
                 to="/admin/login"
                 className={({ isActive }) =>
-                  `px-3 py-2 rounded-lg text-sm font-semibold flex items-center space-x-1 text-gray-400 hover:text-[#0054A6] hover:bg-gray-50 transition-all duration-200 ml-2 ${
-                    isActive ? 'text-[#0054A6] bg-blue-50' : ''
+                  `px-3 py-2 rounded-lg text-sm font-semibold flex items-center space-x-1 text-gray-400 hover:text-[#0054A6] hover:bg-gray-50 transition-all duration-200 ml-2 ${isActive ? 'text-[#0054A6] bg-blue-50' : ''
                   }`
                 }
               >
@@ -220,10 +216,9 @@ export default function Navbar() {
                 to={link.path}
                 onClick={() => setIsOpen(false)}
                 className={({ isActive }) =>
-                  `block px-3 py-2 rounded-xl text-sm font-semibold transition-all ${
-                    isActive
-                      ? 'bg-blue-50 text-[#0054A6] border-l-4 border-[#0054A6] pl-4 shadow-inner'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-[#0054A6]'
+                  `block px-3 py-2 rounded-xl text-sm font-semibold transition-all ${isActive
+                    ? 'bg-blue-50 text-[#0054A6] border-l-4 border-[#0054A6] pl-4 shadow-inner'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-[#0054A6]'
                   }`
                 }
               >
