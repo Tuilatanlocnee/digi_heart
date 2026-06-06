@@ -14,6 +14,12 @@ dotenv.config();
 const connUri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/digi_heart';
 
 const seedDatabase = async () => {
+  // Kiểm tra an toàn bảo mật môi trường Production
+  if (process.env.NODE_ENV === 'production') {
+    console.error('❌ CẢNH BÁO BẢO MẬT: Không được phép chạy script seed dữ liệu trên môi trường Production!');
+    process.exit(1);
+  }
+
   try {
     console.log(`Đang kết nối tới MongoDB để nạp dữ liệu mẫu: ${connUri}...`);
     await mongoose.connect(connUri);

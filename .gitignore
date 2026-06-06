@@ -1,0 +1,15 @@
+# Node.js dependencies
+node_modules/
+server/node_modules/
+website/node_modules/
+
+# Local env files
+.env
+server/.env
+website/.env
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

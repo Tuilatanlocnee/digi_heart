@@ -19,7 +19,10 @@ export default function authMiddleware(req, res, next) {
   }
 
   try {
-    const secret = process.env.JWT_SECRET || 'digi_heart_super_secret_key_123';
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      return res.status(500).json({ message: 'Lỗi cấu hình hệ thống: Thiếu khóa bảo mật JWT!' });
+    }
     const decoded = jwt.verify(token, secret);
     
     // Lưu thông tin admin đã giải mã vào object request để dùng tiếp ở các controller phía sau

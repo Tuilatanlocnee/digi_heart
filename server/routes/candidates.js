@@ -17,10 +17,12 @@ router.get('/', authMiddleware, async (req, res) => {
   }
 });
 
-// 1.2 API Lấy danh sách ứng viên đã duyệt (Công khai)
+// 1.2 API Lấy danh sách ứng viên đã duyệt (Công khai - Che giấu số điện thoại và email)
 router.get('/approved', async (req, res) => {
   try {
-    const candidates = await Candidate.find({ status: 'Đã duyệt' }).sort({ createdAt: -1 });
+    const candidates = await Candidate.find({ status: 'Đã duyệt' })
+      .select('fullName avatar department targetBan skills reason status date createdAt')
+      .sort({ createdAt: -1 });
     res.json(candidates);
   } catch (error) {
     res.status(500).json({ message: 'Lỗi lấy danh sách thành viên!', error: error.message });
@@ -138,6 +140,27 @@ router.post('/', async (req, res) => {
   }
 });
 
+// Hàm tạo mật khẩu ngẫu nhiên tạm thời cho thành viên mới
+const generateTempPassword = () => {
+  const lowercase = 'abcdefghijklmnopqrstuvwxyz';
+  const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const numbers = '0123456789';
+  const specials = '!@#$%&*';
+  const allChars = lowercase + uppercase + numbers + specials;
+  
+  let password = '';
+  password += lowercase[Math.floor(Math.random() * lowercase.length)];
+  password += uppercase[Math.floor(Math.random() * uppercase.length)];
+  password += numbers[Math.floor(Math.random() * numbers.length)];
+  password += specials[Math.floor(Math.random() * specials.length)];
+  
+  for (let i = 0; i < 4; i++) {
+    password += allChars[Math.floor(Math.random() * allChars.length)];
+  }
+  
+  return password.split('').sort(() => 0.5 - Math.random()).join('');
+};
+
 // 3. API Cập nhật trạng thái ứng viên (Admin phê duyệt / từ chối)
 router.put('/:id', authMiddleware, async (req, res) => {
   const { status } = req.body;
@@ -153,11 +176,14 @@ router.put('/:id', authMiddleware, async (req, res) => {
       return res.status(404).json({ message: 'Không tìm thấy hồ sơ ứng viên.' });
     }
 
+    let tempPassword = null;
+
     // Nếu phê duyệt sang 'Đã duyệt', tự động tạo tài khoản cho thành viên
     if (status === 'Đã duyệt') {
       const existingUser = await User.findOne({ username: candidate.phone });
       if (!existingUser) {
-        const hashedPassword = await bcrypt.hash(candidate.phone, 10);
+        tempPassword = generateTempPassword();
+        const hashedPassword = await bcrypt.hash(tempPassword, 10);
         const newUser = new User({
           username: candidate.phone,
           password: hashedPassword,
@@ -173,7 +199,8 @@ router.put('/:id', authMiddleware, async (req, res) => {
 
     res.json({
       message: `Đã cập nhật trạng thái ứng viên thành: ${status}`,
-      candidate: updatedCandidate
+      candidate: updatedCandidate,
+      ...(tempPassword && { tempPassword }) // Trả về mật khẩu tạm thời cho admin sao chép nếu tạo mới
     });
 
   } catch (error) {

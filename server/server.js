@@ -10,14 +10,50 @@ import ideaRoutes from './routes/ideas.js';
 import postRoutes from './routes/posts.js';
 import newsRoutes from './routes/news.js';
 
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+
 // Cấu hình dotenv
 dotenv.config();
+
+// Kiểm tra an toàn cho JWT_SECRET lúc khởi động máy chủ
+if (!process.env.JWT_SECRET) {
+  if (process.env.NODE_ENV === 'production') {
+    console.error('❌ FATAL ERROR: Biến môi trường JWT_SECRET chưa được cấu hình!');
+    process.exit(1);
+  } else {
+    console.warn('⚠️ CẢNH BÁO BẢO MẬT: Biến môi trường JWT_SECRET chưa được cấu hình. Hãy cấu hình sớm trong file .env!');
+  }
+}
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Cấu hình Middleware
+// Cấu hình Middleware bảo mật và giới hạn tần suất
+app.use(helmet());
 app.use(cors());
+
+// Rate Limiting cấu hình
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 phút
+  max: 200, // Tối đa 200 requests từ mỗi IP
+  message: { message: 'Bạn đã gửi quá nhiều yêu cầu, vui lòng thử lại sau 15 phút!' },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 phút
+  max: 30, // Tối đa 30 requests đăng nhập/đổi mật khẩu
+  message: { message: 'Đăng nhập quá nhiều lần liên tiếp, vui lòng thử lại sau 15 phút!' },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
+app.use('/api/', generalLimiter);
+app.use('/api/auth/login', authLimiter);
+app.use('/api/auth/change-password', authLimiter);
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 

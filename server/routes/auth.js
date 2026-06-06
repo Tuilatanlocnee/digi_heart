@@ -28,7 +28,10 @@ router.post('/login', async (req, res) => {
     }
 
     // Tạo mã thông báo JWT (hết hạn trong 1 ngày)
-    const secret = process.env.JWT_SECRET || 'digi_heart_super_secret_key_123';
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      return res.status(500).json({ message: 'Lỗi cấu hình hệ thống: Thiếu khóa bảo mật JWT!' });
+    }
     const token = jwt.sign(
       { id: user._id, username: user.username, role: user.role },
       secret,

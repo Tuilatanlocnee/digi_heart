@@ -13,7 +13,8 @@ const getOptionalUser = (req) => {
     const token = authHeader.split(' ')[1];
     if (token) {
       try {
-        const secret = process.env.JWT_SECRET || 'digi_heart_super_secret_key_123';
+        const secret = process.env.JWT_SECRET;
+        if (!secret) return null;
         return jwt.verify(token, secret);
       } catch (e) {
         // Bỏ qua nếu token không hợp lệ
