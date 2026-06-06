@@ -266,60 +266,60 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-         {/* 📊 Thẻ Thống Kê Nhanh (Stats Cards) */}
+        {/* 📊 Thẻ Thống Kê Nhanh (Stats Cards) */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
           
-          <div className="bg-white border-l-4 border-l-amber-500 border border-y-slate-100 border-r-slate-100 rounded-2xl p-3 sm:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group">
+          <div className="bg-white border border-slate-200/80 rounded-2xl p-3 sm:p-5 shadow-sm hover:shadow-md hover:border-[#0054A6]/20 transition-all duration-300 flex items-center justify-between group">
             <div className="min-w-0 flex-1">
-              <span className="text-[9px] sm:text-[10px] uppercase font-bold text-slate-400 tracking-wider block mb-1 truncate">Ý tưởng sáng tạo</span>
-              <h3 className="text-xl sm:text-3xl font-black text-slate-800 mt-1">{stats.totalIdeas}</h3>
-              <div className="text-[9px] sm:text-[10px] text-slate-450 mt-1.5 flex items-center space-x-1">
+              <span className="text-[9px] sm:text-[10px] uppercase font-bold text-slate-450 tracking-wider block mb-1 truncate">Sáng kiến số</span>
+              <h3 className="text-xl sm:text-2xl font-black text-slate-800 mt-1">{stats.totalIdeas}</h3>
+              <div className="text-[9px] sm:text-[10px] text-slate-500 mt-1.5 flex items-center space-x-1">
                 <span className="shrink-0">Chờ duyệt:</span>
-                <span className="font-extrabold text-amber-655 bg-amber-50 px-1.5 py-0.5 rounded-md border border-amber-100/30 text-[9px]">{stats.pendingIdeas}</span>
+                <span className={`font-bold px-1.5 py-0.5 rounded-md text-[9px] ${stats.pendingIdeas > 0 ? 'bg-amber-50 text-amber-600 border border-amber-100/50' : 'bg-slate-50 text-slate-500 border border-slate-100'}`}>{stats.pendingIdeas}</span>
               </div>
             </div>
-            <div className="p-2 sm:p-4 bg-gradient-to-br from-amber-50 to-amber-100/30 text-amber-500 rounded-xl shadow-inner group-hover:scale-105 transition-transform duration-300 hidden xs:flex shrink-0 ml-1">
-              <FiZap className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
+            <div className="p-2.5 bg-slate-50 text-slate-400 group-hover:bg-blue-50 group-hover:text-[#0054A6] rounded-xl transition-all duration-300 hidden xs:flex shrink-0 ml-1">
+              <FiZap className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
             </div>
           </div>
 
-          <div className="bg-white border-l-4 border-l-emerald-500 border border-y-slate-100 border-r-slate-100 rounded-2xl p-3 sm:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group">
+          <div className="bg-white border border-slate-200/80 rounded-2xl p-3 sm:p-5 shadow-sm hover:shadow-md hover:border-[#0054A6]/20 transition-all duration-300 flex items-center justify-between group">
             <div className="min-w-0 flex-1">
-              <span className="text-[9px] sm:text-[10px] uppercase font-bold text-slate-400 tracking-wider block mb-1 truncate">Đã áp dụng</span>
-              <h3 className="text-xl sm:text-3xl font-black text-emerald-650 mt-1">{stats.appliedIdeas}</h3>
-              <div className="text-[9px] sm:text-[10px] text-slate-450 mt-1.5">
-                <span className="bg-emerald-50/50 text-emerald-650 px-1.5 py-0.5 rounded-md border border-emerald-100/30 font-bold block text-center sm:inline-block text-[8px] sm:text-[9px]">Đã vào thực tế</span>
+              <span className="text-[9px] sm:text-[10px] uppercase font-bold text-slate-450 tracking-wider block mb-1 truncate">Đã áp dụng</span>
+              <h3 className="text-xl sm:text-2xl font-black text-slate-800 mt-1">{stats.appliedIdeas}</h3>
+              <div className="text-[9px] sm:text-[10px] text-slate-500 mt-1.5">
+                <span className="bg-blue-50/50 text-[#0054A6] px-1.5 py-0.5 rounded-md border border-blue-100/30 font-bold block text-center sm:inline-block text-[8px] sm:text-[9px]">Sáng kiến thực tế</span>
               </div>
             </div>
-            <div className="p-2 sm:p-4 bg-gradient-to-br from-emerald-50 to-emerald-100/30 text-emerald-500 rounded-xl shadow-inner group-hover:scale-105 transition-transform duration-300 hidden xs:flex shrink-0 ml-1">
-              <FiCheck className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
+            <div className="p-2.5 bg-slate-50 text-slate-400 group-hover:bg-blue-50 group-hover:text-[#0054A6] rounded-xl transition-all duration-300 hidden xs:flex shrink-0 ml-1">
+              <FiCheck className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
             </div>
           </div>
 
-          <div className="bg-white border-l-4 border-l-purple-500 border border-y-slate-100 border-r-slate-100 rounded-2xl p-3 sm:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group">
+          <div className="bg-white border border-slate-200/80 rounded-2xl p-3 sm:p-5 shadow-sm hover:shadow-md hover:border-[#0054A6]/20 transition-all duration-300 flex items-center justify-between group">
             <div className="min-w-0 flex-1">
-              <span className="text-[9px] sm:text-[10px] uppercase font-bold text-slate-400 tracking-wider block mb-1 truncate">Liên hệ & Góp ý</span>
-              <h3 className="text-xl sm:text-3xl font-black text-purple-650 mt-1">{stats.totalFeedbacks}</h3>
-              <div className="text-[9px] sm:text-[10px] text-slate-455 mt-1.5 flex items-center space-x-1">
+              <span className="text-[9px] sm:text-[10px] uppercase font-bold text-slate-455 tracking-wider block mb-1 truncate">Liên hệ góp ý</span>
+              <h3 className="text-xl sm:text-2xl font-black text-slate-800 mt-1">{stats.totalFeedbacks}</h3>
+              <div className="text-[9px] sm:text-[10px] text-slate-500 mt-1.5 flex items-center space-x-1">
                 <span className="shrink-0">Chưa xử lý:</span>
-                <span className="font-extrabold text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded-md border border-purple-100/30 text-[9px]">{stats.pendingFeedbacks}</span>
+                <span className={`font-bold px-1.5 py-0.5 rounded-md text-[9px] ${stats.pendingFeedbacks > 0 ? 'bg-purple-50 text-purple-600 border border-purple-100/50' : 'bg-slate-50 text-slate-500 border border-slate-100'}`}>{stats.pendingFeedbacks}</span>
               </div>
             </div>
-            <div className="p-2 sm:p-4 bg-gradient-to-br from-purple-50 to-purple-100/30 text-purple-500 rounded-xl shadow-inner group-hover:scale-105 transition-transform duration-300 hidden xs:flex shrink-0 ml-1">
-              <FiMail className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
+            <div className="p-2.5 bg-slate-50 text-slate-400 group-hover:bg-blue-50 group-hover:text-[#0054A6] rounded-xl transition-all duration-300 hidden xs:flex shrink-0 ml-1">
+              <FiMail className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
             </div>
           </div>
 
-          <div className="bg-white border-l-4 border-l-[#0054A6] border border-y-slate-100 border-r-slate-100 rounded-2xl p-3 sm:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group">
+          <div className="bg-white border border-slate-200/80 rounded-2xl p-3 sm:p-5 shadow-sm hover:shadow-md hover:border-[#0054A6]/20 transition-all duration-300 flex items-center justify-between group">
             <div className="min-w-0 flex-1">
-              <span className="text-[9px] sm:text-[10px] uppercase font-bold text-slate-400 tracking-wider block mb-1 truncate">Bài viết tin tức</span>
-              <h3 className="text-xl sm:text-3xl font-black text-[#0054A6] mt-1">{stats.totalNews}</h3>
-              <div className="text-[9px] sm:text-[10px] text-slate-455 mt-1.5">
+              <span className="text-[9px] sm:text-[10px] uppercase font-bold text-slate-455 tracking-wider block mb-1 truncate">Bài viết tin tức</span>
+              <h3 className="text-xl sm:text-2xl font-black text-slate-800 mt-1">{stats.totalNews}</h3>
+              <div className="text-[9px] sm:text-[10px] text-slate-500 mt-1.5">
                 <span className="bg-blue-50/50 text-[#0054A6] px-1.5 py-0.5 rounded-md border border-blue-100/30 font-bold block text-center sm:inline-block text-[8px] sm:text-[9px]">Đã đăng tin</span>
               </div>
             </div>
-             <div className="p-2 sm:p-4 bg-gradient-to-br from-blue-50 to-blue-100/30 text-[#0054A6] rounded-xl shadow-inner group-hover:scale-105 transition-transform duration-300 hidden xs:flex shrink-0 ml-1">
-              <FiFileText className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
+            <div className="p-2.5 bg-slate-50 text-slate-400 group-hover:bg-blue-50 group-hover:text-[#0054A6] rounded-xl transition-all duration-300 hidden xs:flex shrink-0 ml-1">
+              <FiFileText className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
             </div>
           </div>
         </div>
@@ -342,7 +342,7 @@ export default function AdminDashboard() {
             onClick={() => setActiveTab('feedbacks')}
             className={`shrink-0 pb-4 px-1 text-xs sm:text-sm font-bold transition-all duration-300 flex items-center space-x-2 border-b-2 ${
               activeTab === 'feedbacks' 
-                ? 'border-purple-500 text-purple-600' 
+                ? 'border-[#0054A6] text-[#0054A6]' 
                 : 'border-transparent text-slate-400 hover:text-slate-700'
             }`}
           >
@@ -366,7 +366,7 @@ export default function AdminDashboard() {
             onClick={() => setActiveTab('trash')}
             className={`shrink-0 pb-4 px-1 text-xs sm:text-sm font-bold transition-all duration-300 flex items-center space-x-2 border-b-2 ${
               activeTab === 'trash' 
-                ? 'border-red-500 text-red-600' 
+                ? 'border-[#0054A6] text-[#0054A6]' 
                 : 'border-transparent text-slate-400 hover:text-slate-700'
             }`}
           >
