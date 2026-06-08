@@ -796,58 +796,7 @@ export default function Fanpage() {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Hình ảnh đính kèm</label>
-                
-                {postForm.image ? (
-                  /* Khung hiển thị ảnh xem trước (Preview) */
-                  <div className="relative rounded-xl overflow-hidden border border-gray-200 bg-gray-50 max-h-[220px] flex items-center justify-center group">
-                    <img 
-                      src={postForm.image} 
-                      alt="Xem trước ảnh tải lên" 
-                      className="w-full h-full object-cover max-h-[220px]"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setPostForm({ ...postForm, image: '' })}
-                      className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-black/80 text-white rounded-full transition-colors shadow"
-                      title="Xóa ảnh"
-                    >
-                      <FiX className="w-4 h-4" />
-                    </button>
-                  </div>
-                ) : (
-                  /* Khung chọn ảnh */
-                  <div className="space-y-3">
-                    {/* Vùng tải file từ máy tính */}
-                    <label className="border-2 border-dashed border-gray-200 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer hover:border-[#0054A6]/50 hover:bg-blue-50/10 transition-all space-y-1">
-                      <FiUpload className="w-6 h-6 text-gray-400" />
-                      <span className="text-xs font-bold text-[#0054A6]">Tải ảnh lên từ thiết bị</span>
-                      <span className="text-[10px] text-gray-450">Hỗ trợ định dạng JPG, PNG, WEBP (Tối đa 4MB)</span>
-                      <input 
-                        type="file" 
-                        accept="image/*" 
-                        onChange={handleFileChange} 
-                        className="hidden" 
-                      />
-                    </label>
-                    
-                    {/* Nhập link URL thay thế */}
-                    <div className="relative">
-                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-450 text-xs">
-                        <FiImage />
-                      </span>
-                      <input
-                        type="url"
-                        placeholder="Hoặc dán URL ảnh có sẵn vào đây..."
-                        value={postForm.image}
-                        onChange={(e) => setPostForm({ ...postForm, image: e.target.value })}
-                        className="w-full bg-white border border-gray-200 rounded-xl pl-9 pr-3 py-2.5 text-xs focus:outline-none focus:border-[#0054A6] text-gray-800 shadow-inner"
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
+
 
               <div className="flex items-center justify-end space-x-3 pt-3 border-t border-gray-100">
                 <button
