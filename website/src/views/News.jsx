@@ -253,7 +253,7 @@ export default function News() {
   if (activePost) {
     return (
       <div className="bg-gray-50 text-gray-800 py-10 md:py-16">
-        <div className="max-w-4xl mx-auto px-4">
+        <div className="max-w-5xl mx-auto px-4">
 
           <button
             onClick={() => setActivePost(null)}
@@ -264,13 +264,11 @@ export default function News() {
           </button>
 
           <article className="bg-white border border-gray-200/80 rounded-3xl p-6 md:p-10 shadow-lg animate-fadeIn">
-            <img
-              src={activePost.image}
-              alt={activePost.title}
-              className="w-full h-64 md:h-[400px] object-cover rounded-2xl mb-8 shadow-sm"
-            />
+            <h1 className="text-xl sm:text-2xl md:text-4xl font-extrabold mb-4 leading-snug text-gray-800">
+              {activePost.title}
+            </h1>
 
-            <div className="flex flex-wrap items-center gap-4 text-xs md:text-sm text-gray-500 mb-6">
+            <div className="flex flex-wrap items-center gap-4 text-xs md:text-sm text-gray-500 mb-6 pb-4 border-b border-gray-100">
               <span className="px-3 py-1 rounded-full bg-blue-50 text-[#0054A6] border border-blue-100 flex items-center space-x-1 font-semibold">
                 <FiTag className="w-3.5 h-3.5" />
                 <span>{activePost.category}</span>
@@ -285,9 +283,15 @@ export default function News() {
               </span>
             </div>
 
-            <h1 className="text-xl sm:text-2xl md:text-4xl font-extrabold mb-6 leading-snug text-gray-800">
-              {activePost.title}
-            </h1>
+            {activePost.image && (
+              <div className="mb-8 overflow-hidden rounded-2xl shadow-sm border border-gray-105">
+                <img
+                  src={activePost.image}
+                  alt={activePost.title}
+                  className="w-full h-64 md:h-[400px] object-cover"
+                />
+              </div>
+            )}
 
             <div className="text-gray-655 leading-relaxed text-sm md:text-base border-t border-gray-100 pt-6">
               {renderContent(activePost.content)}
@@ -451,7 +455,7 @@ export default function News() {
       {/* 🔐 Modal Đăng Tin Tức Mới dành cho Admin */}
       {showAddModal && createPortal(
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/55 backdrop-blur-sm p-4 animate-fadeIn">
-          <div className="bg-white border border-gray-200/80 w-full max-w-2xl rounded-3xl p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+          <div className="bg-white border border-gray-200/80 w-full max-w-3xl rounded-3xl p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <h3 className="text-lg font-black text-gray-800 mb-5 flex items-center space-x-2 border-b border-gray-100 pb-3">
               <FiTag className="text-[#0054A6] w-5 h-5" />
               <span>Đăng Tin Tức & Sự Kiện Mới</span>
@@ -670,7 +674,7 @@ export default function News() {
       {/* 🔐 Modal Chỉnh Sửa Tin Tức dành cho Admin */}
       {showEditModal && createPortal(
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/55 backdrop-blur-sm p-4 animate-fadeIn">
-          <div className="bg-white border border-gray-200/80 w-full max-w-2xl rounded-3xl p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+          <div className="bg-white border border-gray-200/80 w-full max-w-3xl rounded-3xl p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <h3 className="text-lg font-black text-gray-800 mb-5 flex items-center space-x-2 border-b border-gray-100 pb-3">
               <FiEdit className="text-[#0054A6] w-5 h-5" />
               <span>Chỉnh Sửa Tin Tức & Sự Kiện</span>

@@ -831,7 +831,7 @@ export default function AdminDashboard() {
         {/* 🔐 Modal Đăng Bài Viết Mới */}
         {showAddPost && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/55 backdrop-blur-sm p-4 animate-fadeIn">
-            <div className="bg-white border border-gray-200/80 w-full max-w-2xl rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xl relative max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
+            <div className="bg-white border border-gray-200/80 w-full max-w-3xl rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xl relative max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
               <h3 className="text-lg font-black text-gray-800 mb-5 flex items-center space-x-2 border-b border-gray-100 pb-3">
                 <FiFileText className="text-[#0054A6] w-5 h-5" />
                 <span>Đăng Bài Viết Tin Tức Mới</span>
@@ -1033,7 +1033,7 @@ export default function AdminDashboard() {
         {/* 🔐 Modal Chỉnh Sửa Bài Viết */}
         {showEditPost && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/55 backdrop-blur-sm p-4 animate-fadeIn">
-            <div className="bg-white border border-gray-200/80 w-full max-w-2xl rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xl relative max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
+            <div className="bg-white border border-gray-200/80 w-full max-w-3xl rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xl relative max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
               <h3 className="text-lg font-black text-gray-800 mb-5 flex items-center space-x-2 border-b border-gray-100 pb-3">
                 <FiEdit className="text-[#0054A6] w-5 h-5" />
                 <span>Chỉnh Sửa Bài Viết Tin Tức</span>

@@ -321,25 +321,26 @@ export default function Fanpage() {
   if (activePost) {
     return (
       <div className="bg-gray-50 text-gray-800 py-6 sm:py-10 md:py-16">
-        <div className="max-w-4xl mx-auto px-4 pt-6">
-
+        <div className="max-w-5xl mx-auto px-4 pt-6">
           <article className="bg-white border border-gray-200/80 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-10 shadow-lg animate-fadeIn">
-            {activePost.image && (
-              <img
-                src={activePost.image}
-                alt={activePost.title}
-                className="w-full h-48 sm:h-64 md:h-[400px] object-cover rounded-2xl mb-8 shadow-sm"
-              />
-            )}
+            <h1 className="text-lg sm:text-2xl md:text-3xl font-black mb-4 leading-snug text-gray-800">
+              {activePost.title}
+            </h1>
 
-            <div className="flex items-center text-xs text-gray-400 mb-4 font-bold uppercase tracking-wider">
+            <div className="flex items-center text-xs text-gray-400 mb-6 font-bold uppercase tracking-wider">
               <FiCalendar className="w-4 h-4 mr-1.5" />
               <span>{formatDate(activePost.createdAt || activePost.time)}</span>
             </div>
 
-            <h1 className="text-lg sm:text-2xl md:text-3xl font-black mb-6 leading-snug text-gray-800">
-              {activePost.title}
-            </h1>
+            {activePost.image && (
+              <div className="mb-8 overflow-hidden rounded-2xl shadow-sm border border-gray-100/60">
+                <img
+                  src={activePost.image}
+                  alt={activePost.title}
+                  className="w-full h-48 sm:h-64 md:h-[400px] object-cover"
+                />
+              </div>
+            )}
 
             <div className="text-gray-655 leading-relaxed text-xs sm:text-sm md:text-base border-t border-gray-100 pt-6">
               {renderContent(activePost.content)}
@@ -663,7 +664,7 @@ export default function Fanpage() {
       {/* 🔐 Modal Đăng Bài Viết Mới */}
       {showAddModal && createPortal(
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/55 backdrop-blur-sm p-4 animate-fadeIn">
-          <div className="bg-white border border-gray-200/80 w-full max-w-lg rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xl relative max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
+          <div className="bg-white border border-gray-200/80 w-full max-w-3xl rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xl relative max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
             <h3 className="text-lg font-black text-gray-800 mb-5 flex items-center space-x-2 border-b border-gray-100 pb-3">
               <FiPlusCircle className="text-[#0054A6] w-5 h-5" />
               <span>Đăng Bài Viết Mới</span>
