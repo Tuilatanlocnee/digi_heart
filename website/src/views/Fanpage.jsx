@@ -210,9 +210,26 @@ export default function Fanpage() {
     reader.readAsDataURL(file);
   };
 
+  const handlePastePlain = (e) => {
+    e.preventDefault();
+    const text = e.clipboardData.getData('text/plain');
+    document.execCommand('insertText', false, text);
+  };
+
   // Các hàm tiện ích cho Block Editor (nội dung xen kẽ chữ/ảnh)
+  const syncBlocksFromDOM = (currentBlocks) => {
+    return currentBlocks.map((block, idx) => {
+      if (block.type === 'text') {
+        const editor = document.getElementById(`editor-add-${idx}`);
+        return { ...block, value: editor ? editor.innerHTML : block.value };
+      }
+      return block;
+    });
+  };
+
   const addBlock = (type) => {
-    setPostBlocks([...postBlocks, { type, value: '' }]);
+    const synced = syncBlocksFromDOM(postBlocks);
+    setPostBlocks([...synced, { type, value: '' }]);
   };
 
   const updateBlockValue = (index, val) => {
@@ -221,19 +238,41 @@ export default function Fanpage() {
     setPostBlocks(updated);
   };
 
+  const handleFormatText = (idx, formatType, colorValue = null, editorId) => {
+    const editor = document.getElementById(editorId);
+    if (!editor) return;
+
+    editor.focus();
+
+    if (formatType === 'bold') {
+      document.execCommand('bold', false, null);
+    } else if (formatType === 'italic') {
+      document.execCommand('italic', false, null);
+    } else if (formatType === 'underline') {
+      document.execCommand('underline', false, null);
+    } else if (formatType === 'color' && colorValue) {
+      document.execCommand('foreColor', false, colorValue);
+    }
+
+    // Cập nhật lại giá trị block
+    updateBlockValue(idx, editor.innerHTML);
+  };
+
   const deleteBlock = (index) => {
-    if (postBlocks.length === 1) {
+    const synced = syncBlocksFromDOM(postBlocks);
+    if (synced.length === 1) {
       setPostBlocks([{ type: 'text', value: '' }]);
       return;
     }
-    setPostBlocks(postBlocks.filter((_, i) => i !== index));
+    setPostBlocks(synced.filter((_, i) => i !== index));
   };
 
   const moveBlock = (index, direction) => {
+    const synced = syncBlocksFromDOM(postBlocks);
     if (direction === 'up' && index === 0) return;
-    if (direction === 'down' && index === postBlocks.length - 1) return;
+    if (direction === 'down' && index === synced.length - 1) return;
     const targetIndex = direction === 'up' ? index - 1 : index + 1;
-    const updated = [...postBlocks];
+    const updated = [...synced];
     const temp = updated[index];
     updated[index] = updated[targetIndex];
     updated[targetIndex] = temp;
@@ -262,8 +301,11 @@ export default function Fanpage() {
       return;
     }
 
+    // Lấy nội dung mới nhất từ các contentEditable
+    const syncedBlocks = syncBlocksFromDOM(postBlocks);
+    
     // Lọc bỏ block trống
-    const validBlocks = postBlocks.filter(b => b.value.trim() !== '');
+    const validBlocks = syncedBlocks.filter(b => b.value.trim() !== '' && b.value !== '<br>' && b.value !== '<div><br></div>');
     if (validBlocks.length === 0) {
       alert('Vui lòng điền nội dung bài viết!');
       return;
@@ -321,28 +363,39 @@ export default function Fanpage() {
   if (activePost) {
     return (
       <div className="bg-gray-50 text-gray-800 py-6 sm:py-10 md:py-16">
-        <div className="max-w-5xl mx-auto px-4 pt-6">
-          <article className="bg-white border border-gray-200/80 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-10 shadow-lg animate-fadeIn">
-            <h1 className="text-lg sm:text-2xl md:text-3xl font-black mb-4 leading-snug text-gray-800">
-              {activePost.title}
-            </h1>
-
-            <div className="flex items-center text-xs text-gray-400 mb-6 font-bold uppercase tracking-wider">
-              <FiCalendar className="w-4 h-4 mr-1.5" />
-              <span>{formatDate(activePost.createdAt || activePost.time)}</span>
-            </div>
-
-            {activePost.image && (
-              <div className="mb-8 overflow-hidden rounded-2xl shadow-sm border border-gray-100/60">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+          <article className="relative animate-fadeIn">
+            {/* Vùng ảnh banner lớn */}
+            {activePost.image ? (
+              <div className="relative rounded-3xl overflow-hidden shadow-lg border border-gray-100/60 h-64 sm:h-96 md:h-[450px]">
                 <img
                   src={activePost.image}
                   alt={activePost.title}
-                  className="w-full h-48 sm:h-64 md:h-[400px] object-cover"
+                  className="w-full h-full object-cover"
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent"></div>
+              </div>
+            ) : (
+              // Nền xanh MobiFone khi không có ảnh
+              <div className="relative rounded-3xl overflow-hidden shadow-lg h-40 bg-gradient-to-r from-[#002f6c] to-[#0054A6] flex items-center justify-center">
+                <span className="text-white/20 font-black text-4xl sm:text-5xl select-none">DIGI HEART</span>
               </div>
             )}
 
-            <div className="text-gray-655 leading-relaxed text-xs sm:text-sm md:text-base border-t border-gray-100 pt-6">
+            {/* Block Tiêu đề màu trắng đè lên góc dưới của ảnh banner */}
+            <div className="relative -mt-16 sm:-mt-20 mx-4 sm:mx-8 bg-white border border-gray-200/80 rounded-2xl p-5 sm:p-8 shadow-xl z-10 transition-all">
+              <h1 className="text-lg sm:text-2xl md:text-3xl font-black leading-snug text-gray-800 mb-4 sm:mb-6">
+                {activePost.title}
+              </h1>
+
+              <div className="flex items-center space-x-2 text-xs text-gray-400 border-t border-gray-100 pt-4 font-bold uppercase tracking-wider">
+                <FiCalendar className="w-4 h-4 text-gray-400" />
+                <span>{formatDate(activePost.createdAt || activePost.time)}</span>
+              </div>
+            </div>
+
+            {/* Nội dung chi tiết bài viết */}
+            <div className="bg-white border border-gray-200/80 rounded-3xl p-5 sm:p-8 md:p-10 shadow-lg mt-8 text-gray-655 leading-relaxed text-xs sm:text-sm md:text-base">
               {renderContent(activePost.content)}
             </div>
           </article>
@@ -764,13 +817,71 @@ export default function Fanpage() {
                       </div>
 
                       {block.type === 'text' ? (
-                        <textarea
-                          rows="3"
-                          value={block.value}
-                          onChange={(e) => updateBlockValue(idx, e.target.value)}
-                          className="w-full bg-white border border-gray-200 rounded-lg p-2 text-xs focus:outline-none focus:border-[#0054A6] text-gray-800 resize-y"
-                          placeholder="Nhập nội dung đoạn văn bản tại đây..."
-                        />
+                        <div className="space-y-1.5">
+                          {/* Thanh công cụ định dạng Rich Text */}
+                          <div className="flex flex-wrap items-center gap-1.5 bg-white border border-gray-200/80 rounded-lg p-1.5 shadow-sm">
+                            <button
+                              type="button"
+                              onMouseDown={(e) => e.preventDefault()}
+                              onClick={() => handleFormatText(idx, 'bold', null, `editor-add-${idx}`)}
+                              className="px-2 py-0.5 bg-gray-55 hover:bg-gray-100 border border-gray-200 rounded text-[10px] font-bold text-gray-700 transition-colors"
+                              title="In đậm"
+                            >
+                              B
+                            </button>
+                            <button
+                              type="button"
+                              onMouseDown={(e) => e.preventDefault()}
+                              onClick={() => handleFormatText(idx, 'italic', null, `editor-add-${idx}`)}
+                              className="px-2 py-0.5 bg-gray-55 hover:bg-gray-100 border border-gray-200 rounded text-[10px] italic text-gray-700 transition-colors"
+                              title="In nghiêng"
+                            >
+                              I
+                            </button>
+                            <button
+                              type="button"
+                              onMouseDown={(e) => e.preventDefault()}
+                              onClick={() => handleFormatText(idx, 'underline', null, `editor-add-${idx}`)}
+                              className="px-2 py-0.5 bg-gray-55 hover:bg-gray-100 border border-gray-200 rounded text-[10px] underline text-gray-700 transition-colors"
+                              title="Gạch chân"
+                            >
+                              U
+                            </button>
+                            
+                            <div className="w-px h-4 bg-gray-200 mx-1"></div>
+                            
+                            {/* Bảng màu mini */}
+                            <div className="flex items-center space-x-1">
+                              {[
+                                { color: '#0054A6', title: 'Xanh MobiFone' },
+                                { color: '#E60023', title: 'Đỏ MobiFone' },
+                                { color: '#2E7D32', title: 'Xanh lá' },
+                                { color: '#EF6C00', title: 'Cam' },
+                                { color: '#7B1FA2', title: 'Tím' },
+                                { color: '#1F2937', title: 'Đen' }
+                              ].map((item) => (
+                                <button
+                                  key={item.color}
+                                  type="button"
+                                  onMouseDown={(e) => e.preventDefault()}
+                                  onClick={() => handleFormatText(idx, 'color', item.color, `editor-add-${idx}`)}
+                                  className="w-3.5 h-3.5 rounded-full border border-gray-300 hover:scale-110 active:scale-95 transition-transform"
+                                  style={{ backgroundColor: item.color }}
+                                  title={item.title}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                          <div
+                            id={`editor-add-${idx}`}
+                            contentEditable
+                            suppressContentEditableWarning={true}
+                            dangerouslySetInnerHTML={{ __html: block.value }}
+                            onPaste={handlePastePlain}
+                            className="w-full bg-white border border-gray-200 rounded-lg p-2.5 text-xs focus:outline-none focus:border-[#0054A6] text-gray-800 min-h-[90px] outline-none overflow-y-auto"
+                            placeholder="Nhập nội dung đoạn văn bản tại đây..."
+                          />
+                        </div>
                       ) : (
                         <div className="space-y-2">
                           {block.value ? (

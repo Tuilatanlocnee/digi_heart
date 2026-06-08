@@ -81,9 +81,46 @@ export default function News() {
     }
   }, []);
 
+  const handlePastePlain = (e) => {
+    e.preventDefault();
+    const text = e.clipboardData.getData('text/plain');
+    document.execCommand('insertText', false, text);
+  };
+
   // Các hàm tiện ích cho Block Editor (nội dung xen kẽ chữ/ảnh)
-  const addBlock = (type) => {
-    setNewsBlocks([...newsBlocks, { type, value: '' }]);
+  const syncBlocksFromDOM = (currentBlocks, prefix = 'add') => {
+    return currentBlocks.map((block, idx) => {
+      if (block.type === 'text') {
+        const editor = document.getElementById(`editor-${prefix}-${idx}`);
+        return { ...block, value: editor ? editor.innerHTML : block.value };
+      }
+      return block;
+    });
+  };
+
+  const handleFormatText = (idx, formatType, colorValue = null, editorId) => {
+    const editor = document.getElementById(editorId);
+    if (!editor) return;
+
+    editor.focus();
+
+    if (formatType === 'bold') {
+      document.execCommand('bold', false, null);
+    } else if (formatType === 'italic') {
+      document.execCommand('italic', false, null);
+    } else if (formatType === 'underline') {
+      document.execCommand('underline', false, null);
+    } else if (formatType === 'color' && colorValue) {
+      document.execCommand('foreColor', false, colorValue);
+    }
+
+    // Cập nhật lại giá trị block
+    updateBlockValue(idx, editor.innerHTML);
+  };
+
+  const addBlock = (type, prefix = 'add') => {
+    const synced = syncBlocksFromDOM(newsBlocks, prefix);
+    setNewsBlocks([...synced, { type, value: '' }]);
   };
 
   const updateBlockValue = (index, val) => {
@@ -92,19 +129,21 @@ export default function News() {
     setNewsBlocks(updated);
   };
 
-  const deleteBlock = (index) => {
-    if (newsBlocks.length === 1) {
+  const deleteBlock = (index, prefix = 'add') => {
+    const synced = syncBlocksFromDOM(newsBlocks, prefix);
+    if (synced.length === 1) {
       setNewsBlocks([{ type: 'text', value: '' }]);
       return;
     }
-    setNewsBlocks(newsBlocks.filter((_, i) => i !== index));
+    setNewsBlocks(synced.filter((_, i) => i !== index));
   };
 
-  const moveBlock = (index, direction) => {
+  const moveBlock = (index, direction, prefix = 'add') => {
+    const synced = syncBlocksFromDOM(newsBlocks, prefix);
     if (direction === 'up' && index === 0) return;
-    if (direction === 'down' && index === newsBlocks.length - 1) return;
+    if (direction === 'down' && index === synced.length - 1) return;
     const targetIndex = direction === 'up' ? index - 1 : index + 1;
-    const updated = [...newsBlocks];
+    const updated = [...synced];
     const temp = updated[index];
     updated[index] = updated[targetIndex];
     updated[targetIndex] = temp;
@@ -133,7 +172,8 @@ export default function News() {
       return;
     }
 
-    const validBlocks = newsBlocks.filter(b => b.value.trim() !== '');
+    const syncedBlocks = syncBlocksFromDOM(newsBlocks, 'add');
+    const validBlocks = syncedBlocks.filter(b => b.value.trim() !== '' && b.value !== '<br>' && b.value !== '<div><br></div>');
     if (validBlocks.length === 0) {
       alert('Vui lòng điền nội dung bài viết!');
       return;
@@ -202,7 +242,8 @@ export default function News() {
       return;
     }
 
-    const validBlocks = newsBlocks.filter(b => b.value.trim() !== '');
+    const syncedBlocks = syncBlocksFromDOM(newsBlocks, 'edit');
+    const validBlocks = syncedBlocks.filter(b => b.value.trim() !== '' && b.value !== '<br>' && b.value !== '<div><br></div>');
     if (validBlocks.length === 0) {
       alert('Vui lòng điền nội dung bài viết!');
       return;
@@ -253,47 +294,40 @@ export default function News() {
   if (activePost) {
     return (
       <div className="bg-gray-50 text-gray-800 py-10 md:py-16">
-        <div className="max-w-5xl mx-auto px-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-          <button
-            onClick={() => setActivePost(null)}
-            className="flex items-center space-x-2 text-[#0054A6] hover:text-[#003f7f] transition-colors mb-8 group font-semibold"
-          >
-            <FiArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-            <span>Quay lại danh sách tin tức</span>
-          </button>
-
-          <article className="bg-white border border-gray-200/80 rounded-3xl p-6 md:p-10 shadow-lg animate-fadeIn">
-            <h1 className="text-xl sm:text-2xl md:text-4xl font-extrabold mb-4 leading-snug text-gray-800">
-              {activePost.title}
-            </h1>
-
-            <div className="flex flex-wrap items-center gap-4 text-xs md:text-sm text-gray-500 mb-6 pb-4 border-b border-gray-100">
-              <span className="px-3 py-1 rounded-full bg-blue-50 text-[#0054A6] border border-blue-100 flex items-center space-x-1 font-semibold">
-                <FiTag className="w-3.5 h-3.5" />
-                <span>{activePost.category}</span>
-              </span>
-              <span className="flex items-center space-x-1">
-                <FiCalendar className="w-4 h-4 text-gray-400" />
-                <span>{activePost.date}</span>
-              </span>
-              <span className="flex items-center space-x-1">
-                <FiUser className="w-4 h-4 text-gray-400" />
-                <span>Người viết: {activePost.author}</span>
-              </span>
-            </div>
-
-            {activePost.image && (
-              <div className="mb-8 overflow-hidden rounded-2xl shadow-sm border border-gray-105">
+          <article className="relative animate-fadeIn">
+            {/* Vùng ảnh banner lớn */}
+            {activePost.image ? (
+              <div className="relative rounded-3xl overflow-hidden shadow-lg border border-gray-100/60 h-64 sm:h-96 md:h-[480px]">
                 <img
                   src={activePost.image}
                   alt={activePost.title}
-                  className="w-full h-64 md:h-[400px] object-cover"
+                  className="w-full h-full object-cover"
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent"></div>
+              </div>
+            ) : (
+              // Background gradient xanh MobiFone khi không có banner
+              <div className="relative rounded-3xl overflow-hidden shadow-lg h-44 bg-gradient-to-r from-[#002f6c] to-[#0054A6] flex items-center justify-center">
+                <span className="text-white/20 font-black text-4xl sm:text-6xl select-none">DIGI HEART</span>
               </div>
             )}
 
-            <div className="text-gray-655 leading-relaxed text-sm md:text-base border-t border-gray-100 pt-6">
+            {/* Block Tiêu đề màu trắng đè lên góc dưới của ảnh banner */}
+            <div className="relative -mt-16 sm:-mt-24 mx-4 sm:mx-8 bg-white border border-gray-200/80 rounded-2xl p-5 sm:p-8 shadow-xl z-10 transition-all">
+              <h1 className="text-lg sm:text-2xl md:text-3xl font-black leading-snug text-gray-800 mb-4 sm:mb-6">
+                {activePost.title}
+              </h1>
+
+              <div className="flex items-center space-x-2 text-xs text-gray-400 border-t border-gray-100 pt-4 font-bold uppercase tracking-wider">
+                <FiCalendar className="w-4 h-4 text-gray-400" />
+                <span>{activePost.date}</span>
+              </div>
+            </div>
+
+            {/* Nội dung chi tiết tin tức */}
+            <div className="bg-white border border-gray-200/80 rounded-3xl p-6 sm:p-8 md:p-10 shadow-lg mt-8 text-gray-655 leading-relaxed text-sm md:text-base">
               {renderContent(activePost.content)}
             </div>
           </article>
@@ -502,14 +536,49 @@ export default function News() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Link ảnh đại diện (URL)</label>
-                  <input
-                    type="url"
-                    value={newsForm.image}
-                    onChange={(e) => setNewsForm({ ...newsForm, image: e.target.value })}
-                    className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#0054A6] text-gray-800 shadow-inner"
-                    placeholder="https://images.unsplash.com/..."
-                  />
+                  <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Ảnh banner tin tức (Ảnh đại diện)</label>
+                  {newsForm.image ? (
+                    <div className="relative rounded-xl overflow-hidden border border-gray-200 bg-gray-50 max-h-[160px] flex items-center justify-center group">
+                      <img 
+                        src={newsForm.image} 
+                        alt="Xem trước ảnh banner" 
+                        className="w-full h-full object-cover max-h-[160px]"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setNewsForm({ ...newsForm, image: '' })}
+                        className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-black/80 text-white rounded-full transition-colors shadow"
+                        title="Xóa ảnh banner"
+                      >
+                        <FiX className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="w-full">
+                      <label className="border border-dashed border-gray-300 rounded-lg p-2.5 flex flex-col items-center justify-center cursor-pointer hover:bg-blue-50/10 hover:border-[#0054A6]/50 transition-all">
+                        <FiUpload className="w-4 h-4 text-gray-400 mb-1" />
+                        <span className="text-[10px] font-bold text-[#0054A6]">Tải ảnh lên từ thiết bị</span>
+                        <input 
+                          type="file" 
+                          accept="image/*" 
+                          onChange={(e) => {
+                            const file = e.target.files[0];
+                            if (!file) return;
+                            if (file.size > 4 * 1024 * 1024) {
+                              alert('Kích thước ảnh quá lớn! Vui lòng chọn file ảnh dưới 4MB.');
+                              return;
+                            }
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                              setNewsForm({ ...newsForm, image: reader.result });
+                            };
+                            reader.readAsDataURL(file);
+                          }} 
+                          className="hidden" 
+                        />
+                      </label>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -539,7 +608,7 @@ export default function News() {
                         <div className="flex items-center space-x-1">
                           <button
                             type="button"
-                            onClick={() => moveBlock(idx, 'up')}
+                            onClick={() => moveBlock(idx, 'up', 'add')}
                             disabled={idx === 0}
                             className="p-1 hover:bg-gray-200 disabled:opacity-30 rounded text-gray-555"
                             title="Di chuyển lên"
@@ -548,7 +617,7 @@ export default function News() {
                           </button>
                           <button
                             type="button"
-                            onClick={() => moveBlock(idx, 'down')}
+                            onClick={() => moveBlock(idx, 'down', 'add')}
                             disabled={idx === newsBlocks.length - 1}
                             className="p-1 hover:bg-gray-200 disabled:opacity-30 rounded text-gray-555"
                             title="Di chuyển xuống"
@@ -557,7 +626,7 @@ export default function News() {
                           </button>
                           <button
                             type="button"
-                            onClick={() => deleteBlock(idx)}
+                            onClick={() => deleteBlock(idx, 'add')}
                             className="p-1 hover:bg-red-50 hover:text-red-500 rounded text-gray-400 transition-colors"
                             title="Xóa block"
                           >
@@ -567,13 +636,71 @@ export default function News() {
                       </div>
 
                       {block.type === 'text' ? (
-                        <textarea
-                          rows="3"
-                          value={block.value}
-                          onChange={(e) => updateBlockValue(idx, e.target.value)}
-                          className="w-full bg-white border border-gray-200 rounded-lg p-2 text-xs focus:outline-none focus:border-[#0054A6] text-gray-800 resize-y"
-                          placeholder="Nhập nội dung đoạn văn bản tại đây..."
-                        />
+                        <div className="space-y-1.5">
+                          {/* Thanh công cụ định dạng Rich Text */}
+                          <div className="flex flex-wrap items-center gap-1.5 bg-white border border-gray-200/80 rounded-lg p-1.5 shadow-sm">
+                            <button
+                              type="button"
+                              onMouseDown={(e) => e.preventDefault()}
+                              onClick={() => handleFormatText(idx, 'bold', null, `editor-add-${idx}`)}
+                              className="px-2 py-0.5 bg-gray-55 hover:bg-gray-100 border border-gray-200 rounded text-[10px] font-bold text-gray-700 transition-colors"
+                              title="In đậm"
+                            >
+                              B
+                            </button>
+                            <button
+                              type="button"
+                              onMouseDown={(e) => e.preventDefault()}
+                              onClick={() => handleFormatText(idx, 'italic', null, `editor-add-${idx}`)}
+                              className="px-2 py-0.5 bg-gray-55 hover:bg-gray-100 border border-gray-200 rounded text-[10px] italic text-gray-700 transition-colors"
+                              title="In nghiêng"
+                            >
+                              I
+                            </button>
+                            <button
+                              type="button"
+                              onMouseDown={(e) => e.preventDefault()}
+                              onClick={() => handleFormatText(idx, 'underline', null, `editor-add-${idx}`)}
+                              className="px-2 py-0.5 bg-gray-55 hover:bg-gray-100 border border-gray-200 rounded text-[10px] underline text-gray-700 transition-colors"
+                              title="Gạch chân"
+                            >
+                              U
+                            </button>
+                            
+                            <div className="w-px h-4 bg-gray-200 mx-1"></div>
+                            
+                            {/* Bảng màu mini */}
+                            <div className="flex items-center space-x-1">
+                              {[
+                                { color: '#0054A6', title: 'Xanh MobiFone' },
+                                { color: '#E60023', title: 'Đỏ MobiFone' },
+                                { color: '#2E7D32', title: 'Xanh lá' },
+                                { color: '#EF6C00', title: 'Cam' },
+                                { color: '#7B1FA2', title: 'Tím' },
+                                { color: '#1F2937', title: 'Đen' }
+                              ].map((item) => (
+                                <button
+                                  key={item.color}
+                                  type="button"
+                                  onMouseDown={(e) => e.preventDefault()}
+                                  onClick={() => handleFormatText(idx, 'color', item.color, `editor-add-${idx}`)}
+                                  className="w-3.5 h-3.5 rounded-full border border-gray-300 hover:scale-110 active:scale-95 transition-transform"
+                                  style={{ backgroundColor: item.color }}
+                                  title={item.title}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                          <div
+                            id={`editor-add-${idx}`}
+                            contentEditable
+                            suppressContentEditableWarning={true}
+                            dangerouslySetInnerHTML={{ __html: block.value }}
+                            onPaste={handlePastePlain}
+                            className="w-full bg-white border border-gray-200 rounded-lg p-2.5 text-xs focus:outline-none focus:border-[#0054A6] text-gray-800 min-h-[90px] outline-none overflow-y-auto"
+                            placeholder="Nhập nội dung đoạn văn bản tại đây..."
+                          />
+                        </div>
                       ) : (
                         <div className="space-y-2">
                           {block.value ? (
@@ -624,14 +751,14 @@ export default function News() {
                 <div className="flex items-center space-x-2 pt-1 border-t border-gray-100">
                   <button
                     type="button"
-                    onClick={() => addBlock('text')}
+                    onClick={() => addBlock('text', 'add')}
                     className="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all flex items-center justify-center space-x-1"
                   >
                     <span>+ Thêm đoạn chữ</span>
                   </button>
                   <button
                     type="button"
-                    onClick={() => addBlock('image')}
+                    onClick={() => addBlock('image', 'add')}
                     className="flex-1 py-2 bg-blue-50 hover:bg-blue-100 text-[#0054A6] text-xs font-bold rounded-xl transition-all flex items-center justify-center space-x-1"
                   >
                     <span>+ Thêm hình ảnh</span>
@@ -721,14 +848,49 @@ export default function News() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Link ảnh đại diện (URL)</label>
-                  <input
-                    type="url"
-                    value={newsForm.image}
-                    onChange={(e) => setNewsForm({ ...newsForm, image: e.target.value })}
-                    className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#0054A6] text-gray-800 shadow-inner"
-                    placeholder="https://images.unsplash.com/..."
-                  />
+                  <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Ảnh banner tin tức (Ảnh đại diện)</label>
+                  {newsForm.image ? (
+                    <div className="relative rounded-xl overflow-hidden border border-gray-200 bg-gray-50 max-h-[160px] flex items-center justify-center group">
+                      <img 
+                        src={newsForm.image} 
+                        alt="Xem trước ảnh banner" 
+                        className="w-full h-full object-cover max-h-[160px]"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setNewsForm({ ...newsForm, image: '' })}
+                        className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-black/80 text-white rounded-full transition-colors shadow"
+                        title="Xóa ảnh banner"
+                      >
+                        <FiX className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="w-full">
+                      <label className="border border-dashed border-gray-300 rounded-lg p-2.5 flex flex-col items-center justify-center cursor-pointer hover:bg-blue-50/10 hover:border-[#0054A6]/50 transition-all">
+                        <FiUpload className="w-4 h-4 text-gray-400 mb-1" />
+                        <span className="text-[10px] font-bold text-[#0054A6]">Tải ảnh lên từ thiết bị</span>
+                        <input 
+                          type="file" 
+                          accept="image/*" 
+                          onChange={(e) => {
+                            const file = e.target.files[0];
+                            if (!file) return;
+                            if (file.size > 4 * 1024 * 1024) {
+                              alert('Kích thước ảnh quá lớn! Vui lòng chọn file ảnh dưới 4MB.');
+                              return;
+                            }
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                              setNewsForm({ ...newsForm, image: reader.result });
+                            };
+                            reader.readAsDataURL(file);
+                          }} 
+                          className="hidden" 
+                        />
+                      </label>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -758,7 +920,7 @@ export default function News() {
                         <div className="flex items-center space-x-1">
                           <button
                             type="button"
-                            onClick={() => moveBlock(idx, 'up')}
+                            onClick={() => moveBlock(idx, 'up', 'edit')}
                             disabled={idx === 0}
                             className="p-1 hover:bg-gray-200 disabled:opacity-30 rounded text-gray-555"
                             title="Di chuyển lên"
@@ -767,7 +929,7 @@ export default function News() {
                           </button>
                           <button
                             type="button"
-                            onClick={() => moveBlock(idx, 'down')}
+                            onClick={() => moveBlock(idx, 'down', 'edit')}
                             disabled={idx === newsBlocks.length - 1}
                             className="p-1 hover:bg-gray-200 disabled:opacity-30 rounded text-gray-555"
                             title="Di chuyển xuống"
@@ -776,7 +938,7 @@ export default function News() {
                           </button>
                           <button
                             type="button"
-                            onClick={() => deleteBlock(idx)}
+                            onClick={() => deleteBlock(idx, 'edit')}
                             className="p-1 hover:bg-red-50 hover:text-red-500 rounded text-gray-400 transition-colors"
                             title="Xóa block"
                           >
@@ -786,13 +948,71 @@ export default function News() {
                       </div>
 
                       {block.type === 'text' ? (
-                        <textarea
-                          rows="3"
-                          value={block.value}
-                          onChange={(e) => updateBlockValue(idx, e.target.value)}
-                          className="w-full bg-white border border-gray-200 rounded-lg p-2 text-xs focus:outline-none focus:border-[#0054A6] text-gray-800 resize-y"
-                          placeholder="Nhập nội dung đoạn văn bản tại đây..."
-                        />
+                        <div className="space-y-1.5">
+                          {/* Thanh công cụ định dạng Rich Text */}
+                          <div className="flex flex-wrap items-center gap-1.5 bg-white border border-gray-200/80 rounded-lg p-1.5 shadow-sm">
+                            <button
+                              type="button"
+                              onMouseDown={(e) => e.preventDefault()}
+                              onClick={() => handleFormatText(idx, 'bold', null, `editor-edit-${idx}`)}
+                              className="px-2 py-0.5 bg-gray-55 hover:bg-gray-100 border border-gray-200 rounded text-[10px] font-bold text-gray-700 transition-colors"
+                              title="In đậm"
+                            >
+                              B
+                            </button>
+                            <button
+                              type="button"
+                              onMouseDown={(e) => e.preventDefault()}
+                              onClick={() => handleFormatText(idx, 'italic', null, `editor-edit-${idx}`)}
+                              className="px-2 py-0.5 bg-gray-55 hover:bg-gray-100 border border-gray-200 rounded text-[10px] italic text-gray-700 transition-colors"
+                              title="In nghiêng"
+                            >
+                              I
+                            </button>
+                            <button
+                              type="button"
+                              onMouseDown={(e) => e.preventDefault()}
+                              onClick={() => handleFormatText(idx, 'underline', null, `editor-edit-${idx}`)}
+                              className="px-2 py-0.5 bg-gray-55 hover:bg-gray-100 border border-gray-200 rounded text-[10px] underline text-gray-700 transition-colors"
+                              title="Gạch chân"
+                            >
+                              U
+                            </button>
+                            
+                            <div className="w-px h-4 bg-gray-200 mx-1"></div>
+                            
+                            {/* Bảng màu mini */}
+                            <div className="flex items-center space-x-1">
+                              {[
+                                { color: '#0054A6', title: 'Xanh MobiFone' },
+                                { color: '#E60023', title: 'Đỏ MobiFone' },
+                                { color: '#2E7D32', title: 'Xanh lá' },
+                                { color: '#EF6C00', title: 'Cam' },
+                                { color: '#7B1FA2', title: 'Tím' },
+                                { color: '#1F2937', title: 'Đen' }
+                              ].map((item) => (
+                                <button
+                                  key={item.color}
+                                  type="button"
+                                  onMouseDown={(e) => e.preventDefault()}
+                                  onClick={() => handleFormatText(idx, 'color', item.color, `editor-edit-${idx}`)}
+                                  className="w-3.5 h-3.5 rounded-full border border-gray-300 hover:scale-110 active:scale-95 transition-transform"
+                                  style={{ backgroundColor: item.color }}
+                                  title={item.title}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                          <div
+                            id={`editor-edit-${idx}`}
+                            contentEditable
+                            suppressContentEditableWarning={true}
+                            dangerouslySetInnerHTML={{ __html: block.value }}
+                            onPaste={handlePastePlain}
+                            className="w-full bg-white border border-gray-200 rounded-lg p-2.5 text-xs focus:outline-none focus:border-[#0054A6] text-gray-800 min-h-[90px] outline-none overflow-y-auto"
+                            placeholder="Nhập nội dung đoạn văn bản tại đây..."
+                          />
+                        </div>
                       ) : (
                         <div className="space-y-2">
                           {block.value ? (
@@ -843,14 +1063,14 @@ export default function News() {
                 <div className="flex items-center space-x-2 pt-1 border-t border-gray-100">
                   <button
                     type="button"
-                    onClick={() => addBlock('text')}
+                    onClick={() => addBlock('text', 'edit')}
                     className="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all flex items-center justify-center space-x-1"
                   >
                     <span>+ Thêm đoạn chữ</span>
                   </button>
                   <button
                     type="button"
-                    onClick={() => addBlock('image')}
+                    onClick={() => addBlock('image', 'edit')}
                     className="flex-1 py-2 bg-blue-50 hover:bg-blue-100 text-[#0054A6] text-xs font-bold rounded-xl transition-all flex items-center justify-center space-x-1"
                   >
                     <span>+ Thêm hình ảnh</span>

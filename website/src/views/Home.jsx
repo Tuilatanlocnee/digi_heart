@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { FiCpu, FiUsers, FiAward, FiBookOpen } from 'react-icons/fi';
+import ImageCarousel3D from '../components/ImageCarousel3D';
 
 /**
  * View Home - Trang chủ giới thiệu về CLB Digi Heart (Light Mode).
@@ -76,6 +77,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* 🎠 Banner ảnh xoay vòng 3D */}
+      <ImageCarousel3D />
 
       {/* 📊 Section: Số liệu Thống kê Ấn tượng (Nền xám nhạt phẳng) */}
       <section className="py-8 sm:py-12 border-b border-gray-200 bg-gray-50">
