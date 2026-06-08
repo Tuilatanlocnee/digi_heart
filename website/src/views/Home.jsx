@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { FiCpu, FiUsers, FiAward, FiBookOpen } from 'react-icons/fi';
+import { FiCpu, FiUsers, FiAward, FiFileText } from 'react-icons/fi';
 import ImageCarousel3D from '../components/ImageCarousel3D';
 
 /**
@@ -68,11 +68,11 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 max-w-xs sm:max-w-none mx-auto">
 
             <Link
-              to="/projects"
+              to="/news"
               className="w-fit sm:w-auto px-4 sm:px-8 py-2 bg-white/10 border border-white/25 rounded-xl text-sm sm:text-base font-bold hover:bg-white/25 hover:border-white/40 transition-all duration-300 flex items-center justify-center space-x-2 text-white"
             >
-              <FiBookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-blue-300" />
-              <span>Xem dự án số</span>
+              <FiFileText className="w-4 h-4 sm:w-5 sm:h-5 text-blue-300" />
+              <span>Xem tin tức</span>
             </Link>
           </div>
         </div>

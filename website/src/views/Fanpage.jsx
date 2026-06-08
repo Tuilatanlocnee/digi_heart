@@ -31,6 +31,7 @@ export default function Fanpage() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState({ type: 'all', value: null });
   const [expandedYears, setExpandedYears] = useState({});
+  const [showMobileFilter, setShowMobileFilter] = useState(false);
   
   // Quản lý bài viết chi tiết bằng URL search params (?id=xxx) để hỗ trợ nút Back của trình duyệt và menu Navbar
   const [searchParams, setSearchParams] = useSearchParams();
@@ -566,15 +567,43 @@ export default function Fanpage() {
 
           {/* Cột phải (8 phần): Danh sách các bài đăng */}
           <div className="lg:col-span-8 space-y-6">
-            {/* Mobile Filter (lg:hidden) */}
-            <div className="lg:hidden bg-white border border-gray-200/80 p-4 rounded-2xl mb-6 shadow-sm space-y-3 animate-fadeIn">
-              <div className="text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center space-x-1.5 mb-1">
-                <FiFilter className="text-[#0054A6]" />
-                <span>Lọc theo thời gian</span>
-              </div>
-              
-              {/* Horizontal scroll for Years */}
-              <div className="flex overflow-x-auto gap-2 pb-1 scrollbar-none">
+            {/* Mobile Filter Toggle Button (lg:hidden) */}
+            <div className="lg:hidden flex justify-end mb-4 animate-fadeIn">
+              <button
+                type="button"
+                onClick={() => setShowMobileFilter(!showMobileFilter)}
+                className={`px-3.5 py-2 rounded-xl text-xs font-extrabold border transition-all flex items-center space-x-1.5 shadow-sm hover:scale-105 active:scale-95 ${
+                  showMobileFilter || filter.type !== 'all'
+                    ? 'bg-[#0054A6] text-white border-[#0054A6]'
+                    : 'bg-white text-gray-655 border-gray-200 hover:bg-gray-50'
+                }`}
+              >
+                <FiFilter className="w-3.5 h-3.5" />
+                <span>Lọc</span>
+                {filter.type !== 'all' && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 block shrink-0 animate-pulse"></span>
+                )}
+              </button>
+            </div>
+
+            {/* Mobile Filter Dropdown (lg:hidden) */}
+            {showMobileFilter && (
+              <div className="lg:hidden bg-white border border-gray-200/80 p-3.5 rounded-2xl mb-5 shadow-md space-y-3 animate-fadeIn">
+                <div className="flex items-center justify-between border-b border-gray-100 pb-2">
+                  <span className="text-[10px] font-bold text-gray-405 uppercase tracking-wider">Chọn thời gian lọc</span>
+                  {filter.type !== 'all' && (
+                    <button
+                      type="button"
+                      onClick={() => setFilter({ type: 'all', value: null })}
+                      className="text-[10px] font-bold text-[#E30613] hover:underline"
+                    >
+                      Xóa lọc
+                    </button>
+                  )}
+                </div>
+                
+                {/* Horizontal scroll for Years */}
+                <div className="flex overflow-x-auto gap-2 pb-0.5 scrollbar-none">
                 <button
                   onClick={() => setFilter({ type: 'all', value: null })}
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold shrink-0 transition-all border text-left flex justify-between items-center ${
@@ -636,6 +665,7 @@ export default function Fanpage() {
                 );
               })}
             </div>
+          )}
 
             {loading ? (
               <div className="bg-white border border-gray-200 rounded-3xl p-16 text-center shadow-sm max-w-md mx-auto">

@@ -27,8 +27,8 @@ const CAROUSEL_IMAGES = [
   {
     id: 4,
     url: '/photos/photo4.jpg',
-    title: 'Hỗ Trợ Người Dân Cài Đặt App',
-    description: 'Đồng hành cùng người dân trải nghiệm các tiện ích số hiện đại.',
+    title: 'Hỗ Trợ Người Dân Xác Thực Sim',
+    description: 'Đồng hành cùng người dân xác thực sim chính chủ theo quy định mới.',
   },
   {
     id: 5,
@@ -55,10 +55,10 @@ export default function ImageCarousel3D() {
       setWindowWidth(window.innerWidth);
       setIsMobile(window.innerWidth < 768);
     };
-    
+
     // Gọi ngay lần đầu tiên để khởi tạo đúng
     handleResize();
-    
+
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -100,7 +100,7 @@ export default function ImageCarousel3D() {
     // Khoảng cách dịch chuyển ngang (translateX) được tính toán tối ưu dựa trên kích thước card mới
     const stepX = isMobile ? Math.min(105, windowWidth * 0.25) : 280; // Dịch chuyển card phụ sang 2 bên xa hơn
     const farStepX = isMobile ? 180 : 450; // Dịch chuyển các card ẩn đi xa hơn hẳn
-    
+
     let translateX = 0;
     let scale = 1;
     let rotateY = 0;
@@ -163,13 +163,13 @@ export default function ImageCarousel3D() {
   };
 
   return (
-    <section 
+    <section
       className="py-12 md:py-16 bg-gradient-to-b from-[#f8fafc] to-[#f1f5f9] border-b border-gray-200 overflow-hidden"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="max-w-7xl mx-auto px-4 text-center">
-        
+
         {/* Tiêu đề mục banner */}
         <div className="mb-8 md:mb-12">
           <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-gray-800 tracking-tight">
@@ -179,7 +179,7 @@ export default function ImageCarousel3D() {
         </div>
 
         {/* Khung chứa các slide 3D xếp chồng */}
-        <div 
+        <div
           className="relative flex items-center justify-center min-h-[200px] sm:min-h-[280px] md:min-h-[380px] max-w-5xl mx-auto"
           style={{ perspective: '1200px', transformStyle: 'preserve-3d' }}
         >
@@ -206,12 +206,11 @@ export default function ImageCarousel3D() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-80 transition-opacity duration-300 group-hover:opacity-90"></div>
 
                 {/* Tiêu đề ngắn gọn hiển thị ngay trên card */}
-                <div 
-                  className={`absolute bottom-0 left-0 right-0 p-3 sm:p-5 md:p-6 text-left text-white transition-all duration-500 ease-in-out ${
-                    isActive 
-                      ? 'opacity-100 translate-y-0 pointer-events-auto scale-100' 
+                <div
+                  className={`absolute bottom-0 left-0 right-0 p-3 sm:p-5 md:p-6 text-left text-white transition-all duration-500 ease-in-out ${isActive
+                      ? 'opacity-100 translate-y-0 pointer-events-auto scale-100'
                       : 'opacity-0 translate-y-4 pointer-events-none scale-95'
-                  }`}
+                    }`}
                 >
                   <h3 className="text-xs sm:text-sm md:text-lg font-extrabold tracking-wide mb-0.5 sm:mb-1 drop-shadow-md">
                     {img.title}
@@ -256,11 +255,10 @@ export default function ImageCarousel3D() {
               <button
                 key={index}
                 onClick={() => setActiveIndex(index)}
-                className={`h-2 rounded-full transition-all duration-300 focus:outline-none ${
-                  isActive 
-                    ? 'w-6 sm:w-8 bg-[#0054A6]' 
+                className={`h-2 rounded-full transition-all duration-300 focus:outline-none ${isActive
+                    ? 'w-6 sm:w-8 bg-[#0054A6]'
                     : 'w-2 bg-gray-300 hover:bg-gray-400'
-                }`}
+                  }`}
                 aria-label={`Đi tới slide ${index + 1}`}
               />
             );
