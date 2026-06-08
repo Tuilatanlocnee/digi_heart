@@ -45,12 +45,14 @@ const CAROUSEL_IMAGES = [
 export default function ImageCarousel3D() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [isHovered, setIsHovered] = useState(false);
   const autoplayTimer = useRef(null);
 
   // Cập nhật trạng thái mobile/desktop khi thay đổi kích thước màn hình
   useEffect(() => {
     const handleResize = () => {
+      setWindowWidth(window.innerWidth);
       setIsMobile(window.innerWidth < 768);
     };
     
@@ -96,8 +98,8 @@ export default function ImageCarousel3D() {
     if (offset < -2) offset += total;
 
     // Khoảng cách dịch chuyển ngang (translateX) được tính toán tối ưu dựa trên kích thước card mới
-    const stepX = isMobile ? 75 : 280; // Dịch chuyển card phụ sang 2 bên xa hơn
-    const farStepX = isMobile ? 130 : 450; // Dịch chuyển các card ẩn đi xa hơn hẳn
+    const stepX = isMobile ? Math.min(105, windowWidth * 0.25) : 280; // Dịch chuyển card phụ sang 2 bên xa hơn
+    const farStepX = isMobile ? 180 : 450; // Dịch chuyển các card ẩn đi xa hơn hẳn
     
     let translateX = 0;
     let scale = 1;
