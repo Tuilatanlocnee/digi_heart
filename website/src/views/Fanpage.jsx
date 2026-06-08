@@ -12,10 +12,13 @@ import {
   FiX,
   FiArrowLeft,
   FiChevronDown,
-  FiChevronRight
+  FiChevronRight,
+  FiArrowUp,
+  FiArrowDown
 } from 'react-icons/fi';
 import { useSearchParams } from 'react-router-dom';
 import { postAPI } from '../utils/api';
+import { renderContent, getTextPreview } from '../utils/contentParser';
 
 /**
  * View Fanpage - Trang tin tức CLB Digi Heart.
@@ -46,6 +49,7 @@ export default function Fanpage() {
     content: '',
     image: ''
   });
+  const [postBlocks, setPostBlocks] = useState([{ type: 'text', value: '' }]);
 
   // Nạp danh sách bài viết từ Backend
   const fetchPosts = async () => {
@@ -206,18 +210,70 @@ export default function Fanpage() {
     reader.readAsDataURL(file);
   };
 
+  // Các hàm tiện ích cho Block Editor (nội dung xen kẽ chữ/ảnh)
+  const addBlock = (type) => {
+    setPostBlocks([...postBlocks, { type, value: '' }]);
+  };
+
+  const updateBlockValue = (index, val) => {
+    const updated = [...postBlocks];
+    updated[index].value = val;
+    setPostBlocks(updated);
+  };
+
+  const deleteBlock = (index) => {
+    if (postBlocks.length === 1) {
+      setPostBlocks([{ type: 'text', value: '' }]);
+      return;
+    }
+    setPostBlocks(postBlocks.filter((_, i) => i !== index));
+  };
+
+  const moveBlock = (index, direction) => {
+    if (direction === 'up' && index === 0) return;
+    if (direction === 'down' && index === postBlocks.length - 1) return;
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    const updated = [...postBlocks];
+    const temp = updated[index];
+    updated[index] = updated[targetIndex];
+    updated[targetIndex] = temp;
+    setPostBlocks(updated);
+  };
+
+  const handleBlockFileChange = (index, e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 4 * 1024 * 1024) {
+      alert('Kích thước ảnh quá lớn! Vui lòng chọn file ảnh dưới 4MB.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      updateBlockValue(index, reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
   // Xử lý tạo bài viết mới
   const handleCreatePost = async (e) => {
     e.preventDefault();
-    if (!postForm.title.trim() || !postForm.content.trim()) {
-      alert('Vui lòng điền đầy đủ tiêu đề và nội dung bài viết!');
+    if (!postForm.title.trim()) {
+      alert('Vui lòng điền đầy đủ tiêu đề bài viết!');
       return;
     }
+
+    // Lọc bỏ block trống
+    const validBlocks = postBlocks.filter(b => b.value.trim() !== '');
+    if (validBlocks.length === 0) {
+      alert('Vui lòng điền nội dung bài viết!');
+      return;
+    }
+    const serializedContent = JSON.stringify(validBlocks);
 
     try {
       await postAPI.create({
         title: postForm.title,
-        content: postForm.content,
+        content: serializedContent,
         image: postForm.image.trim() || null,
         author: user?.fullName || 'Thành viên CLB',
         avatar: user?.avatar || ''
@@ -225,6 +281,7 @@ export default function Fanpage() {
 
       setShowAddModal(false);
       setPostForm({ title: '', content: '', image: '' });
+      setPostBlocks([{ type: 'text', value: '' }]);
       await fetchPosts(); // Load lại danh sách bài viết
     } catch (error) {
       alert(error.message || 'Lỗi khi đăng bài viết!');
@@ -284,8 +341,8 @@ export default function Fanpage() {
               {activePost.title}
             </h1>
 
-            <div className="text-gray-655 leading-relaxed text-xs sm:text-sm md:text-base space-y-6 whitespace-pre-line border-t border-gray-100 pt-6">
-              {activePost.content}
+            <div className="text-gray-655 leading-relaxed text-xs sm:text-sm md:text-base border-t border-gray-100 pt-6">
+              {renderContent(activePost.content)}
             </div>
           </article>
 
@@ -562,7 +619,7 @@ export default function Fanpage() {
                             {post.title}
                           </h3>
                           <p className="text-gray-500 text-[11px] sm:text-xs md:text-sm font-light leading-relaxed line-clamp-2">
-                            {post.content}
+                            {getTextPreview(post.content, 120)}
                           </p>
                         </div>
                         
@@ -625,16 +682,118 @@ export default function Fanpage() {
                 />
               </div>
 
-              <div>
-                <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Nội dung bài đăng *</label>
-                <textarea
-                  rows="5"
-                  value={postForm.content}
-                  onChange={(e) => setPostForm({ ...postForm, content: e.target.value })}
-                  className="w-full bg-white border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:border-[#0054A6] text-gray-800 resize-none shadow-inner"
-                  placeholder="Hãy viết nội dung chia sẻ chi tiết tại đây..."
-                  required
-                />
+              <div className="space-y-4">
+                <label className="block text-[11px] font-bold text-gray-500 uppercase">Nội dung bài đăng (Xen kẽ chữ và hình ảnh) *</label>
+                
+                <div className="space-y-3 max-h-[320px] overflow-y-auto pr-1 pb-1">
+                  {postBlocks.map((block, idx) => (
+                    <div key={idx} className="border border-gray-200 rounded-xl p-3 bg-gray-50/50 space-y-2 relative group/block">
+                      <div className="flex items-center justify-between border-b border-gray-100 pb-1.5">
+                        <span className="text-[10px] font-bold text-[#0054A6] uppercase tracking-wider">
+                          Khu vực {block.type === 'text' ? 'Văn Bản' : 'Hình Ảnh'} #{idx + 1}
+                        </span>
+                        
+                        <div className="flex items-center space-x-1">
+                          <button
+                            type="button"
+                            onClick={() => moveBlock(idx, 'up')}
+                            disabled={idx === 0}
+                            className="p-1 hover:bg-gray-200 disabled:opacity-30 rounded text-gray-555"
+                            title="Di chuyển lên"
+                          >
+                            <FiArrowUp className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => moveBlock(idx, 'down')}
+                            disabled={idx === postBlocks.length - 1}
+                            className="p-1 hover:bg-gray-200 disabled:opacity-30 rounded text-gray-555"
+                            title="Di chuyển xuống"
+                          >
+                            <FiArrowDown className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => deleteBlock(idx)}
+                            className="p-1 hover:bg-red-50 hover:text-red-500 rounded text-gray-400 transition-colors"
+                            title="Xóa block"
+                          >
+                            <FiTrash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {block.type === 'text' ? (
+                        <textarea
+                          rows="3"
+                          value={block.value}
+                          onChange={(e) => updateBlockValue(idx, e.target.value)}
+                          className="w-full bg-white border border-gray-200 rounded-lg p-2 text-xs focus:outline-none focus:border-[#0054A6] text-gray-800 resize-y"
+                          placeholder="Nhập nội dung đoạn văn bản tại đây..."
+                        />
+                      ) : (
+                        <div className="space-y-2">
+                          {block.value ? (
+                            <div className="relative rounded-lg overflow-hidden border border-gray-200 bg-white max-h-[140px] flex items-center justify-center">
+                              <img src={block.value} alt="Preview block" className="w-full h-full object-cover max-h-[140px]" />
+                              <button
+                                type="button"
+                                onClick={() => updateBlockValue(idx, '')}
+                                className="absolute top-1 right-1 p-1 bg-black/60 hover:bg-red-600 text-white rounded-full transition-colors"
+                                title="Xóa ảnh"
+                              >
+                                <FiX className="w-3 h-3" />
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="grid grid-cols-1 gap-2">
+                              <label className="border border-dashed border-gray-300 rounded-lg p-3 flex flex-col items-center justify-center cursor-pointer hover:bg-blue-50/10 hover:border-[#0054A6]/50 transition-all">
+                                <FiUpload className="w-4 h-4 text-gray-400 mb-1" />
+                                <span className="text-[10px] font-bold text-[#0054A6]">Tải ảnh lên từ thiết bị</span>
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={(e) => handleBlockFileChange(idx, e)}
+                                  className="hidden"
+                                />
+                              </label>
+                              
+                              <div className="relative">
+                                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-[10px]">
+                                  <FiImage />
+                                </span>
+                                <input
+                                  type="url"
+                                  placeholder="Hoặc dán URL ảnh vào đây..."
+                                  value={block.value}
+                                  onChange={(e) => updateBlockValue(idx, e.target.value)}
+                                  className="w-full bg-white border border-gray-200 rounded-lg pl-7 pr-2 py-1.5 text-[10px] focus:outline-none focus:border-[#0054A6] text-gray-800"
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex items-center space-x-2 pt-1 border-t border-gray-100">
+                  <button
+                    type="button"
+                    onClick={() => addBlock('text')}
+                    className="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all flex items-center justify-center space-x-1"
+                  >
+                    <span>+ Thêm đoạn chữ</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => addBlock('image')}
+                    className="flex-1 py-2 bg-blue-50 hover:bg-blue-100 text-[#0054A6] text-xs font-bold rounded-xl transition-all flex items-center justify-center space-x-1"
+                  >
+                    <span>+ Thêm hình ảnh</span>
+                  </button>
+                </div>
               </div>
 
               <div>
@@ -696,6 +855,7 @@ export default function Fanpage() {
                   onClick={() => {
                     setShowAddModal(false);
                     setPostForm({ title: '', content: '', image: '' });
+                    setPostBlocks([{ type: 'text', value: '' }]);
                   }}
                   className="px-4 py-2 text-xs font-bold text-gray-500 hover:bg-gray-100 rounded-xl transition-colors"
                 >

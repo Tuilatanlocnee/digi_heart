@@ -1,7 +1,23 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { FiCalendar, FiUser, FiSearch, FiArrowLeft, FiTag, FiInbox, FiPlusCircle, FiEdit, FiTrash2 } from 'react-icons/fi';
+import { 
+  FiCalendar, 
+  FiUser, 
+  FiSearch, 
+  FiArrowLeft, 
+  FiTag, 
+  FiInbox, 
+  FiPlusCircle, 
+  FiEdit, 
+  FiTrash2,
+  FiArrowUp,
+  FiArrowDown,
+  FiX,
+  FiUpload,
+  FiImage
+} from 'react-icons/fi';
 import { newsAPI } from '../utils/api';
+import { parseContent, renderContent, getTextPreview } from '../utils/contentParser';
 
 /**
  * View News - Trang hiển thị Tin tức & Sự kiện của CLB Digi Heart.
@@ -33,6 +49,7 @@ export default function News() {
     author: 'Ban Truyền Thông',
     image: ''
   });
+  const [newsBlocks, setNewsBlocks] = useState([{ type: 'text', value: '' }]);
   const [notify, setNotify] = useState({ text: '', type: '' });
 
   // Tải danh sách tin tức từ backend khi trang khởi chạy
@@ -64,15 +81,70 @@ export default function News() {
     }
   }, []);
 
+  // Các hàm tiện ích cho Block Editor (nội dung xen kẽ chữ/ảnh)
+  const addBlock = (type) => {
+    setNewsBlocks([...newsBlocks, { type, value: '' }]);
+  };
+
+  const updateBlockValue = (index, val) => {
+    const updated = [...newsBlocks];
+    updated[index].value = val;
+    setNewsBlocks(updated);
+  };
+
+  const deleteBlock = (index) => {
+    if (newsBlocks.length === 1) {
+      setNewsBlocks([{ type: 'text', value: '' }]);
+      return;
+    }
+    setNewsBlocks(newsBlocks.filter((_, i) => i !== index));
+  };
+
+  const moveBlock = (index, direction) => {
+    if (direction === 'up' && index === 0) return;
+    if (direction === 'down' && index === newsBlocks.length - 1) return;
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    const updated = [...newsBlocks];
+    const temp = updated[index];
+    updated[index] = updated[targetIndex];
+    updated[targetIndex] = temp;
+    setNewsBlocks(updated);
+  };
+
+  const handleBlockFileChange = (index, e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 4 * 1024 * 1024) {
+      alert('Kích thước ảnh quá lớn! Vui lòng chọn file ảnh dưới 4MB.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      updateBlockValue(index, reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
   // Xử lý đăng tin tức mới
   const handleCreateNews = async (e) => {
     e.preventDefault();
-    if (!newsForm.title || !newsForm.summary || !newsForm.content || !newsForm.author) {
+    if (!newsForm.title || !newsForm.summary || !newsForm.author) {
       alert('Vui lòng điền đầy đủ các thông tin bắt buộc (*)');
       return;
     }
+
+    const validBlocks = newsBlocks.filter(b => b.value.trim() !== '');
+    if (validBlocks.length === 0) {
+      alert('Vui lòng điền nội dung bài viết!');
+      return;
+    }
+    const serializedContent = JSON.stringify(validBlocks);
+
     try {
-      const response = await newsAPI.create(newsForm);
+      const response = await newsAPI.create({
+        ...newsForm,
+        content: serializedContent
+      });
       setNewsList([response.news, ...newsList]);
       setShowAddModal(false);
       setNewsForm({
@@ -83,6 +155,7 @@ export default function News() {
         author: 'Ban Truyền Thông',
         image: ''
       });
+      setNewsBlocks([{ type: 'text', value: '' }]);
       setNotify({ text: 'Đăng bài viết tin tức thành công!', type: 'success' });
       setTimeout(() => setNotify({ text: '', type: '' }), 4500);
     } catch (error) {
@@ -115,19 +188,33 @@ export default function News() {
       author: post.author,
       image: post.image || ''
     });
+    // Parse content blocks
+    const blocks = parseContent(post.content);
+    setNewsBlocks(blocks);
     setShowEditModal(true);
   };
 
   // Gửi cập nhật tin tức lên API
   const handleUpdateNews = async (e) => {
     e.preventDefault();
-    if (!newsForm.title || !newsForm.summary || !newsForm.content || !newsForm.author) {
+    if (!newsForm.title || !newsForm.summary || !newsForm.author) {
       alert('Vui lòng điền đầy đủ các thông tin bắt buộc (*)');
       return;
     }
+
+    const validBlocks = newsBlocks.filter(b => b.value.trim() !== '');
+    if (validBlocks.length === 0) {
+      alert('Vui lòng điền nội dung bài viết!');
+      return;
+    }
+    const serializedContent = JSON.stringify(validBlocks);
+
     try {
-      const response = await newsAPI.update(editingNewsId, newsForm);
-      const updatedNews = response.news || { ...newsForm, _id: editingNewsId };
+      const response = await newsAPI.update(editingNewsId, {
+        ...newsForm,
+        content: serializedContent
+      });
+      const updatedNews = response.news || { ...newsForm, content: serializedContent, _id: editingNewsId };
 
       setNewsList(newsList.map(item =>
         (item._id === editingNewsId || item.id === editingNewsId) ? { ...item, ...updatedNews } : item
@@ -143,6 +230,7 @@ export default function News() {
         author: 'Ban Truyền Thông',
         image: ''
       });
+      setNewsBlocks([{ type: 'text', value: '' }]);
       setNotify({ text: 'Chỉnh sửa bài viết tin tức thành công!', type: 'success' });
       setTimeout(() => setNotify({ text: '', type: '' }), 4500);
     } catch (error) {
@@ -201,8 +289,8 @@ export default function News() {
               {activePost.title}
             </h1>
 
-            <div className="text-gray-655 leading-relaxed text-sm md:text-base space-y-6 whitespace-pre-line border-t border-gray-100 pt-6">
-              {activePost.content}
+            <div className="text-gray-655 leading-relaxed text-sm md:text-base border-t border-gray-100 pt-6">
+              {renderContent(activePost.content)}
             </div>
           </article>
 
@@ -433,16 +521,118 @@ export default function News() {
                 />
               </div>
 
-              <div>
-                <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Nội dung chi tiết tin tức *</label>
-                <textarea
-                  rows="6"
-                  value={newsForm.content}
-                  onChange={(e) => setNewsForm({ ...newsForm, content: e.target.value })}
-                  className="w-full bg-white border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:border-[#0054A6] text-gray-800 resize-none shadow-inner"
-                  placeholder="Viết nội dung bài viết tin tức tại đây..."
-                  required
-                />
+              <div className="space-y-4">
+                <label className="block text-[11px] font-bold text-gray-500 uppercase">Nội dung chi tiết tin tức (Xen kẽ chữ và hình ảnh) *</label>
+                
+                <div className="space-y-3 max-h-[300px] overflow-y-auto pr-1 pb-1">
+                  {newsBlocks.map((block, idx) => (
+                    <div key={idx} className="border border-gray-200 rounded-xl p-3 bg-gray-50/50 space-y-2 relative group/block">
+                      <div className="flex items-center justify-between border-b border-gray-100 pb-1.5">
+                        <span className="text-[10px] font-bold text-[#0054A6] uppercase tracking-wider">
+                          Khu vực {block.type === 'text' ? 'Văn Bản' : 'Hình Ảnh'} #{idx + 1}
+                        </span>
+                        
+                        <div className="flex items-center space-x-1">
+                          <button
+                            type="button"
+                            onClick={() => moveBlock(idx, 'up')}
+                            disabled={idx === 0}
+                            className="p-1 hover:bg-gray-200 disabled:opacity-30 rounded text-gray-555"
+                            title="Di chuyển lên"
+                          >
+                            <FiArrowUp className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => moveBlock(idx, 'down')}
+                            disabled={idx === newsBlocks.length - 1}
+                            className="p-1 hover:bg-gray-200 disabled:opacity-30 rounded text-gray-555"
+                            title="Di chuyển xuống"
+                          >
+                            <FiArrowDown className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => deleteBlock(idx)}
+                            className="p-1 hover:bg-red-50 hover:text-red-500 rounded text-gray-400 transition-colors"
+                            title="Xóa block"
+                          >
+                            <FiTrash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {block.type === 'text' ? (
+                        <textarea
+                          rows="3"
+                          value={block.value}
+                          onChange={(e) => updateBlockValue(idx, e.target.value)}
+                          className="w-full bg-white border border-gray-200 rounded-lg p-2 text-xs focus:outline-none focus:border-[#0054A6] text-gray-800 resize-y"
+                          placeholder="Nhập nội dung đoạn văn bản tại đây..."
+                        />
+                      ) : (
+                        <div className="space-y-2">
+                          {block.value ? (
+                            <div className="relative rounded-lg overflow-hidden border border-gray-200 bg-white max-h-[140px] flex items-center justify-center">
+                              <img src={block.value} alt="Preview block" className="w-full h-full object-cover max-h-[140px]" />
+                              <button
+                                type="button"
+                                onClick={() => updateBlockValue(idx, '')}
+                                className="absolute top-1 right-1 p-1 bg-black/60 hover:bg-red-600 text-white rounded-full transition-colors"
+                                title="Xóa ảnh"
+                              >
+                                <FiX className="w-3 h-3" />
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="grid grid-cols-1 gap-2">
+                              <label className="border border-dashed border-gray-300 rounded-lg p-3 flex flex-col items-center justify-center cursor-pointer hover:bg-blue-50/10 hover:border-[#0054A6]/50 transition-all">
+                                <FiUpload className="w-4 h-4 text-gray-400 mb-1" />
+                                <span className="text-[10px] font-bold text-[#0054A6]">Tải ảnh lên từ thiết bị</span>
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={(e) => handleBlockFileChange(idx, e)}
+                                  className="hidden"
+                                />
+                              </label>
+                              
+                              <div className="relative">
+                                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-[10px]">
+                                  <FiImage />
+                                </span>
+                                <input
+                                  type="url"
+                                  placeholder="Hoặc dán URL ảnh vào đây..."
+                                  value={block.value}
+                                  onChange={(e) => updateBlockValue(idx, e.target.value)}
+                                  className="w-full bg-white border border-gray-200 rounded-lg pl-7 pr-2 py-1.5 text-[10px] focus:outline-none focus:border-[#0054A6] text-gray-800"
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex items-center space-x-2 pt-1 border-t border-gray-100">
+                  <button
+                    type="button"
+                    onClick={() => addBlock('text')}
+                    className="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all flex items-center justify-center space-x-1"
+                  >
+                    <span>+ Thêm đoạn chữ</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => addBlock('image')}
+                    className="flex-1 py-2 bg-blue-50 hover:bg-blue-100 text-[#0054A6] text-xs font-bold rounded-xl transition-all flex items-center justify-center space-x-1"
+                  >
+                    <span>+ Thêm hình ảnh</span>
+                  </button>
+                </div>
               </div>
 
               <div className="flex items-center justify-end space-x-3 pt-3 border-t border-gray-100">
@@ -458,6 +648,7 @@ export default function News() {
                       author: 'Ban Truyền Thông',
                       image: ''
                     });
+                    setNewsBlocks([{ type: 'text', value: '' }]);
                   }}
                   className="px-4 py-2 text-xs font-bold text-gray-500 hover:bg-gray-100 rounded-xl transition-colors"
                 >
@@ -549,16 +740,118 @@ export default function News() {
                 />
               </div>
 
-              <div>
-                <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Nội dung chi tiết tin tức *</label>
-                <textarea
-                  rows="6"
-                  value={newsForm.content}
-                  onChange={(e) => setNewsForm({ ...newsForm, content: e.target.value })}
-                  className="w-full bg-white border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:border-[#0054A6] text-gray-800 resize-none shadow-inner"
-                  placeholder="Viết nội dung bài viết tin tức tại đây..."
-                  required
-                />
+              <div className="space-y-4">
+                <label className="block text-[11px] font-bold text-gray-500 uppercase">Nội dung chi tiết tin tức (Xen kẽ chữ và hình ảnh) *</label>
+                
+                <div className="space-y-3 max-h-[300px] overflow-y-auto pr-1 pb-1">
+                  {newsBlocks.map((block, idx) => (
+                    <div key={idx} className="border border-gray-200 rounded-xl p-3 bg-gray-50/50 space-y-2 relative group/block">
+                      <div className="flex items-center justify-between border-b border-gray-100 pb-1.5">
+                        <span className="text-[10px] font-bold text-[#0054A6] uppercase tracking-wider">
+                          Khu vực {block.type === 'text' ? 'Văn Bản' : 'Hình Ảnh'} #{idx + 1}
+                        </span>
+                        
+                        <div className="flex items-center space-x-1">
+                          <button
+                            type="button"
+                            onClick={() => moveBlock(idx, 'up')}
+                            disabled={idx === 0}
+                            className="p-1 hover:bg-gray-200 disabled:opacity-30 rounded text-gray-555"
+                            title="Di chuyển lên"
+                          >
+                            <FiArrowUp className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => moveBlock(idx, 'down')}
+                            disabled={idx === newsBlocks.length - 1}
+                            className="p-1 hover:bg-gray-200 disabled:opacity-30 rounded text-gray-555"
+                            title="Di chuyển xuống"
+                          >
+                            <FiArrowDown className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => deleteBlock(idx)}
+                            className="p-1 hover:bg-red-50 hover:text-red-500 rounded text-gray-400 transition-colors"
+                            title="Xóa block"
+                          >
+                            <FiTrash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {block.type === 'text' ? (
+                        <textarea
+                          rows="3"
+                          value={block.value}
+                          onChange={(e) => updateBlockValue(idx, e.target.value)}
+                          className="w-full bg-white border border-gray-200 rounded-lg p-2 text-xs focus:outline-none focus:border-[#0054A6] text-gray-800 resize-y"
+                          placeholder="Nhập nội dung đoạn văn bản tại đây..."
+                        />
+                      ) : (
+                        <div className="space-y-2">
+                          {block.value ? (
+                            <div className="relative rounded-lg overflow-hidden border border-gray-200 bg-white max-h-[140px] flex items-center justify-center">
+                              <img src={block.value} alt="Preview block" className="w-full h-full object-cover max-h-[140px]" />
+                              <button
+                                type="button"
+                                onClick={() => updateBlockValue(idx, '')}
+                                className="absolute top-1 right-1 p-1 bg-black/60 hover:bg-red-600 text-white rounded-full transition-colors"
+                                title="Xóa ảnh"
+                              >
+                                <FiX className="w-3 h-3" />
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="grid grid-cols-1 gap-2">
+                              <label className="border border-dashed border-gray-300 rounded-lg p-3 flex flex-col items-center justify-center cursor-pointer hover:bg-blue-50/10 hover:border-[#0054A6]/50 transition-all">
+                                <FiUpload className="w-4 h-4 text-gray-400 mb-1" />
+                                <span className="text-[10px] font-bold text-[#0054A6]">Tải ảnh lên từ thiết bị</span>
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  onChange={(e) => handleBlockFileChange(idx, e)}
+                                  className="hidden"
+                                />
+                              </label>
+                              
+                              <div className="relative">
+                                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-[10px]">
+                                  <FiImage />
+                                </span>
+                                <input
+                                  type="url"
+                                  placeholder="Hoặc dán URL ảnh vào đây..."
+                                  value={block.value}
+                                  onChange={(e) => updateBlockValue(idx, e.target.value)}
+                                  className="w-full bg-white border border-gray-200 rounded-lg pl-7 pr-2 py-1.5 text-[10px] focus:outline-none focus:border-[#0054A6] text-gray-800"
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex items-center space-x-2 pt-1 border-t border-gray-100">
+                  <button
+                    type="button"
+                    onClick={() => addBlock('text')}
+                    className="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all flex items-center justify-center space-x-1"
+                  >
+                    <span>+ Thêm đoạn chữ</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => addBlock('image')}
+                    className="flex-1 py-2 bg-blue-50 hover:bg-blue-100 text-[#0054A6] text-xs font-bold rounded-xl transition-all flex items-center justify-center space-x-1"
+                  >
+                    <span>+ Thêm hình ảnh</span>
+                  </button>
+                </div>
               </div>
 
               <div className="flex items-center justify-end space-x-3 pt-3 border-t border-gray-100">
@@ -575,6 +868,7 @@ export default function News() {
                       author: 'Ban Truyền Thông',
                       image: ''
                     });
+                    setNewsBlocks([{ type: 'text', value: '' }]);
                   }}
                   className="px-4 py-2 text-xs font-bold text-gray-500 hover:bg-gray-100 rounded-xl transition-colors"
                 >
