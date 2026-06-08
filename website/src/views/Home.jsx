@@ -69,9 +69,9 @@ export default function Home() {
 
             <Link
               to="/projects"
-              className="w-full sm:w-auto px-6 sm:px-8 py-2.5 bg-white/10 border border-white/25 rounded-xl font-bold hover:bg-white/25 hover:border-white/40 transition-all duration-300 flex items-center justify-center space-x-2 text-white"
+              className="w-fit sm:w-auto px-4 sm:px-8 py-2 bg-white/10 border border-white/25 rounded-xl text-sm sm:text-base font-bold hover:bg-white/25 hover:border-white/40 transition-all duration-300 flex items-center justify-center space-x-2 text-white"
             >
-              <FiBookOpen className="w-5 h-5 text-blue-300" />
+              <FiBookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-blue-300" />
               <span>Xem dự án số</span>
             </Link>
           </div>
