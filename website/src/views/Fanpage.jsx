@@ -683,6 +683,58 @@ export default function Fanpage() {
                 />
               </div>
 
+              <div>
+                <label className="block text-[11px] font-bold text-gray-500 mb-1.5 uppercase">Ảnh banner chính bài viết (Ảnh đại diện đại diện)</label>
+                
+                {postForm.image ? (
+                  /* Khung hiển thị ảnh xem trước (Preview) */
+                  <div className="relative rounded-xl overflow-hidden border border-gray-200 bg-gray-50 max-h-[160px] flex items-center justify-center group">
+                    <img 
+                      src={postForm.image} 
+                      alt="Xem trước ảnh banner" 
+                      className="w-full h-full object-cover max-h-[160px]"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setPostForm({ ...postForm, image: '' })}
+                      className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-black/80 text-white rounded-full transition-colors shadow"
+                      title="Xóa ảnh banner"
+                    >
+                      <FiX className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  /* Khung chọn ảnh banner */
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {/* Vùng tải file từ máy tính */}
+                    <label className="border border-dashed border-gray-300 rounded-xl p-3 flex flex-col items-center justify-center cursor-pointer hover:border-[#0054A6]/50 hover:bg-blue-50/10 transition-all space-y-1">
+                      <FiUpload className="w-5 h-5 text-gray-400" />
+                      <span className="text-[10px] font-bold text-[#0054A6]">Tải ảnh banner lên từ thiết bị</span>
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={handleFileChange} 
+                        className="hidden" 
+                      />
+                    </label>
+                    
+                    {/* Nhập link URL banner */}
+                    <div className="relative flex items-center">
+                      <span className="absolute left-3 text-gray-450 text-xs">
+                        <FiImage />
+                      </span>
+                      <input
+                        type="url"
+                        placeholder="Hoặc dán URL ảnh banner vào đây..."
+                        value={postForm.image}
+                        onChange={(e) => setPostForm({ ...postForm, image: e.target.value })}
+                        className="w-full bg-white border border-gray-200 rounded-xl pl-9 pr-3 py-2.5 text-xs focus:outline-none focus:border-[#0054A6] text-gray-800 shadow-inner"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <div className="space-y-4">
                 <label className="block text-[11px] font-bold text-gray-500 uppercase">Nội dung bài đăng (Xen kẽ chữ và hình ảnh) *</label>
                 
