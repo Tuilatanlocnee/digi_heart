@@ -7,7 +7,6 @@ import User from './models/User.js';
 import Candidate from './models/Candidate.js';
 import Idea from './models/Idea.js';
 import Post from './models/Post.js';
-import News from './models/News.js';
 
 dotenv.config();
 
@@ -31,7 +30,6 @@ const seedDatabase = async () => {
     await Candidate.deleteMany({});
     await Idea.deleteMany({});
     await Post.deleteMany({});
-    await News.deleteMany({});
 
     // 2. Tạo tài khoản Admin mặc định
     console.log('Đang tạo tài khoản Admin mặc định...');
@@ -61,12 +59,6 @@ const seedDatabase = async () => {
     const mockPosts = [];
     await Post.insertMany(mockPosts);
     console.log(`✅ Đã nạp thành công ${mockPosts.length} bài đăng Fanpage mẫu.`);
-
-    // 6. Nạp danh sách tin tức mẫu (News) - Rỗng để đăng thực tế
-    console.log('Đang nạp dữ liệu tin tức mẫu...');
-    const mockNews = [];
-    await News.insertMany(mockNews);
-    console.log(`✅ Đã nạp thành công ${mockNews.length} bài viết tin tức mẫu.`);
 
     console.log('🎉 TẤT CẢ DỮ LIỆU CŨ ĐÃ ĐƯỢC DỌN SẠCH. CHỈ CÒN LẠI TÀI KHOẢN ADMIN ĐỂ ĐĂNG THỰC TẾ!');
     process.exit(0);

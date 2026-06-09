@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   FiZap, FiCheck, FiTrash2,
   FiRefreshCw, FiShield, FiFileText, FiEdit, FiMail,
-  FiArrowUp, FiArrowDown, FiX, FiUpload, FiImage, FiPlusCircle
+  FiArrowUp, FiArrowDown, FiX, FiUpload, FiImage
 } from 'react-icons/fi';
 import { ideaAPI, postAPI } from '../utils/api';
 import { parseContent, getTextPreview } from '../utils/contentParser';
@@ -1390,8 +1390,18 @@ export default function AdminDashboard() {
           </div>
         )}
 
+        {/* Thông báo Toast phản hồi nhanh */}
+        {message.text && (
+          <div className={`fixed bottom-4 right-4 z-[999] px-4 py-3 rounded-xl shadow-xl text-white font-bold text-xs transition-all duration-300 animate-fadeIn ${
+            message.type === 'danger' ? 'bg-red-500' :
+            message.type === 'warning' ? 'bg-amber-500' :
+            'bg-emerald-500'
+          }`}>
+            {message.text}
+          </div>
+        )}
+
       </div>
     </div>
-
   );
 }

@@ -10,7 +10,6 @@ import {
   FiZap,
   FiUpload,
   FiX,
-  FiArrowLeft,
   FiChevronDown,
   FiChevronRight,
   FiArrowUp,

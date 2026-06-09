@@ -20,7 +20,7 @@ export function parseContent(contentString) {
       if (Array.isArray(parsed)) {
         return parsed;
       }
-    } catch (e) {
+    } catch {
       // Bỏ qua lỗi và coi như text thường
     }
   }

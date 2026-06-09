@@ -101,14 +101,14 @@ export default function ImageCarousel3D() {
     const stepX = isMobile ? Math.min(105, windowWidth * 0.25) : 280; // Dịch chuyển card phụ sang 2 bên xa hơn
     const farStepX = isMobile ? 180 : 450; // Dịch chuyển các card ẩn đi xa hơn hẳn
 
-    let translateX = 0;
-    let scale = 1;
-    let rotateY = 0;
-    let zIndex = 10;
-    let opacity = 1;
-    let filter = 'none';
-    let visibility = 'visible';
-    let pointerEvents = 'auto';
+    let translateX;
+    let scale;
+    let rotateY;
+    let zIndex;
+    let opacity;
+    let filter;
+    let visibility;
+    let pointerEvents;
 
     if (offset === 0) {
       // Card đang hiển thị chính giữa (Active)

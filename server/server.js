@@ -8,7 +8,6 @@ import authRoutes from './routes/auth.js';
 import candidateRoutes from './routes/candidates.js';
 import ideaRoutes from './routes/ideas.js';
 import postRoutes from './routes/posts.js';
-import newsRoutes from './routes/news.js';
 
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
@@ -77,7 +76,6 @@ app.use('/api/auth', authRoutes);
 app.use('/api/candidates', candidateRoutes);
 app.use('/api/ideas', ideaRoutes);
 app.use('/api/posts', postRoutes);
-app.use('/api/news', newsRoutes);
 
 // Định nghĩa API Root chào mừng
 app.get('/', (req, res) => {
